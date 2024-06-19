@@ -1,0 +1,21 @@
+package layout
+
+templ Base(title string){
+    <!DOCTYPE html>
+    <html lang="en" data-theme="dark">
+        <head>
+            <meta charset="UTF-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
+            <meta name="google" content="notranslate"/>
+            <script src="https://cdn.tailwindcss.com"></script>
+            <title> RD-Vigor | {title} </title>
+            <script src="https://unpkg.com/htmx.org@2.0.0" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
+            <link rel="preconnect" href="https://fonts.googleapis.com"></link>
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin></link>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"></link>
+        </head>
+        <body hx-boost="true" class="flex flex-col min-h-screen font-[Inter] font-medium">
+            { children... }
+        </body>
+    </html>
+}
