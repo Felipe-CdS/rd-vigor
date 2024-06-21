@@ -21,7 +21,17 @@ templ LandingIndex(title string){
             </div>
         </div>
         <div class="flex flex-col items-center justify-center grow">
-        <div class="rounded-3xl h-96 w-3/5 overflow-hidden border border-solid border-gray-200 flex flex-col">
+        <div class="card-shadow relative rounded-3xl h-96 w-3/5 border border-solid border-gray-200 flex flex-col"
+            style="background-image: linear-gradient(to right top, #ffdfa9, #fed18c, #fec371, #feb455, #fea439);">
+
+            <div class="flex card-shadow py-1 px-2 w-4/5 bg-white absolute -bottom-7 rounded-3xl left-1/2 -translate-x-1/2 border border-solid border-gray-200">
+                <div class=" relative h-10 w-10">
+                    <img class="w-full" src="static/img/search.svg"/>
+                </div>
+                <input class="w-full flex-grow" type="text" placeholder="Procure por uma ocupação ou empresa especifica"/>
+                <button class="ml-3" type="button" >aaaaa</button>
+            </div>
+
         </div>
         </div>
         <div class="py-4 px-8 flex justify-center border-t border-solid border-gray-200">
