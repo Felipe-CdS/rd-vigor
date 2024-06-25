@@ -43,7 +43,7 @@ func (dbStore *Store) getConnection() error {
 		dbname   = "rdvigor"
 	)
 
-	if os.Getenv("FOO") == "PRODUCTION" {
+	if os.Getenv("DEPLOY_TYPE") == "PRODUCTION" {
 		host = os.Getenv("PGHOST")
 		user = os.Getenv("PGUSER")
 		password = os.Getenv("PGPASSWORD")
