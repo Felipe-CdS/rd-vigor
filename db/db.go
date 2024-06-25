@@ -4,36 +4,56 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 type Store struct {
 	Db *sql.DB
 }
 
-func NewStore(dbName string) Store {
+func NewStore() Store {
 
 	dbStore := Store{}
 
-	if err := dbStore.getConnection(dbName); err != nil {
+	if err := dbStore.getConnection(); err != nil {
 		log.Fatalf("failed to connect to the database... Error: %s", err)
 	}
 
-	if err := createMigrations(dbName, dbStore.Db); err != nil {
+	if err := createMigrations(dbStore.Db); err != nil {
 		log.Fatalln(err)
 	}
 
 	return dbStore
 }
 
-func (dbStore *Store) getConnection(dbName string) error {
+func (dbStore *Store) getConnection() error {
 
 	if dbStore.Db != nil {
 		return nil
 	}
 
-	db, err := sql.Open("sqlite3", dbName)
+	var (
+		host     = "localhost"
+		port     = 5432
+		user     = "postgres"
+		password = "postgres"
+		dbname   = "rdvigor"
+	)
+
+	if os.Getenv("FOO") == "PRODUCTION" {
+		host = os.Getenv("PGHOST")
+		user = os.Getenv("PGUSER")
+		password = os.Getenv("PGPASSWORD")
+		port, _ = strconv.Atoi(os.Getenv("PGPORT"))
+	}
+
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+
+	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		return fmt.Errorf("%s", err)
 	}
@@ -44,10 +64,10 @@ func (dbStore *Store) getConnection(dbName string) error {
 	return nil
 }
 
-func createMigrations(dbName string, db *sql.DB) error {
+func createMigrations(db *sql.DB) error {
 
 	statement := `CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         first_name TEXT NOT NULL,
         last_name TEXT NOT NULL,
         email TEXT NOT NULL,

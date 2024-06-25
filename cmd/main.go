@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"nugu.dev/rd-vigor/db"
@@ -9,16 +11,22 @@ import (
 )
 
 func main() {
+	port, ok := os.LookupEnv("PORT")
+
+	if !ok {
+		port = ":42069"
+	}
+
 	e := echo.New()
 
 	e.Static("/static", "assets")
 	e.Use(middleware.Logger())
 
-	store := db.NewStore("APP_DATA.db")
+	store := db.NewStore()
 
 	us := services.NewUserService(services.User{}, store)
 	uh := handlers.NewUserHandler(us)
 
 	handlers.SetupRoutes(e, uh)
-	e.Logger.Fatal(e.Start(":42069"))
+	e.Logger.Fatal(e.Start(port))
 }
