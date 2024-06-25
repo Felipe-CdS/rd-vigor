@@ -2,40 +2,38 @@ package landing_page
 
 import "nugu.dev/rd-vigor/views/layout"
 
-templ LandingIndex(title string){
-    @layout.Base(title){
-        <div class="py-4 px-8 flex items-center h-14 border-b border-solid border-gray-200">
-            <a class="h-8 w-8 flex items-center space-x-1 mr-3 sm:mr-6">
-                <img class="w-full" src="static/img/logo.svg"/>
-            </a>
-            <div class="flex items-center space-x-3">
-                <a class="p-1 text-[#27272A] cursor-pointer">Home</a>
-                <a class="p-1 text-[#71717A] cursor-pointer">Eventos</a>
-                <a class="p-1 text-[#71717A] cursor-pointer">Reuniões</a>
-            </div>
-            
-            <div class="flex items-center ml-auto space-x-4">
-                <button class="text-sm px-4 py-2 rounded-full bg-[#27272A] text-white font-medium">
-                    <span class="sm:block">Login</span>
-                </button>
-            </div>
-        </div>
-        <div class="flex flex-col items-center justify-center grow">
-        <div class="card-shadow relative rounded-3xl h-96 w-3/5 border border-solid border-gray-200 flex flex-col"
-            style="background-image: linear-gradient(to right top, #ffdfa9, #fed18c, #fec371, #feb455, #fea439);">
+templ LandingIndex(title string) {
+	@layout.Base(title) {
+		<div class="flex items-center py-4 px-8 h-14 border-b border-gray-200 border-solid">
+			<a class="flex items-center mr-3 w-28 sm:mr-4">
+				<img class="w-full" src="static/img/logo-full.png"/>
+			</a>
+			<div class="flex items-center space-x-3 h-8">
+				<a class="p-1 text-[#27272A] cursor-pointer">Home</a>
+				<a class="p-1 text-[#71717A] cursor-pointer">Eventos</a>
+				<a class="p-1 text-[#71717A] cursor-pointer">Reuniões</a>
+			</div>
+			<div class="flex items-center ml-auto space-x-4">
+				<button class="text-sm px-4 py-2 rounded-full bg-[#27272A] text-white font-medium">
+					<span class="sm:block">Login</span>
+				</button>
+			</div>
+		</div>
+		<div class="flex flex-col justify-center items-center grow">
+			<div class="flex relative flex-col w-3/5 h-96 rounded-3xl border border-gray-200 border-solid card-shadow"
+				    style="background-image: linear-gradient(to right top, #ffdfa9, #fed18c, #fec371, #feb455, #fea439);">
 
-            <div class="flex card-shadow py-1 px-2 w-4/5 bg-white absolute -bottom-7 rounded-3xl left-1/2 -translate-x-1/2 border border-solid border-gray-200">
-                <div class=" relative h-10 w-10">
-                    <img class="w-full" src="static/img/search.svg"/>
-                </div>
-                <input class="w-full flex-grow" type="text" placeholder="Procure por uma ocupação ou empresa especifica"/>
-                <button class="ml-3" type="button" >aaaaa</button>
-            </div>
-
-        </div>
-        </div>
-        <div class="py-4 px-8 flex justify-center border-t border-solid border-gray-200">
-            <span class="text-[#71717A]">© RD Vigor 2024</span>
-        </div>
-    }
+				<div class="flex absolute -bottom-7 left-1/2 py-1 px-2 w-4/5 bg-white rounded-3xl border border-gray-200 border-solid -translate-x-1/2 card-shadow">
+					<div class="relative mr-3 w-10 h-10">
+						<img class="w-full" src="static/img/search.svg"/>
+					</div>
+					<input class="flex-grow w-full" type="text" placeholder="Procure por uma ocupação ou empresa especifica"/>
+					<button class="ml-3" type="button">aaaaa</button>
+				</div>
+			</div>
+		</div>
+		<div class="flex justify-center py-4 px-8 border-t border-gray-200 border-solid">
+			<span class="text-[#71717A]">© RD Vigor 2024</span>
+		</div>
+	}
 }
