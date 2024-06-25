@@ -13,9 +13,9 @@ import (
 
 func main() {
 	godotenv.Load()
-	port, ok := os.LookupEnv("PORT")
+	port := os.Getenv("PORT")
 
-	if !ok {
+	if port == "" {
 		port = ":42069"
 	}
 
