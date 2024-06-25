@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"nugu.dev/rd-vigor/db"
@@ -11,6 +12,7 @@ import (
 )
 
 func main() {
+	godotenv.Load()
 	port, ok := os.LookupEnv("PORT")
 
 	if !ok {
