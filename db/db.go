@@ -45,6 +45,7 @@ func (dbStore *Store) getConnection() error {
 		host = os.Getenv("PGHOST")
 		user = os.Getenv("PGUSER")
 		password = os.Getenv("PGPASSWORD")
+		dbname = os.Getenv("PGDATABASE")
 		port, _ = strconv.Atoi(os.Getenv("PGPORT"))
 	}
 
