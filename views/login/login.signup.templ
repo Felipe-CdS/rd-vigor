@@ -57,11 +57,21 @@ templ SignupForm() {
 			Para finalizar, precisamos de um documento ou imagem que comprove a sua área de atuação. Pedimos isso para assegurar a qualidade e veracidade dos usuários da RD Vigor, mantendo assim o nosso compromisso de oferecer apenas os melhores profissionais para a sua empresa.
 		</label>
 		<input type="file"
+			name="occupation_file"
 			class="py-3 px-4 w-full font-normal rounded-md border-2 border-gray-200 border-dashed"/>
 		<button 
 			type="submit"
+			data-loading-disable
+			data-loading-class="hidden"
 			class="p-3 w-full font-semibold text-lg rounded-md text-white bg-[#FFBD59]">
 		Criar Conta
+		</button>
+
+		<button 
+			disabled
+			data-loading
+			class="p-3 w-full font-semibold text-lg rounded-md text-white bg-[#ffdfa9]">
+			Enviando...
 		</button>
 	</form>
 }

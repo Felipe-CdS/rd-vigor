@@ -1,10 +1,15 @@
 package handlers
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/a-h/templ"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/labstack/echo/v4"
 	"nugu.dev/rd-vigor/services"
 	"nugu.dev/rd-vigor/views/login"
@@ -40,12 +45,50 @@ func (uh *UserHandler) CreateNewUser(c echo.Context) error {
 			CreatedAt:      1532009163,
 		}
 
-		fmt.Printf("%+v\n", user)
-		err := uh.UserServices.CreateUser(user)
+		if err := uh.UserServices.CreateUser(user); err != nil {
+			return err
+		}
+
+		file, err := c.FormFile("occupation_file")
 
 		if err != nil {
 			return err
 		}
+
+		src, err := file.Open()
+
+		if err != nil {
+			return err
+		}
+
+		defer src.Close()
+
+		sess, err := session.NewSession(&aws.Config{
+			Region: aws.String("us-east-2"),
+		})
+
+		if err != nil {
+			return err
+		}
+
+		svc := s3.New(sess)
+
+		var buf bytes.Buffer
+
+		if _, err := io.Copy(&buf, src); err != nil {
+			return err
+		}
+
+		_, err = svc.PutObject(&s3.PutObjectInput{
+			Bucket: aws.String("rd-vigor-20050411"),
+			Key:    aws.String(fmt.Sprintf("%s_%s_%s", c.FormValue("first_name"), c.FormValue("last_name"), file.Filename)),
+			Body:   bytes.NewReader(buf.Bytes()),
+		})
+
+		if err != nil {
+			return err
+		}
+
 		return c.Redirect(http.StatusSeeOther, "/signup-done")
 	}
 
