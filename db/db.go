@@ -53,6 +53,8 @@ func (dbStore *Store) getConnection() error {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
+	fmt.Printf("%s\n", psqlInfo)
+
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		return fmt.Errorf("%s", err)
