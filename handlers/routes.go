@@ -14,8 +14,9 @@ func SetupRoutes(e *echo.Echo, uh *UserHandler) {
 	e.GET("/signup-done", signupFormDone)
 
 	e.GET("/login", loginForm)
+	e.GET("/not-ready", notReady)
 
-	e.GET("/home", userHome)
+	// e.GET("/home", userHome)
 }
 
 func userHome(c echo.Context) error {
@@ -40,5 +41,10 @@ func signupFormDone(c echo.Context) error {
 
 func loginForm(c echo.Context) error {
 	cmp := login.LoginForm()
+	return cmp.Render(c.Request().Context(), c.Response().Writer)
+}
+
+func notReady(c echo.Context) error {
+	cmp := login.NotReady()
 	return cmp.Render(c.Request().Context(), c.Response().Writer)
 }

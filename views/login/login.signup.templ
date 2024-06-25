@@ -80,13 +80,31 @@ templ SignupFormDone() {
 	</div>
 }
 
+templ NotReady() {
+	<div class="flex flex-col justify-between items-center w-full">
+		<div>
+			<h1 class="text-center text-gray-400 text-md">
+			Obrigado por se cadastrar na RD Vigor. No momento ainda estamos dando os últimos retoques na plataforma para que você tenha a melhor experiência possivel. Assim que tudo estiver pronto enviaremos um e-mail para você. Nos vemos em breve!
+		</h1>
+		</div>
+		<a hx-get="/"
+			hx-target="body"
+			class="text-md mt-3 text-[#FFBD59] cursor-pointer font-normal">
+			Voltar
+		</a>
+	</div>
+}
+
 templ LoginForm() {
 	<form class="flex flex-col space-y-3 w-full">
 		<input class="py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid"
 		placeholder="E-mail"/>
 		<input class="py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid"
 		placeholder="Senha"/>
-		<button class="p-3 w-full text-lg font-semibold rounded-md text-white bg-[#FFBD59]">
+		<button 
+			hx-get="/not-ready"
+			hx-target="#form-box"
+			class="p-3 w-full text-lg font-semibold rounded-md text-white bg-[#FFBD59]">
 		Entrar
 		</button>
 	</form>
