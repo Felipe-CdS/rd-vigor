@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -15,8 +16,10 @@ func main() {
 	godotenv.Load()
 	port := os.Getenv("PORT")
 
+	fmt.Printf("%s\n", port)
+
 	if port == "" {
-		port = ":42069"
+		port = "42069"
 	}
 
 	e := echo.New()
@@ -30,5 +33,5 @@ func main() {
 	uh := handlers.NewUserHandler(us)
 
 	handlers.SetupRoutes(e, uh)
-	e.Logger.Fatal(e.Start(port))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", port)))
 }
