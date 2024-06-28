@@ -1,0 +1,96 @@
+package auth_views
+
+templ SignupForm() {
+	<div class="flex justify-between w-full">
+		<div>
+			<h1 class="text-2xl font-bold">Pré-cadastro</h1>
+			<h1 class="text-sm text-gray-400">Crie a sua conta agora e tenha a oportunidade de ser um dos primeiros na RD Vigor!</h1>
+		</div>
+		<button hx-get="/"
+			hx-target="body"
+			class="size-10">
+			<img class="w-full" src="static/img/close.svg"/>
+		</button>
+	</div>
+
+	<hr class="w-full h-px bg-gray-200 border-0"/>
+
+	<form hx-post="/signup"
+		hx-target="#form-box"
+		hx-target-error="#error-alert"
+		hx-encoding="multipart/form-data"
+		class="flex flex-col space-y-3 w-full">
+		<div class="flex justify-between items-center space-x-3 w-full">
+			<input type="text"
+				name="first_name"
+				placeholder="Primeiro Nome"
+				class="py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid"/>
+
+			<input type="text"
+				name="last_name"
+				placeholder="Sobrenome"
+				class="py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid"/>
+		</div>
+
+		<input type="text"
+			name="email"
+			placeholder="E-mail"
+			class="py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid"/>
+
+		<input type="password"
+			name="password"
+			placeholder="Nova senha"
+			class="py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid"/>
+
+		<input type="password"
+			name="repeat-password"
+			placeholder="Repita a senha"
+			class="py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid"/>
+
+		
+		<input type="text"
+			name="occupation_area"
+			placeholder="Area de atuação"
+			class="py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid"/>
+
+		<span id="error-alert"></span>
+
+		<button 
+			type="submit"
+			data-loading-disable
+			data-loading-class="hidden"
+			class="p-3 w-full font-semibold text-lg rounded-md text-white bg-[#FFBD59]">
+		Criar Conta
+		</button>
+
+		<button 
+			disabled
+			data-loading
+			class="p-3 w-full font-semibold text-lg rounded-md text-white bg-[#ffdfa9]">
+			Enviando...
+		</button>
+
+	</form>
+}
+
+templ SignupFormDone() {
+	<div class="flex flex-col justify-between items-center w-full">
+		<div>
+			<h1 class="text-center text-gray-400 text-md">
+			Obrigado por demonstrar interesse na nossa plataforma! Seu perfil será analisado e em breve enviaremos um email para você com todas as informações que precisa.</h1>
+		</div>
+		<a hx-get="/"
+			hx-target="body"
+			class="text-md mt-3 text-[#FFBD59] cursor-pointer font-normal">
+			Voltar
+		</a>
+	</div>
+}
+
+templ SignupFormErrorAlert(message string){
+	<span id="error-alert"
+		class="block p-3 w-full text-sm rounded-md bg-[#fff1d4] border rounded-md font-normal border-[#fea439]">
+		<img class="inline size-5" src="static/img/error.svg"/>
+		{ message }
+	</span>
+}

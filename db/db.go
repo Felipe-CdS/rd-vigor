@@ -74,7 +74,7 @@ func createMigrations(db *sql.DB) error {
         email TEXT NOT NULL,
         password TEXT NOT NULL,
         occupation_area TEXT NOT NULL,
-        created_at INTEGER NOT NULL
+        created_at TIMESTAMP NOT NULL
     )`
 
 	_, err := db.Exec(statement)
