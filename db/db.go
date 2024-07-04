@@ -36,7 +36,7 @@ func (dbStore *Store) getConnection() error {
 	}
 
 	host := "localhost"
-	port := 5432
+	port := 8001
 	user := "postgres"
 	password := "postgres"
 	dbname := "rdvigor"
