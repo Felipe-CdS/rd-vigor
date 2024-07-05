@@ -33,6 +33,8 @@ func (uh *UserHandler) CreateNewUser(c echo.Context) error {
 			Email:          c.FormValue("email"),
 			OccupationArea: c.FormValue("occupation_area"),
 			Password:       c.FormValue("password"),
+			Telephone:      c.FormValue("telephone"),
+			ReferFriend:    c.FormValue("refer_friend"),
 			CreatedAt:      1532009163,
 		}
 

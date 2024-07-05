@@ -65,13 +65,15 @@ func (dbStore *Store) getConnection() error {
 
 func createMigrations(db *sql.DB) error {
 
-	statement := `CREATE TABLE IF NOT EXISTS users (
+	statement := `CREATE TABLE IF NOT EXISTS users1 (
         id SERIAL PRIMARY KEY,
         first_name TEXT NOT NULL,
         last_name TEXT NOT NULL,
         email TEXT NOT NULL,
         password TEXT NOT NULL,
         occupation_area TEXT NOT NULL,
+        telephone TEXT NOT NULL,
+        refer_friend TEXT NOT NULL,
         created_at INTEGER NOT NULL
     )`
 
