@@ -1,8 +1,8 @@
-package login
+package auth_views
 
 import "nugu.dev/rd-vigor/views/layout"
 
-templ LoginIndex(title string) {
+templ Base(title string) {
 	@layout.Base(title) {
 		<div class="flex flex-col py-10 lg:flex-row grow justify-center px-5 bg-[#F0F2F5] w-screen h-full items-center">
 			<div class="flex flex-col items-center mb-5 w-full lg:items-start lg:mr-16 lg:w-3/12">
@@ -16,7 +16,7 @@ templ LoginIndex(title string) {
 
 			<div	id="form-box"
 				class="flex flex-col justify-center items-center p-4 space-y-4 w-full bg-white rounded-md border border-gray-200 border-solid lg:w-96 max-w-96 card-shadow">
-			@LoginForm()
+			@SignupForm()
 			</div>
 		</div>
 	}

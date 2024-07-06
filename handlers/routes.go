@@ -2,19 +2,19 @@ package handlers
 
 import (
 	"github.com/labstack/echo/v4"
+	"nugu.dev/rd-vigor/views/auth_views"
 	"nugu.dev/rd-vigor/views/landing_page"
-	"nugu.dev/rd-vigor/views/login"
 )
 
 func SetupRoutes(e *echo.Echo, uh *UserHandler) {
-	e.GET("/", loginLanding)
+	e.GET("/", authViewBase)
 
-	e.GET("/signup", signupFormGET)
-	e.POST("/signup", uh.CreateNewUser)
+	e.GET("/signup", signupForm)
 	e.GET("/signup-done", signupFormDone)
 
-	e.GET("/login", loginForm)
-	e.GET("/not-ready", notReady)
+	e.POST("/signup", uh.CreateNewUser)
+
+	e.GET("/not-ready", signinFormDone)
 
 	// e.GET("/home", userHome)
 }
@@ -24,27 +24,22 @@ func userHome(c echo.Context) error {
 	return cmp.Render(c.Request().Context(), c.Response().Writer)
 }
 
-func loginLanding(c echo.Context) error {
-	cmp := login.LoginIndex("Login or sign up")
+func authViewBase(c echo.Context) error {
+	cmp := auth_views.Base("Login or sign up")
 	return cmp.Render(c.Request().Context(), c.Response().Writer)
 }
 
-func signupFormGET(c echo.Context) error {
-	cmp := login.SignupForm()
+func signupForm(c echo.Context) error {
+	cmp := auth_views.SignupForm()
 	return cmp.Render(c.Request().Context(), c.Response().Writer)
 }
 
 func signupFormDone(c echo.Context) error {
-	cmp := login.SignupFormDone()
+	cmp := auth_views.SignupFormDone()
 	return cmp.Render(c.Request().Context(), c.Response().Writer)
 }
 
-func loginForm(c echo.Context) error {
-	cmp := login.LoginForm()
-	return cmp.Render(c.Request().Context(), c.Response().Writer)
-}
-
-func notReady(c echo.Context) error {
-	cmp := login.NotReady()
+func signinFormDone(c echo.Context) error {
+	cmp := auth_views.SigninFormDone()
 	return cmp.Render(c.Request().Context(), c.Response().Writer)
 }
