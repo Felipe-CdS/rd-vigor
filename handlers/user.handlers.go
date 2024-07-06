@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
@@ -35,7 +36,7 @@ func (uh *UserHandler) CreateNewUser(c echo.Context) error {
 			Password:       c.FormValue("password"),
 			Telephone:      c.FormValue("telephone"),
 			ReferFriend:    c.FormValue("refer_friend"),
-			CreatedAt:      1532009163,
+			CreatedAt:      time.Now(),
 		}
 
 		if err := uh.UserServices.CreateUser(user); err != nil {

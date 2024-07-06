@@ -1,6 +1,10 @@
 package services
 
-import "nugu.dev/rd-vigor/db"
+import (
+	"time"
+
+	"nugu.dev/rd-vigor/db"
+)
 
 func NewUserService(u User, uStore db.Store) *UserService {
 	return &UserService{
@@ -10,15 +14,15 @@ func NewUserService(u User, uStore db.Store) *UserService {
 }
 
 type User struct {
-	ID             int    `json:"id"`
-	FirstName      string `json:"first_name"`
-	LastName       string `json:"last_name"`
-	Email          string `json:"email"`
-	OccupationArea string `json:"occupation_area"`
-	Telephone      string `json:"telephone"`
-	ReferFriend    string `json:"refer_friend"`
-	Password       string `json:"password"`
-	CreatedAt      int    `json:"created_at"`
+	ID             int       `json:"id"`
+	FirstName      string    `json:"first_name"`
+	LastName       string    `json:"last_name"`
+	Email          string    `json:"email"`
+	OccupationArea string    `json:"occupation_area"`
+	Telephone      string    `json:"telephone"`
+	ReferFriend    string    `json:"refer_friend"`
+	Password       string    `json:"password"`
+	CreatedAt      time.Time `json:"created_at"`
 }
 
 type UserService struct {

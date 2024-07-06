@@ -74,7 +74,7 @@ func createMigrations(db *sql.DB) error {
         occupation_area TEXT NOT NULL,
         telephone TEXT NOT NULL,
         refer_friend TEXT NOT NULL,
-        created_at INTEGER NOT NULL
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL
     )`
 
 	_, err := db.Exec(statement)
@@ -84,5 +84,4 @@ func createMigrations(db *sql.DB) error {
 	}
 
 	return nil
-
 }
