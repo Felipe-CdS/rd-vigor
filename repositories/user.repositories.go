@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"database/sql"
-	"fmt"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -68,8 +67,6 @@ func (ur *UserRepository) CheckEmailExists(email string) bool {
 	stmt := "SELECT email FROM users WHERE email = $1"
 
 	queryResult := ur.UserStore.Db.QueryRow(stmt, email).Scan()
-
-	fmt.Printf("%+v\n", queryResult)
 
 	if queryResult != sql.ErrNoRows {
 		return true

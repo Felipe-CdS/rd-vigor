@@ -65,6 +65,11 @@ func (uh *UserHandler) CreateNewUser(c echo.Context) error {
 			return uh.View(c, auth_views.SignupFormErrorAlert("Por favor, insira uma área de atuação válida."))
 		}
 
+		if c.FormValue("telephone") == "" {
+			c.Response().WriteHeader(http.StatusBadRequest)
+			return uh.View(c, auth_views.SignupFormErrorAlert("Por favor, insira um telefone válido."))
+		}
+
 		user := repositories.User{
 			FirstName:      c.FormValue("first_name"),
 			LastName:       c.FormValue("last_name"),

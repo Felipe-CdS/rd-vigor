@@ -36,11 +36,14 @@ func (dbStore *Store) getConnection() error {
 	}
 
 	host := "localhost"
-	port := 8001
+	port := 5432
 	user := "postgres"
 	password := "postgres"
 	dbname := "rdvigor"
 
+	if os.Getenv("APP_ENV") == "TESTING" {
+		port = 8001
+	}
 	if os.Getenv("APP_ENV") == "PROD" {
 		host = os.Getenv("PGHOST")
 		user = os.Getenv("PGUSER")
