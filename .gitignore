@@ -1,3 +1,4 @@
 APP_DATA.db
 tmp/
 .env
+*_templ.go
