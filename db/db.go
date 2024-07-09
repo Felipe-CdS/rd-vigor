@@ -44,6 +44,7 @@ func (dbStore *Store) getConnection() error {
 	if os.Getenv("APP_ENV") == "TESTING" {
 		port = 8001
 	}
+
 	if os.Getenv("APP_ENV") == "PROD" {
 		host = os.Getenv("PGHOST")
 		user = os.Getenv("PGUSER")
@@ -61,7 +62,7 @@ func (dbStore *Store) getConnection() error {
 	}
 
 	dbStore.Db = db
-	log.Println("Connected successfully to the database...")
+	log.Printf("Connected successfully to the database | ENV: %s | host: %s | dbname: %s\n", os.Getenv("APP_ENV"), host, dbname)
 
 	return nil
 }

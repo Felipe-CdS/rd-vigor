@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"log"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -34,8 +35,7 @@ func NewUserRepository(u User, uStore db.Store) *UserRepository {
 
 func (ur *UserRepository) CreateUser(u User) *RepositoryLayerErr {
 
-	stmt := `INSERT INTO users1 (first_name, last_name, email, occupation_area, password, telephone, refer_friend, created_at) 
-			VALUES($1, $2, $3, $4, $5, $6, $7, $8)`
+	stmt := `INSERT INTO users1 (first_name, last_name, email, occupation_area, password, telephone, refer_friend, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), 14)
 
@@ -58,6 +58,8 @@ func (ur *UserRepository) CreateUser(u User) *RepositoryLayerErr {
 	if err != nil {
 		return &RepositoryLayerErr{err, "Insert Error"}
 	}
+
+	log.Printf("%s | New User Created: %s.\n", u.CreatedAt.Format(time.RFC822Z), u.Email)
 
 	return nil
 }
