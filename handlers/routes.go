@@ -3,7 +3,6 @@ package handlers
 import (
 	"github.com/labstack/echo/v4"
 	"nugu.dev/rd-vigor/views/auth_views"
-	"nugu.dev/rd-vigor/views/landing_page"
 )
 
 func SetupRoutes(e *echo.Echo, uh *UserHandler) {
@@ -17,11 +16,9 @@ func SetupRoutes(e *echo.Echo, uh *UserHandler) {
 	e.GET("/not-ready", signinFormDone)
 
 	// e.GET("/home", userHome)
-}
 
-func userHome(c echo.Context) error {
-	cmp := landing_page.LandingIndex("Login or sign up")
-	return cmp.Render(c.Request().Context(), c.Response().Writer)
+	e.GET("/dashboard", uh.GetAdminUserList)
+	e.GET("/dashboard/details", uh.GetUserDetails)
 }
 
 func authViewBase(c echo.Context) error {

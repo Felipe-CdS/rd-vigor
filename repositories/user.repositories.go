@@ -74,3 +74,39 @@ func (ur *UserRepository) CheckEmailExists(email string) bool {
 
 	return false
 }
+
+func (ur *UserRepository) GetAllUsers() ([]User, error) {
+
+	var users []User
+
+	stmt := "SELECT id, first_name, last_name, email, occupation_area FROM users1"
+
+	rows, err := ur.UserStore.Db.Query(stmt)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var usr User
+		if err := rows.Scan(&usr.ID, &usr.FirstName, &usr.LastName, &usr.Email, &usr.OccupationArea); err != nil {
+			return nil, err
+		}
+		users = append(users, usr)
+	}
+
+	return users, nil
+}
+
+func (ur *UserRepository) GetUserByID(id int) (User, error) {
+
+	var usr User
+
+	stmt := "SELECT id, first_name, last_name, email, occupation_area FROM users1 WHERE id = $1"
+
+	if err := ur.UserStore.Db.QueryRow(stmt, id).Scan(&usr.ID, &usr.FirstName, &usr.LastName, &usr.Email, &usr.OccupationArea); err != nil {
+		return usr, err
+	}
+
+	return usr, nil
+}

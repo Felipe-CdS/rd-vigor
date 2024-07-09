@@ -17,6 +17,8 @@ import (
 type UserRepository interface {
 	CreateUser(u repositories.User) *repositories.RepositoryLayerErr
 	CheckEmailExists(email string) bool
+	GetAllUsers() ([]repositories.User, error)
+	GetUserByID(id int) (repositories.User, error)
 }
 
 type UserService struct {
@@ -42,6 +44,26 @@ func (us *UserService) CreateUser(u repositories.User) *ServiceLayerErr {
 	us.Repository.CreateUser(u)
 
 	return nil
+}
+
+func (us *UserService) GetAllUsers() ([]repositories.User, *ServiceLayerErr) {
+
+	users, err := us.Repository.GetAllUsers()
+
+	if err != nil {
+		return nil, &ServiceLayerErr{err, "Query Err", http.StatusInternalServerError}
+	}
+	return users, nil
+}
+
+func (us *UserService) GetUserByID(id int) (repositories.User, *ServiceLayerErr) {
+
+	users, err := us.Repository.GetUserByID(id)
+
+	if err != nil {
+		return repositories.User{}, &ServiceLayerErr{err, "Query Err", http.StatusInternalServerError}
+	}
+	return users, nil
 }
 
 func putFileS3(f *multipart.FileHeader) *ServiceLayerErr {

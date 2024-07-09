@@ -3,17 +3,21 @@ package handlers
 import (
 	"net/http"
 	"net/mail"
+	"strconv"
 	"time"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 	"nugu.dev/rd-vigor/repositories"
 	"nugu.dev/rd-vigor/services"
+	admin_views "nugu.dev/rd-vigor/views/admin_views/dashboard"
 	"nugu.dev/rd-vigor/views/auth_views"
 )
 
 type UserService interface {
 	CreateUser(u repositories.User) *services.ServiceLayerErr
+	GetAllUsers() ([]repositories.User, *services.ServiceLayerErr)
+	GetUserByID(id int) (repositories.User, *services.ServiceLayerErr)
 }
 
 func NewUserHandler(us UserService) *UserHandler {
@@ -94,6 +98,32 @@ func (uh *UserHandler) CreateNewUser(c echo.Context) error {
 	}
 
 	return uh.View(c, auth_views.SigninForm())
+}
+
+func (uh *UserHandler) GetAdminUserList(c echo.Context) error {
+
+	users, queryErr := uh.UserServices.GetAllUsers()
+	if queryErr != nil {
+
+	}
+
+	return uh.View(c, admin_views.Base("", users))
+}
+
+func (uh *UserHandler) GetUserDetails(c echo.Context) error {
+
+	param, err := strconv.Atoi(c.QueryParam("user"))
+
+	if err != nil {
+	}
+
+	usr, queryErr := uh.UserServices.GetUserByID(param)
+
+	if queryErr != nil {
+
+	}
+
+	return uh.View(c, admin_views.UserInfoDiv(usr))
 }
 
 func (uh *UserHandler) View(c echo.Context, cmp templ.Component) error {
