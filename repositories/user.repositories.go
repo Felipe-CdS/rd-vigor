@@ -102,9 +102,18 @@ func (ur *UserRepository) GetUserByID(id int) (User, error) {
 
 	var usr User
 
-	stmt := "SELECT id, first_name, last_name, email, occupation_area FROM users1 WHERE id = $1"
+	stmt := "SELECT id, first_name, last_name, email, occupation_area, telephone, created_at, refer_friend FROM users1 WHERE id = $1"
 
-	if err := ur.UserStore.Db.QueryRow(stmt, id).Scan(&usr.ID, &usr.FirstName, &usr.LastName, &usr.Email, &usr.OccupationArea); err != nil {
+	if err := ur.UserStore.Db.QueryRow(stmt, id).Scan(
+		&usr.ID,
+		&usr.FirstName,
+		&usr.LastName,
+		&usr.Email,
+		&usr.OccupationArea,
+		&usr.Telephone,
+		&usr.CreatedAt,
+		&usr.ReferFriend,
+	); err != nil {
 		return usr, err
 	}
 
