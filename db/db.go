@@ -68,17 +68,21 @@ func (dbStore *Store) getConnection() error {
 
 func createMigrations(db *sql.DB) error {
 
-	statement := `CREATE TABLE IF NOT EXISTS users1 (
-        id SERIAL PRIMARY KEY,
-        first_name TEXT NOT NULL,
-        last_name TEXT NOT NULL,
-        email TEXT NOT NULL,
-        password TEXT NOT NULL,
-        occupation_area TEXT NOT NULL,
-        telephone TEXT NOT NULL,
-        refer_friend TEXT NOT NULL,
-        created_at TIMESTAMP WITH TIME ZONE NOT NULL
-    )`
+	statement := `CREATE TABLE IF NOT EXISTS users ( 
+		id UUID PRIMARY KEY
+		, username TEXT NOT NULL
+		, first_name TEXT NOT NULL
+		, last_name TEXT NOT NULL
+		, email TEXT NOT NULL
+		, occupation_area TEXT NOT NULL
+		, telephone TEXT NOT NULL
+		, refer_friend TEXT NOT NULL
+		, password TEXT NOT NULL
+		, role TEXT NOT NULL
+		, registration_status TEXT NOT NULL
+		, created_at TIMESTAMP WITH TIME ZONE NOT NULL
+		, updated_at TIMESTAMP WITH TIME ZONE NOT NULL
+	)`
 
 	_, err := db.Exec(statement)
 

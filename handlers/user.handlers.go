@@ -1,13 +1,14 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"net/mail"
-	"strconv"
-	"time"
+	"regexp"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
+	"nugu.dev/rd-vigor/auth"
 	"nugu.dev/rd-vigor/repositories"
 	"nugu.dev/rd-vigor/services"
 	admin_views "nugu.dev/rd-vigor/views/admin_views/dashboard"
@@ -16,8 +17,9 @@ import (
 
 type UserService interface {
 	CreateUser(u repositories.User) *services.ServiceLayerErr
+	AuthUser(login string, password string) (repositories.User, *services.ServiceLayerErr)
 	GetAllUsers() ([]repositories.User, *services.ServiceLayerErr)
-	GetUserByID(id int) (repositories.User, *services.ServiceLayerErr)
+	GetUserByID(id string) (repositories.User, *services.ServiceLayerErr)
 }
 
 func NewUserHandler(us UserService) *UserHandler {
@@ -32,7 +34,25 @@ type UserHandler struct {
 
 func (uh *UserHandler) CreateNewUser(c echo.Context) error {
 
+	if c.Request().Method == "GET" {
+
+		if c.Request().Header.Get("HX-Request") != "true" {
+			c.Response().Header().Set("HX-redirect", "/signin")
+			return c.NoContent(http.StatusPermanentRedirect)
+		}
+
+		cmp := auth_views.SignupForm()
+		return cmp.Render(c.Request().Context(), c.Response().Writer)
+	}
+
 	if c.Request().Method == "POST" {
+
+		usernameRegex, _ := regexp.Compile("^[\\w\\d][a-zA-Z0-9_\\-\\.]{4,17}$")
+
+		if c.FormValue("username") == "" || !usernameRegex.MatchString(c.FormValue("username")) {
+			c.Response().WriteHeader(http.StatusBadRequest)
+			return uh.View(c, auth_views.SignupFormErrorAlert("Por favor, insira um nome de usuário válido. O mesmo deve ter entre 5 e 18 caracteres e ser composto apenas por letras, números, pontos, hífens ou underscores. Você poderá trocar esse nome depois, se necessário."))
+		}
 
 		if c.FormValue("first_name") == "" {
 			c.Response().WriteHeader(http.StatusBadRequest)
@@ -51,7 +71,7 @@ func (uh *UserHandler) CreateNewUser(c echo.Context) error {
 
 		if _, err := mail.ParseAddress(c.FormValue("email")); err != nil {
 			c.Response().WriteHeader(http.StatusBadRequest)
-			return uh.View(c, auth_views.SignupFormErrorAlert("E-mail inválido."))
+			return uh.View(c, auth_views.SignupFormErrorAlert("Por favor, insira um email válido."))
 		}
 
 		if c.FormValue("password") == "" {
@@ -75,14 +95,14 @@ func (uh *UserHandler) CreateNewUser(c echo.Context) error {
 		}
 
 		user := repositories.User{
+			Username:       c.FormValue("username"),
 			FirstName:      c.FormValue("first_name"),
 			LastName:       c.FormValue("last_name"),
 			Email:          c.FormValue("email"),
 			OccupationArea: c.FormValue("occupation_area"),
-			Password:       c.FormValue("password"),
 			Telephone:      c.FormValue("telephone"),
+			Password:       c.FormValue("password"),
 			ReferFriend:    c.FormValue("refer_friend"),
-			CreatedAt:      time.Now(),
 		}
 
 		if err := uh.UserServices.CreateUser(user); err != nil {
@@ -96,31 +116,88 @@ func (uh *UserHandler) CreateNewUser(c echo.Context) error {
 		}
 		return c.Redirect(http.StatusSeeOther, "/signup-done")
 	}
+	return c.Redirect(http.StatusMethodNotAllowed, "/signup")
+}
 
-	return uh.View(c, auth_views.SigninForm())
+func (uh *UserHandler) SigninUser(c echo.Context) error {
+
+	if c.Request().Method == "GET" {
+		cookieToken, err := c.Cookie("access-token")
+
+		if err == nil && cookieToken.Value != "" {
+			claims, err := auth.DecodeToken(cookieToken.Value)
+
+			if err != nil {
+				auth.ResetAuthCookies(c)
+				return c.Redirect(http.StatusMovedPermanently, "/signin")
+			}
+
+			if claims.Role == "admin" {
+				return c.Redirect(http.StatusMovedPermanently, "/admin/dashboard")
+			}
+
+			return c.Redirect(http.StatusMovedPermanently, "/user/home")
+		}
+
+		cmp := auth_views.Base("Login or sign up")
+		return cmp.Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	if c.Request().Method == "POST" {
+		usr, err := uh.UserServices.AuthUser(c.FormValue("login"), c.FormValue("password"))
+
+		if err != nil {
+			c.Response().WriteHeader(err.Code)
+			return uh.View(c, auth_views.SigninFormErrorAlert(err.Message))
+		}
+
+		if err := auth.GenerateTokensAndSetCookies(usr, c); err != nil {
+			c.Response().WriteHeader(http.StatusInternalServerError)
+			return uh.View(c, auth_views.SigninFormErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
+		}
+
+		return c.Redirect(http.StatusMovedPermanently, "/admin/dashboard")
+	}
+
+	return c.Redirect(http.StatusMethodNotAllowed, "/signup")
 }
 
 func (uh *UserHandler) GetAdminUserList(c echo.Context) error {
 
-	users, queryErr := uh.UserServices.GetAllUsers()
-	if queryErr != nil {
+	cookieToken, err := c.Cookie("access-token")
 
+	if err != nil {
+		return c.Redirect(http.StatusMovedPermanently, "/signin")
 	}
 
-	return uh.View(c, admin_views.Base("", users))
+	claims, err := auth.DecodeToken(cookieToken.Value)
+
+	fmt.Printf("%+v\n", claims)
+
+	if err != nil || claims.Role != "admin" {
+		return c.Redirect(http.StatusMovedPermanently, "/signin")
+	}
+
+	users, queryErr := uh.UserServices.GetAllUsers()
+	if queryErr != nil {
+		return uh.View(c, admin_views.Base("Dashboard", []repositories.User{}))
+	}
+
+	return uh.View(c, admin_views.Base("Dashboard", users))
 }
 
 func (uh *UserHandler) GetUserDetails(c echo.Context) error {
 
-	param, err := strconv.Atoi(c.QueryParam("user"))
-
-	if err != nil {
+	if c.Request().Header.Get("HX-Request") != "true" {
+		c.Response().Header().Set("HX-redirect", "/dashboard")
+		return c.NoContent(http.StatusPermanentRedirect)
 	}
 
-	usr, queryErr := uh.UserServices.GetUserByID(param)
+	usr, queryErr := uh.UserServices.GetUserByID(c.QueryParam("user"))
 
 	if queryErr != nil {
-
+		c.Response().Header().Set("HX-redirect", "/dashboard")
+		return c.NoContent(http.StatusPermanentRedirect)
 	}
 
 	return uh.View(c, admin_views.UserInfoDiv(usr))

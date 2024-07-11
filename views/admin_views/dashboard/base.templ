@@ -12,7 +12,7 @@ templ Base(title string, users []repositories.User) {
 	@layout.Base(title) {
 		<div class="flex items-center py-4 px-8 h-14 border-b border-gray-200 border-solid">
 			<a class="flex items-center mr-3 w-28 sm:mr-4">
-				<img class="w-full" src="static/img/logo-full-2.png"/>
+				<img class="w-full" src="/static/img/logo-full-2.png"/>
 			</a>
 			<div class="flex items-center space-x-3 h-8">
 				<a class="p-1 text-[#71717A] cursor-pointer">Home</a>
@@ -21,8 +21,13 @@ templ Base(title string, users []repositories.User) {
 				<a class="p-1 text-[#27272A] cursor-pointer">Dashboard</a>
 			</div>
 			<div class="flex items-center ml-auto space-x-4">
-				<button class="px-4 py-2 rounded-full bg-[#27272A] text-white font-medium text-sm">
-					<span class="sm:block">Login</span>
+				<button
+					hx-get="/logout"
+					hx-target="body"
+					hx-push-url="true"
+					class="px-4 py-2 rounded-full bg-[#27272A] text-white font-medium text-sm"
+				>
+					<span class="sm:block">Logout</span>
 				</button>
 			</div>
 		</div>
@@ -33,8 +38,8 @@ templ Base(title string, users []repositories.User) {
 				class="flex flex-col justify-center p-4 w-2/3 h-full text-left bg-white rounded-md border border-gray-200 border-solid card-shadow"
 			>
 				<div class="flex flex-col items-center p-4 w-full">
-					<img class="size-16" src="static/img/user.svg"/>
-					<h1 class="text-2xl font-medium text-gray-400">Nenhum usuário selecionado</h1>
+					<img class="size-16" src="/static/img/user.svg"/>
+					<h1 class="mt-1 text-2xl font-medium text-gray-400">Nenhum usuário selecionado</h1>
 					<h1 class="text-sm font-normal text-gray-400">Selecione um usuário da lista para editá-lo</h1>
 				</div>
 			</div>
@@ -49,26 +54,35 @@ templ UsersList(users []repositories.User) {
 		<div class="flex items-center py-3 px-4 w-full bg-white rounded-t-md border-b border-gray-200 border-solid">
 			<h1 class="font-medium">Usuários ({ strconv.Itoa(len(users)) })</h1>
 			<button class="ml-auto" title="filtrar">
-				<img class="size-6" src="static/img/filter.svg"/>
+				<img class="size-6" src="/static/img/filter.svg"/>
 			</button>
 		</div>
 		<div
 			x-data="{selected: ''}"
-			class="flex overflow-y-scroll relative flex-col w-full"
+			class="flex overflow-y-scroll relative flex-col w-full h-full"
 		>
-			for _, usr := range users {
-				<button
-					hx-get={ fmt.Sprintf("dashboard/details?user=%d", usr.ID) }
-					hx-target="#user-info-div"
-					hx-swap="outerHTML"
-					class="flex flex-col items-start p-4 w-full border-b border-gray-200 border-solid"
-					:id="$id('user')"
-					x-on:click="selected = $el.id"
-					x-bind:style="$el.id == selected && { 'border-left': '4px solid #ED6C09' }"
-				>
-					<h1 class="text-sm font-medium">{ usr.FirstName } { usr.LastName }</h1>
-					<h1 class="text-sm font-normal text-gray-400">{ usr.OccupationArea }</h1>
-				</button>
+			if len(users) == 0 {
+				<div class="flex flex-col justify-center items-center w-full h-[calc(100%-2.25rem)] text-center">
+					<img class="size-12" src="/static/img/warning.svg"/>
+					<h1 class="mt-1 text-2xl font-medium text-gray-400">Nenhum usuário encontrado</h1>
+					<h1 class="text-sm font-normal text-gray-400">Consulte o banco de dados se isso for um erro</h1>
+				</div>
+			} else {
+				for _, usr := range users {
+					<button
+						hx-get={ fmt.Sprintf("dashboard/details?user=%s", usr.ID) }
+						hx-target="#user-info-div"
+						hx-target-3xx="body"
+						hx-swap="outerHTML"
+						class="flex flex-col items-start p-4 w-full border-b border-gray-200 border-solid"
+						:id="$id('user')"
+						x-on:click="selected = $el.id"
+						x-bind:style="$el.id == selected && { 'border-left': '4px solid #ED6C09' }"
+					>
+						<h1 class="text-sm font-medium">{ usr.FirstName } { usr.LastName }</h1>
+						<h1 class="text-sm font-normal text-gray-400">{ fmt.Sprintf("@%s", usr.Username) }</h1>
+					</button>
+				}
 			}
 		</div>
 	</div>
@@ -165,18 +179,18 @@ templ UserInfoDiv(user repositories.User) {
 					for="updated_at"
 				>
 					Último Acesso
-					if !user.CreatedAt.IsZero() {
+					if !user.UpdatedAt.IsZero() {
 						<input
 							disabled
 							name="updated_at"
-							value={ user.CreatedAt.Format(time.RFC822Z) }
+							value={ user.UpdatedAt.Format(time.RFC822Z) }
 							class="py-1 px-2 mt-1 font-normal text-gray-800 bg-gray-200 rounded-md"
 						/>
 					} else {
 						<input
 							disabled
 							name="updated_at"
-							value={ "Nenhum acesso registrado." }
+							value={ "Nenhum acesso registrado" }
 							class="py-1 px-2 mt-1 font-normal text-gray-800 bg-gray-200 rounded-md"
 						/>
 					}
@@ -208,11 +222,21 @@ templ UserInfoDiv(user repositories.User) {
 					</label>
 					<div class="flex mt-1 space-x-2 w-full">
 						<select
+							x-data={ fmt.Sprintf("{ selected: '%s' }", user.RegistrationStatus) }
 							class="flex py-1 px-2 font-normal text-gray-800 bg-gray-200 rounded-md grow"
 						>
-							<option value="rejected">Rejeitado</option>
-							<option value="pending">Pendente</option>
-							<option value="accepted">Aceito</option>
+							<option
+								value="rejected"
+								:selected="selected === 'rejected'"
+							>Rejeitado</option>
+							<option
+								value="pending"
+								:selected="selected === 'pending'"
+							>Pendente</option>
+							<option
+								value="accepted"
+								:selected="selected === 'accepted'"
+							>Aceito</option>
 						</select>
 						<button class="w-1/5 rounded-md text-white bg-[#FC8713]">
 							Salvar

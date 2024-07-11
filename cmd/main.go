@@ -24,9 +24,12 @@ func main() {
 	}
 
 	e := echo.New()
-
+	e.Pre(middleware.RemoveTrailingSlash())
 	e.Static("/static", "assets")
-	e.Use(middleware.Logger())
+
+	if os.Getenv("APP_ENV") != "PROD" {
+		//e.Use(middleware.Logger())
+	}
 
 	store := db.NewStore()
 
