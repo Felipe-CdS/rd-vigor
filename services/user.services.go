@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"database/sql"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -78,41 +79,38 @@ func (us *UserService) GetUserByID(id string) (repositories.User, *ServiceLayerE
 func (us *UserService) AuthUser(login string, password string) (repositories.User, *ServiceLayerErr) {
 
 	var user repositories.User
-	var err error
 	var queryErr *repositories.RepositoryLayerErr
+	var isEmail bool = true
 
-	if _, err = mail.ParseAddress(login); err != nil {
-		user, queryErr = us.Repository.GetUserByUsername(login)
-
-		if queryErr != nil {
-			return repositories.User{}, &ServiceLayerErr{err, "Query Err", http.StatusInternalServerError}
-		}
-
-		userPassword, queryErr := us.Repository.GetUserPasswordByID(user.ID)
-
-		if queryErr != nil {
-			return repositories.User{}, &ServiceLayerErr{err, "Query Err", http.StatusInternalServerError}
-		}
-
-		err = bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(password))
-
-		if err != nil {
-			return repositories.User{}, &ServiceLayerErr{err, "Login ou senha errados...", http.StatusBadRequest}
-		}
-
-		return user, nil
+	if login == "" || password == "" {
+		return repositories.User{}, &ServiceLayerErr{nil, "Por favor, preencha ambos os campos.", http.StatusBadRequest}
 	}
 
-	user, queryErr = us.Repository.GetUserByEmail(login)
+	if _, err := mail.ParseAddress(login); err != nil {
+		isEmail = false
+	}
+
+	if isEmail {
+		user, queryErr = us.Repository.GetUserByEmail(login)
+	} else {
+		user, queryErr = us.Repository.GetUserByUsername(login)
+	}
 
 	if queryErr != nil {
-		return repositories.User{}, &ServiceLayerErr{err, "Query Err", http.StatusInternalServerError}
+		if queryErr.Error == sql.ErrNoRows {
+			return repositories.User{}, &ServiceLayerErr{queryErr.Error, "Login ou senha incorretos.", http.StatusBadRequest}
+		}
+		return repositories.User{}, &ServiceLayerErr{queryErr.Error, "Query Err", http.StatusInternalServerError}
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	userPassword, queryErr := us.Repository.GetUserPasswordByID(user.ID)
 
-	if err != nil {
-		return repositories.User{}, &ServiceLayerErr{err, "Login ou senha errados...", http.StatusBadRequest}
+	if queryErr != nil {
+		return repositories.User{}, &ServiceLayerErr{queryErr.Error, "Query Err", http.StatusInternalServerError}
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(password)); err != nil {
+		return repositories.User{}, &ServiceLayerErr{err, "Login ou senha incorretos.", http.StatusBadRequest}
 	}
 
 	return user, nil

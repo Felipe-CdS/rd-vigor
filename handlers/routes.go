@@ -28,6 +28,7 @@ func SetupRoutes(e *echo.Echo, uh *UserHandler) {
 
 	e.GET("/admin/dashboard", uh.GetAdminUserList)
 	e.GET("/admin/dashboard/details", uh.GetUserDetails)
+
 	e.GET("/logout", func(c echo.Context) error {
 		auth.ResetAuthCookies(c)
 		c.Response().Header().Set("HX-redirect", "/signin")

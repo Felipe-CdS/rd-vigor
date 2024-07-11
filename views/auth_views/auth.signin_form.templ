@@ -3,8 +3,9 @@ package auth_views
 templ SigninForm() {
 	<form
 		hx-post="/signin"
-		hx-target="body"
-		hx-target-3xx="#form-box"
+		hx-target="#form-box"
+		hx-target-3xx="body"
+		hx-target-4xx="#error-alert"
 		hx-push-url="true"
 		class="flex flex-col space-y-3 w-full"
 	>
@@ -20,6 +21,7 @@ templ SigninForm() {
 			class="py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid"
 			placeholder="Senha"
 		/>
+		<span id="error-alert"></span>
 		<button
 			type="submit"
 			class="p-3 w-full text-lg font-semibold rounded-md text-white bg-[#FFBD59]"
@@ -27,9 +29,6 @@ templ SigninForm() {
 			Entrar
 		</button>
 	</form>
-	<a class="text-sm text-[#FFBD59] cursor-pointer font-normal">
-		Esqueceu a senha?
-	</a>
 	<hr class="w-full h-px bg-gray-200 border-0"/>
 	<button
 		id="signup-button"
@@ -62,7 +61,7 @@ templ SigninFormDone() {
 templ SigninFormErrorAlert(message string) {
 	<span
 		id="error-alert"
-		class="block p-3 w-full text-sm text-justify rounded-md bg-[#fff1d4] border rounded-md font-normal border-[#fea439]"
+		class="block p-3 w-full text-sm rounded-md bg-[#fff1d4] border rounded-md font-normal border-[#fea439]"
 	>
 		<img class="inline size-5" src="static/img/error.svg"/>
 		{ message }

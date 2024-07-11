@@ -75,12 +75,12 @@ func createMigrations(db *sql.DB) error {
 		, last_name TEXT NOT NULL
 		, email TEXT NOT NULL
 		, occupation_area TEXT NOT NULL
-		, telephone TEXT NOT NULL
-		, refer_friend TEXT NOT NULL
+		, telephone TEXT
+		, refer_friend TEXT
 		, password TEXT NOT NULL
-		, role TEXT NOT NULL
-		, registration_status TEXT NOT NULL
-		, created_at TIMESTAMP WITH TIME ZONE NOT NULL
+		, role TEXT NOT NULL DEFAULT 'member'
+		, registration_status TEXT NOT NULL DEFAULT 'pending'
+		, created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 		, updated_at TIMESTAMP WITH TIME ZONE NOT NULL
 	)`
 

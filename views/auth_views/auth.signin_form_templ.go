@@ -23,7 +23,7 @@ func SigninForm() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form hx-post=\"/signin\" hx-target=\"body\" hx-target-3xx=\"#form-box\" hx-push-url=\"true\" class=\"flex flex-col space-y-3 w-full\"><input type=\"text\" name=\"login\" class=\"py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid\" placeholder=\"E-mail ou nome de usuário\"> <input type=\"password\" name=\"password\" class=\"py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid\" placeholder=\"Senha\"> <button type=\"submit\" class=\"p-3 w-full text-lg font-semibold rounded-md text-white bg-[#FFBD59]\">Entrar</button></form><a class=\"text-sm text-[#FFBD59] cursor-pointer font-normal\">Esqueceu a senha?</a><hr class=\"w-full h-px bg-gray-200 border-0\"><button id=\"signup-button\" hx-get=\"/signup\" hx-target=\"#form-box\" hx-push-url=\"true\" class=\"p-3 w-full font-semibold text-lg rounded-md text-white bg-[#441a06]\">Criar nova conta</button>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form hx-post=\"/signin\" hx-target=\"#form-box\" hx-target-3xx=\"body\" hx-target-4xx=\"#error-alert\" hx-push-url=\"true\" class=\"flex flex-col space-y-3 w-full\"><input type=\"text\" name=\"login\" class=\"py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid\" placeholder=\"E-mail ou nome de usuário\"> <input type=\"password\" name=\"password\" class=\"py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid\" placeholder=\"Senha\"> <span id=\"error-alert\"></span> <button type=\"submit\" class=\"p-3 w-full text-lg font-semibold rounded-md text-white bg-[#FFBD59]\">Entrar</button></form><hr class=\"w-full h-px bg-gray-200 border-0\"><button id=\"signup-button\" hx-get=\"/signup\" hx-target=\"#form-box\" hx-push-url=\"true\" class=\"p-3 w-full font-semibold text-lg rounded-md text-white bg-[#441a06]\">Criar nova conta</button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -71,14 +71,14 @@ func SigninFormErrorAlert(message string) templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<span id=\"error-alert\" class=\"block p-3 w-full text-sm text-justify rounded-md bg-[#fff1d4] border rounded-md font-normal border-[#fea439]\"><img class=\"inline size-5\" src=\"static/img/error.svg\"> ")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<span id=\"error-alert\" class=\"block p-3 w-full text-sm rounded-md bg-[#fff1d4] border rounded-md font-normal border-[#fea439]\"><img class=\"inline size-5\" src=\"static/img/error.svg\"> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(message)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth_views/auth.signin_form.templ`, Line: 68, Col: 11}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth_views/auth.signin_form.templ`, Line: 67, Col: 11}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
