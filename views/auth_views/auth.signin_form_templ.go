@@ -23,7 +23,7 @@ func SigninForm() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form class=\"flex flex-col space-y-3 w-full\"><input class=\"py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid\" placeholder=\"E-mail\"> <input class=\"py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid\" placeholder=\"Senha\"> <button hx-get=\"/not-ready\" hx-target=\"#form-box\" class=\"p-3 w-full text-lg font-semibold rounded-md text-white bg-[#FFBD59]\">Entrar</button></form><a class=\"text-sm text-[#FFBD59] cursor-pointer font-normal\">Esqueceu a senha?</a><hr class=\"w-full h-px bg-gray-200 border-0\"><button id=\"signup-button\" hx-get=\"/signup\" hx-target=\"#form-box\" class=\"p-3 w-full font-semibold text-lg rounded-md text-white bg-[#441a06]\">Criar nova conta</button>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form hx-post=\"/signin\" hx-target=\"#form-box\" hx-target-3xx=\"body\" hx-target-4xx=\"#error-alert\" hx-push-url=\"true\" class=\"flex flex-col space-y-3 w-full\"><input type=\"text\" name=\"login\" class=\"py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid\" placeholder=\"E-mail ou nome de usuário\"> <input type=\"password\" name=\"password\" class=\"py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid\" placeholder=\"Senha\"> <span id=\"error-alert\"></span> <button type=\"submit\" class=\"p-3 w-full text-lg font-semibold rounded-md text-white bg-[#FFBD59]\">Entrar</button></form><hr class=\"w-full h-px bg-gray-200 border-0\"><button id=\"signup-button\" hx-get=\"/signup\" hx-target=\"#form-box\" hx-push-url=\"true\" class=\"p-3 w-full font-semibold text-lg rounded-md text-white bg-[#441a06]\">Criar nova conta</button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -48,6 +48,43 @@ func SigninFormDone() templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-col justify-between items-center w-full\"><div><h1 class=\"text-center text-gray-400 text-md\">Obrigado por se cadastrar na RD Vigor. No momento ainda estamos dando os últimos retoques na plataforma para que você tenha a melhor experiência possivel. Assim que tudo estiver pronto enviaremos um e-mail para você. Nos vemos em breve!</h1></div><a hx-get=\"/\" hx-target=\"body\" class=\"text-md mt-3 text-[#FFBD59] cursor-pointer font-normal\">Voltar</a></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if !templ_7745c5c3_IsBuffer {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteTo(templ_7745c5c3_W)
+		}
+		return templ_7745c5c3_Err
+	})
+}
+
+func SigninFormErrorAlert(message string) templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
+		if !templ_7745c5c3_IsBuffer {
+			templ_7745c5c3_Buffer = templ.GetBuffer()
+			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<span id=\"error-alert\" class=\"block p-3 w-full text-sm rounded-md bg-[#fff1d4] border rounded-md font-normal border-[#fea439]\"><img class=\"inline size-5\" src=\"static/img/error.svg\"> ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(message)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/auth_views/auth.signin_form.templ`, Line: 67, Col: 11}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
