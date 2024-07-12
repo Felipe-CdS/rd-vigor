@@ -12,6 +12,7 @@ import (
 	"nugu.dev/rd-vigor/services"
 	admin_views "nugu.dev/rd-vigor/views/admin_views/dashboard"
 	"nugu.dev/rd-vigor/views/auth_views"
+	"nugu.dev/rd-vigor/views/user_views"
 )
 
 type UserService interface {
@@ -204,6 +205,15 @@ func (uh *UserHandler) GetUserDetails(c echo.Context) error {
 	}
 
 	return uh.View(c, admin_views.UserInfoDiv(usr))
+}
+
+func (uh *UserHandler) GetUserProfile(c echo.Context) error {
+
+	// usr, queryErr := uh.UserServices.GetUser(c.Param("user"))
+
+	user := repositories.User{}
+
+	return uh.View(c, user_views.UserProfile("aaa", user))
 }
 
 func (uh *UserHandler) View(c echo.Context, cmp templ.Component) error {

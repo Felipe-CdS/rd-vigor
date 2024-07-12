@@ -1,0 +1,51 @@
+package layout
+
+import "nugu.dev/rd-vigor/repositories"
+
+templ UserNavbar(user repositories.User) {
+	<div class="flex items-center py-4 px-8 h-14 border-b border-gray-200 border-solid">
+		<a class="flex items-center mr-3 w-28 sm:mr-4">
+			<img class="w-full" src="/static/img/logo-full-2.png"/>
+		</a>
+		<div class="flex items-center space-x-3 h-8">
+			<a class="p-1 text-[#71717A] cursor-pointer">Home</a>
+			<a class="p-1 text-[#71717A] cursor-pointer">Eventos</a>
+			<a class="p-1 text-[#71717A] cursor-pointer">Reuniões</a>
+		</div>
+		<div class="flex items-center ml-auto space-x-4">
+			<span class="sm:block">{ user.Username }</span>
+			<button
+				hx-get="/logout"
+				hx-target="body"
+				hx-push-url="true"
+				class="px-4 py-2 rounded-full bg-[#27272A] text-white font-medium text-sm"
+			>
+				<span class="sm:block">Logout</span>
+			</button>
+		</div>
+	</div>
+}
+
+templ AdminNavbar() {
+	<div class="flex items-center py-4 px-8 h-14 border-b border-gray-200 border-solid">
+		<a class="flex items-center mr-3 w-28 sm:mr-4">
+			<img class="w-full" src="/static/img/logo-full-2.png"/>
+		</a>
+		<div class="flex items-center space-x-3 h-8">
+			<a class="p-1 text-[#71717A] cursor-pointer">Home</a>
+			<a class="p-1 text-[#71717A] cursor-pointer">Eventos</a>
+			<a class="p-1 text-[#71717A] cursor-pointer">Reuniões</a>
+			<a class="p-1 text-[#27272A] cursor-pointer">Dashboard</a>
+		</div>
+		<div class="flex items-center ml-auto space-x-4">
+			<button
+				hx-get="/logout"
+				hx-target="body"
+				hx-push-url="true"
+				class="px-4 py-2 rounded-full bg-[#27272A] text-white font-medium text-sm"
+			>
+				<span class="sm:block">Logout</span>
+			</button>
+		</div>
+	</div>
+}

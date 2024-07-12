@@ -94,10 +94,15 @@ templ UserInfoDiv(user repositories.User) {
 		class="flex flex-col p-4 w-2/3 h-full text-left bg-white rounded-md border border-gray-200 border-solid card-shadow"
 	>
 		<div class="flex flex-col justify-items-start items-start py-2 px-4 w-full">
-			<p class="mr-auto text-2xl font-semibold">
-				{ user.FirstName }
-				{ user.LastName }
-			</p>
+			<div class="flex content-between w-full">
+				<span class="text-2xl font-semibold">
+					{ user.FirstName }
+					{ user.LastName }
+				</span>
+				<a href={ templ.URL(fmt.Sprintf("/user/%s", user.Username)) } class="inline ml-auto text-sm underline">
+					Ir para perfil público
+				</a>
+			</div>
 			<hr class="my-2 w-full h-px bg-gray-200 border-0"/>
 			<h1 class="text-gray-500 text-md">Informações básicas</h1>
 			<div class="flex mt-1 space-x-3 w-full">

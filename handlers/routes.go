@@ -18,6 +18,8 @@ func SetupRoutes(e *echo.Echo, uh *UserHandler) {
 		return c.Redirect(http.StatusPermanentRedirect, "/admin/dashboard")
 	})
 
+	e.GET("/user/:username", uh.GetUserProfile)
+
 	e.GET("/signup-done", signupFormDone)
 
 	e.GET("/signup", uh.CreateNewUser)
