@@ -72,3 +72,27 @@ func AdminNavbar() templ.Component {
 		return templ_7745c5c3_Err
 	})
 }
+
+func MobileNavbar(user repositories.User) templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
+		if !templ_7745c5c3_IsBuffer {
+			templ_7745c5c3_Buffer = templ.GetBuffer()
+			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var4 == nil {
+			templ_7745c5c3_Var4 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div x-data=\"{open: false}\" class=\"flex flex-col\"><div class=\"flex items-center py-4 px-8 h-14 border-b border-gray-200 border-solid\"><a class=\"flex items-center mr-3 w-28 sm:mr-4\"><img class=\"w-full\" src=\"/static/img/logo-full-2.png\"></a> <button class=\"ml-auto size-8\" x-on:click=\"open = !open; document.body.classList.add(&#39;no-scroll&#39;);\"><img class=\"w-full\" src=\"/static/img/menu.svg\"></button></div><button class=\"flex overscroll-contain absolute right-0 z-40 flex-col w-screen h-screen bg-black bg-opacity-50\" x-on:click=\"open = !open; document.body.classList.remove(&#39;no-scroll&#39;);\" x-show=\"open\" x-transition.opacity></button><div class=\"flex absolute right-0 z-50 flex-col w-3/5 h-screen bg-white\" x-show=\"open\" x-transition.scale.origin.right><a class=\"p-1 text-[#71717A] cursor-pointer\">Home</a> <a class=\"p-1 text-[#71717A] cursor-pointer\">Eventos</a> <a class=\"p-1 text-[#71717A] cursor-pointer\">Reuniões</a> <a class=\"p-1 text-[#27272A] cursor-pointer\">Dashboard</a></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if !templ_7745c5c3_IsBuffer {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteTo(templ_7745c5c3_W)
+		}
+		return templ_7745c5c3_Err
+	})
+}

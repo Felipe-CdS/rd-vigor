@@ -7,7 +7,7 @@ import (
 
 templ UserProfile(title string, user repositories.User) {
 	@layout.Base(title) {
-		@layout.UserNavbar(user)
+		@layout.MobileNavbar(user)
 		<div class="flex flex-col py-5 px-5 lg:px-32 2xl:px-64 grow bg-[#F0F2F5] w-screen min-h-[calc(100vh-7rem)] items-center">
 			<div
 				class="flex p-4 w-full h-32 text-left rounded-t-md border border-b-0 border-gray-200 border-solid bgflex-col card-shadow"

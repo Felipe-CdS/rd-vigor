@@ -49,3 +49,38 @@ templ AdminNavbar() {
 		</div>
 	</div>
 }
+
+templ MobileNavbar(user repositories.User) {
+	<div
+		x-data="{open: false}"
+		class="flex flex-col"
+	>
+		<div class="flex items-center py-4 px-8 h-14 border-b border-gray-200 border-solid">
+			<a class="flex items-center mr-3 w-28 sm:mr-4">
+				<img class="w-full" src="/static/img/logo-full-2.png"/>
+			</a>
+			<button
+				class="ml-auto size-8"
+				x-on:click="open = !open; document.body.classList.add('no-scroll');"
+			>
+				<img class="w-full" src="/static/img/menu.svg"/>
+			</button>
+		</div>
+		<button
+			class="flex overscroll-contain absolute right-0 z-40 flex-col w-screen h-screen bg-black bg-opacity-50"
+			x-on:click="open = !open; document.body.classList.remove('no-scroll');"
+			x-show="open"
+			x-transition.opacity
+		></button>
+		<div
+			class="flex absolute right-0 z-50 flex-col w-3/5 h-screen bg-white"
+			x-show="open"
+			x-transition.scale.origin.right
+		>
+			<a class="p-1 text-[#71717A] cursor-pointer">Home</a>
+			<a class="p-1 text-[#71717A] cursor-pointer">Eventos</a>
+			<a class="p-1 text-[#71717A] cursor-pointer">Reuniões</a>
+			<a class="p-1 text-[#27272A] cursor-pointer">Dashboard</a>
+		</div>
+	</div>
+}
