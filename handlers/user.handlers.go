@@ -3,7 +3,6 @@ package handlers
 import (
 	"net/http"
 	"net/mail"
-	"regexp"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
@@ -16,7 +15,7 @@ import (
 )
 
 type UserService interface {
-	CreateUser(u repositories.User) *services.ServiceLayerErr
+	CreateUser(data map[string]string) *services.ServiceLayerErr
 	AuthUser(login string, password string) (repositories.User, *services.ServiceLayerErr)
 	GetAllUsers() ([]repositories.User, *services.ServiceLayerErr)
 	GetUserByID(id string) (repositories.User, *services.ServiceLayerErr)
@@ -45,13 +44,6 @@ func (uh *UserHandler) CreateNewUser(c echo.Context) error {
 	}
 
 	if c.Request().Method == "POST" {
-
-		usernameRegex, _ := regexp.Compile("^[\\w\\d][a-zA-Z0-9_\\-\\.]{4,17}$")
-
-		if c.FormValue("username") == "" || !usernameRegex.MatchString(c.FormValue("username")) {
-			c.Response().WriteHeader(http.StatusBadRequest)
-			return uh.View(c, auth_views.SignupFormErrorAlert("Por favor, insira um nome de usuário válido. O mesmo deve ter entre 5 e 18 caracteres e ser composto apenas por letras, números, pontos, hífens ou underscores. Você poderá trocar esse nome depois, se necessário."))
-		}
 
 		if c.FormValue("first_name") == "" {
 			c.Response().WriteHeader(http.StatusBadRequest)
@@ -93,18 +85,17 @@ func (uh *UserHandler) CreateNewUser(c echo.Context) error {
 			return uh.View(c, auth_views.SignupFormErrorAlert("Por favor, insira um telefone válido."))
 		}
 
-		user := repositories.User{
-			Username:       c.FormValue("username"),
-			FirstName:      c.FormValue("first_name"),
-			LastName:       c.FormValue("last_name"),
-			Email:          c.FormValue("email"),
-			OccupationArea: c.FormValue("occupation_area"),
-			Telephone:      c.FormValue("telephone"),
-			Password:       c.FormValue("password"),
-			ReferFriend:    c.FormValue("refer_friend"),
+		userData := map[string]string{
+			"FirstName":      c.FormValue("first_name"),
+			"LastName":       c.FormValue("last_name"),
+			"Email":          c.FormValue("email"),
+			"OccupationArea": c.FormValue("occupation_area"),
+			"Telephone":      c.FormValue("telephone"),
+			"Password":       c.FormValue("password"),
+			"ReferFriend":    c.FormValue("refer_friend"),
 		}
 
-		if err := uh.UserServices.CreateUser(user); err != nil {
+		if err := uh.UserServices.CreateUser(userData); err != nil {
 			if err.Code == http.StatusInternalServerError {
 				c.Response().WriteHeader(http.StatusInternalServerError)
 				return uh.View(c, auth_views.SignupFormErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))

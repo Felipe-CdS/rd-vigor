@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
+	"math/rand"
 	"mime/multipart"
 	"net/http"
 	"net/mail"
@@ -37,7 +38,28 @@ func NewUserService(ur UserRepository) *UserService {
 	}
 }
 
-func (us *UserService) CreateUser(u repositories.User) *ServiceLayerErr {
+func (us *UserService) CreateUser(data map[string]string) *ServiceLayerErr {
+
+	var generatedUsername string
+
+	for {
+		generatedUsername = fmt.Sprintf("%s-%s-%05d", data["FirstName"], data["LastName"], rand.Intn(10000))
+
+		if !us.Repository.CheckUsernameExists(generatedUsername) {
+			break
+		}
+	}
+
+	u := repositories.User{
+		Username:       generatedUsername,
+		FirstName:      data["FirstName"],
+		LastName:       data["LastName"],
+		Email:          data["Email"],
+		OccupationArea: data["OccupationArea"],
+		Telephone:      data["Telephone"],
+		Password:       data["Password"],
+		ReferFriend:    data["ReferFriend"],
+	}
 
 	if _, err := mail.ParseAddress(u.Email); err != nil {
 		return &ServiceLayerErr{nil, "E-mail inválido.", http.StatusBadRequest}
