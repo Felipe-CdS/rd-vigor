@@ -34,12 +34,7 @@ type UserHandler struct {
 func (uh *UserHandler) CreateNewUser(c echo.Context) error {
 
 	if c.Request().Method == "GET" {
-
-		if c.Request().Header.Get("HX-Request") != "true" {
-			return c.Redirect(http.StatusMovedPermanently, "/signin")
-		}
-
-		cmp := auth_views.SignupForm()
+		cmp := auth_views.Base("Sign up", auth_views.SignupForm())
 		return cmp.Render(c.Request().Context(), c.Response().Writer)
 	}
 
@@ -129,7 +124,7 @@ func (uh *UserHandler) SigninUser(c echo.Context) error {
 			return c.Redirect(http.StatusMovedPermanently, "/user/home")
 		}
 
-		cmp := auth_views.Base("Login or sign up")
+		cmp := auth_views.Base("Login or sign up", auth_views.SigninForm())
 		return cmp.Render(c.Request().Context(), c.Response().Writer)
 	}
 

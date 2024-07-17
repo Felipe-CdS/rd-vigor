@@ -30,15 +30,12 @@ templ SigninForm() {
 		</button>
 	</form>
 	<hr class="w-full h-px bg-gray-200 border-0"/>
-	<button
-		id="signup-button"
-		hx-get="/signup"
-		hx-target="#form-box"
-		hx-push-url="true"
-		class="p-3 w-full font-semibold text-lg rounded-md text-white bg-[#441a06]"
+	<a
+		href="/signup"
+		class="text-center p-3 w-full font-semibold text-lg rounded-md text-white bg-[#441a06]"
 	>
 		Criar nova conta
-	</button>
+	</a>
 }
 
 templ SigninFormDone() {
