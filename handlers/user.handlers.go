@@ -185,14 +185,14 @@ func (uh *UserHandler) GetUserDetails(c echo.Context) error {
 
 	if c.Request().Header.Get("HX-Request") != "true" {
 		c.Response().Header().Set("HX-redirect", "/admin/dashboard")
-		return c.NoContent(http.StatusPermanentRedirect)
+		return c.NoContent(http.StatusMovedPermanently)
 	}
 
 	usr, queryErr := uh.UserServices.GetUserByID(c.QueryParam("user"))
 
 	if queryErr != nil {
 		c.Response().Header().Set("HX-redirect", "/admin/dashboard")
-		return c.NoContent(http.StatusPermanentRedirect)
+		return c.NoContent(http.StatusMovedPermanently)
 	}
 
 	return uh.View(c, admin_views.UserInfoDiv(usr))

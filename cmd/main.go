@@ -28,7 +28,7 @@ func main() {
 	e.Static("/static", "assets")
 
 	if os.Getenv("APP_ENV") != "PROD" {
-		//e.Use(middleware.Logger())
+		e.Use(middleware.Logger())
 	}
 
 	store := db.NewStore()

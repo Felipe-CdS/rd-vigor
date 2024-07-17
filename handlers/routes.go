@@ -11,11 +11,11 @@ import (
 func SetupRoutes(e *echo.Echo, uh *UserHandler) {
 
 	e.GET("/", func(c echo.Context) error {
-		return c.Redirect(http.StatusPermanentRedirect, "/signin")
+		return c.Redirect(http.StatusMovedPermanently, "/signin")
 	})
 
 	e.GET("/admin", func(c echo.Context) error {
-		return c.Redirect(http.StatusPermanentRedirect, "/admin/dashboard")
+		return c.Redirect(http.StatusMovedPermanently, "/admin/dashboard")
 	})
 
 	e.GET("/user/:username", uh.GetUserProfile)
@@ -34,7 +34,7 @@ func SetupRoutes(e *echo.Echo, uh *UserHandler) {
 	e.GET("/logout", func(c echo.Context) error {
 		auth.ResetAuthCookies(c)
 		c.Response().Header().Set("HX-redirect", "/signin")
-		return c.NoContent(http.StatusPermanentRedirect)
+		return c.NoContent(http.StatusMovedPermanently)
 	})
 }
 
