@@ -49,7 +49,7 @@ func UserNavbar(user repositories.User) templ.Component {
 	})
 }
 
-func AdminNavbar() templ.Component {
+func BaseNavbar() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -62,7 +62,39 @@ func AdminNavbar() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex items-center py-4 px-8 h-14 border-b border-gray-200 border-solid\"><a class=\"flex items-center mr-3 w-28 sm:mr-4\"><img class=\"w-full\" src=\"/static/img/logo-full-2.png\"></a><div class=\"flex items-center space-x-3 h-8\"><a class=\"p-1 text-[#71717A] cursor-pointer\">Home</a> <a class=\"p-1 text-[#71717A] cursor-pointer\">Eventos</a> <a class=\"p-1 text-[#71717A] cursor-pointer\">Reuniões</a> <a class=\"p-1 text-[#27272A] cursor-pointer\">Dashboard</a></div><div class=\"flex items-center ml-auto space-x-4\"><button hx-get=\"/logout\" hx-target=\"body\" hx-push-url=\"true\" class=\"px-4 py-2 rounded-full bg-[#27272A] text-white font-medium text-sm\"><span class=\"sm:block\">Logout</span></button></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-col px-5 pt-4 space-y-2 w-full text-lg font-normal\"><a class=\"flex items-center text-[#71717A] cursor-pointer\"><img class=\"mr-2 opacity-50 size-5\" src=\"/static/img/home.svg\"> Início</a> <a class=\"flex items-center text-[#71717A] cursor-pointer\"><img class=\"mr-2 opacity-50 size-5\" src=\"/static/img/events.svg\"> Eventos</a> <a class=\"flex items-center text-[#71717A] cursor-pointer\"><img class=\"mr-2 opacity-50 size-5\" src=\"/static/img/mail.svg\"> Mensagens</a> <a class=\"flex items-center text-[#71717A] cursor-pointer\"><img class=\"mr-2 opacity-50 size-5\" src=\"/static/img/group.svg\"> Grupos</a> <a class=\"flex items-center text-[#71717A] cursor-pointer\"><img class=\"mr-2 opacity-50 size-5\" src=\"/static/img/profile.svg\"> Seu Pefil</a></div><div class=\"flex flex-col mt-auto w-full text-sm font-normal\"><div class=\"flex flex-col py-5 px-5 space-y-2 w-full border-t border-gray-200 border-solid\"><button class=\"flex items-center text-[#71717A] cursor-pointer\"><img class=\"mr-1 w-6 opacity-50\" src=\"/static/img/notification.svg\"> Notificações</button> <button class=\"flex items-center text-[#71717A] cursor-pointer\"><img class=\"mr-1 w-6 opacity-50\" src=\"/static/img/settings.svg\"> Configurações</button> <a href=\"/admin/dashboard\" class=\"flex items-center text-[#71717A] cursor-pointer\"><img class=\"mr-1 w-6 opacity-50\" src=\"/static/img/shield.svg\"> Admin</a> <button hx-get=\"/logout\" hx-target=\"body\" hx-push-url=\"true\" class=\"flex items-center text-[#71717A] cursor-pointer\"><img class=\"mr-1 w-6 opacity-50\" src=\"/static/img/logout.svg\"> Sair</button></div><div class=\"flex items-center py-4 px-4 h-16 w-full bg-[#F0F2F5] lg:bg-white border-t border-gray-200 border-solid\"><img class=\"mr-2 h-full bg-white rounded-full\" src=\"/static/img/musk.jpeg\"><div class=\"flex flex-col grow\"><span class=\"text-[#27272A] font-semibold overflow-x-hidden w-full text-base text-ellipsis\">Elon Musk</span> <span class=\"text-[#71717A] overflow-x-hidden w-full text-xs text-ellipsis\">hasdkhsdahjsda </span></div></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if !templ_7745c5c3_IsBuffer {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteTo(templ_7745c5c3_W)
+		}
+		return templ_7745c5c3_Err
+	})
+}
+
+func DesktopNavbar() templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
+		if !templ_7745c5c3_IsBuffer {
+			templ_7745c5c3_Buffer = templ.GetBuffer()
+			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var4 == nil {
+			templ_7745c5c3_Var4 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"hidden lg:flex flex-col w-72 border-r border-gray-200 border-solid h-screen lg:h-[calc(100vh-3.5rem-1px)]\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = BaseNavbar().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -81,12 +113,20 @@ func MobileNavbar(user repositories.User) templ.Component {
 			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var4 == nil {
-			templ_7745c5c3_Var4 = templ.NopComponent
+		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var5 == nil {
+			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div x-data=\"{open: false}\" class=\"flex flex-col\"><div class=\"flex items-center py-4 px-8 h-14 border-b border-gray-200 border-solid\"><a class=\"flex items-center mr-3 w-28 sm:mr-4\"><img class=\"w-full\" src=\"/static/img/logo-full-2.png\"></a> <button class=\"ml-auto size-8\" x-on:click=\"open = !open; document.body.classList.add(&#39;no-scroll&#39;);\"><img class=\"w-full\" src=\"/static/img/menu.svg\"></button></div><button class=\"flex overscroll-contain absolute right-0 z-40 flex-col w-screen h-screen bg-black bg-opacity-50\" x-on:click=\"open = !open; document.body.classList.remove(&#39;no-scroll&#39;);\" x-show=\"open\" x-transition.opacity></button><div class=\"flex absolute right-0 z-50 flex-col w-3/5 h-screen bg-white\" x-show=\"open\" x-transition.scale.origin.right><a class=\"p-1 text-[#71717A] cursor-pointer\">Home</a> <a class=\"p-1 text-[#71717A] cursor-pointer\">Eventos</a> <a class=\"p-1 text-[#71717A] cursor-pointer\">Reuniões</a> <a class=\"p-1 text-[#27272A] cursor-pointer\">Dashboard</a></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-col w-screen absolute z-50 right-0 border-r -top-14 border-gray-200 border-solid h-screen lg:h-[calc(100vh-3.5rem-1px)]\" x-show=\"open\"><button class=\"flex overscroll-contain absolute right-0 z-40 flex-col w-screen h-screen bg-black bg-opacity-50 lg:hidden\" x-on:click=\"open = !open; document.body.classList.remove(&#39;no-scroll&#39;);\" x-transition.opacity></button><div class=\"flex absolute right-0 z-50 flex-col w-3/5 h-full bg-white md:w-2/6 lg:relative lg:right-auto lg:z-0 lg:w-full\" x-transition.scale><div class=\"flex py-4 px-4 w-full lg:hidden\"><button class=\"ml-auto\" x-on:click=\"open = !open; document.body.classList.remove(&#39;no-scroll&#39;);\"><img class=\"opacity-50 size-10\" src=\"/static/img/close.svg\"></button></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = BaseNavbar().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
