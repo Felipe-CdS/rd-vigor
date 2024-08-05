@@ -22,6 +22,9 @@ templ Base(title string) {
 			.card-shadow {
 				box-shadow: 0 10px 40px -12px rgba(16,24,40,.1);
 			}
+			.no-scroll {
+				position:fixed;
+			}
 			[data-loading] {
 				display: none;
 			}
@@ -30,12 +33,9 @@ templ Base(title string) {
 		<body
 			hx-boost="true"
 			hx-ext="loading-states, response-targets"
-			class="flex flex-col min-h-screen font-medium font-[Inter]"
+			class="flex flex-col w-screen min-h-screen font-medium font-[Inter]"
 		>
 			{ children... }
-			<div class="flex justify-center py-4 px-8 w-full h-14 bg-white border-t border-gray-200 border-solid">
-				<span class="text-[#71717A]">© RD Vigor 2024</span>
-			</div>
 		</body>
 	</html>
 }
