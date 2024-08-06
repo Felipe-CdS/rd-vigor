@@ -8,7 +8,7 @@ import (
 	"nugu.dev/rd-vigor/views/auth_views"
 )
 
-func SetupRoutes(e *echo.Echo, uh *UserHandler) {
+func SetupRoutes(e *echo.Echo, uh *UserHandler, eh *EventHandler) {
 
 	e.GET("/", func(c echo.Context) error {
 		return c.Redirect(http.StatusMovedPermanently, "/signin")
@@ -36,6 +36,10 @@ func SetupRoutes(e *echo.Echo, uh *UserHandler) {
 		c.Response().Header().Set("HX-redirect", "/signin")
 		return c.NoContent(http.StatusMovedPermanently)
 	})
+
+	/* EVENTS ROUTES*/
+
+	e.GET("/events", eh.GetEventSearchPage)
 }
 
 func signupFormDone(c echo.Context) error {

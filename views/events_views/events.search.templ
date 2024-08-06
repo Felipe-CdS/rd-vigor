@@ -1,0 +1,28 @@
+package events_views
+
+import (
+	"nugu.dev/rd-vigor/views/layout"
+	"nugu.dev/rd-vigor/repositories"
+)
+
+templ EventSearch(user repositories.User) {
+	@layout.Base("Eventos") {
+		<div x-data="{open: false}">
+			<div class="flex items-center py-4 px-8 h-14 border-b border-gray-200 border-solid">
+				<a class="flex items-center mr-3 w-28 sm:mr-4">
+					<img class="w-full" src="/static/img/logo-full-2.png"/>
+				</a>
+				<button
+					class="ml-auto lg:hidden size-8"
+					x-on:click="open = !open; document.body.classList.add('no-scroll');"
+				>
+					<img class="w-full" src="/static/img/menu.svg"/>
+				</button>
+			</div>
+			<div class="flex relative w-screen h-[calc(100vh-3.5rem)]">
+				@layout.DesktopNavbar()
+				@layout.MobileNavbar(user)
+			</div>
+		</div>
+	}
+}

@@ -38,6 +38,11 @@ func main() {
 	us := services.NewUserService(ur)
 	uh := handlers.NewUserHandler(us)
 
-	handlers.SetupRoutes(e, uh)
+	er := repositories.NewEventRepository(repositories.Event{}, store)
+	es := services.NewEventService(er)
+	eh := handlers.NewEventHandler(es)
+
+	handlers.SetupRoutes(e, uh, eh)
+
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", port)))
 }
