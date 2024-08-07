@@ -1,8 +1,8 @@
 package events_views
 
 import (
-	"nugu.dev/rd-vigor/views/layout"
 	"nugu.dev/rd-vigor/repositories"
+	"nugu.dev/rd-vigor/views/layout"
 )
 
 templ EventSearch(user repositories.User) {
@@ -22,6 +22,38 @@ templ EventSearch(user repositories.User) {
 			<div class="flex relative w-screen h-[calc(100vh-3.5rem)]">
 				@layout.DesktopNavbar()
 				@layout.MobileNavbar(user)
+				<div class="overflow-x-hidden flex flex-col py-5 px-5 lg:px-12 2xl:px-64 w-full lg:w-[calc(100vw-18rem)] h-full overflow-y-scroll bg-[#F0F2F5]">
+					<h1 class="mb-2 text-3xl font-bold">Eventos</h1>
+					<div class="flex mb-4 w-full font-normal text-gray-400 border-b-2 text-md">
+						<h1 class="mr-5 text-[#ed6c09] border-b-2 pb-[calc(0.5rem-3px)] border-[#ed6c09]">Próximos Eventos</h1>
+						<h1>Eventos Passados</h1>
+						<div class="flex items-center text-sm ml-auto pb-[calc(0.5rem-3px)]">
+							<h1>Filtrar por:</h1>
+							<h1 class="ml-1 text-black">Recomendado</h1>
+							<img class="ml-1 opacity-50 rotate-90 size-3" src="/static/img/arrow-right.svg"/>
+						</div>
+					</div>
+					<div
+						class="flex relative p-4 mb-2 w-full text-left bg-white rounded-md border border-gray-200 border-solid card-shadow"
+					>
+						<img class="mr-5 h-32 aspect-square" src="/static/img/events-1.png"/>
+						<div class="flex flex-col text-sm font-normal text-gray-500 grow">
+							<div class="flex items-center">
+								<h1 class="text-3xl font-bold text-black">Negócios e Inteligência Relacional</h1>
+								<img class="ml-auto opacity-50 size-8" src="/static/img/star.svg"/>
+							</div>
+							<span>Organizado por RD vigor </span>
+							<span class="flex items-center mt-auto">
+								<img class="mr-1 opacity-50 size-5" src="/static/img/map.svg"/>
+								<span class="mt-auto">Praça Pio X, 79 - 2º andar | Centro - Rio de Janeiro</span>
+							</span>
+							<span class="flex items-center mt-1">
+								<img class="mr-1 opacity-50 size-5" src="/static/img/clock.svg"/>
+								<span>13 de agosto de 2024 a partir das 09:00h</span>
+							</span>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	}
