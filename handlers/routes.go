@@ -40,6 +40,7 @@ func SetupRoutes(e *echo.Echo, uh *UserHandler, eh *EventHandler) {
 	/* EVENTS ROUTES*/
 
 	e.GET("/events", eh.GetEventSearchPage)
+	e.GET("/event/:event_id", eh.GetEventDetails)
 }
 
 func signupFormDone(c echo.Context) error {

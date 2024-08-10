@@ -34,7 +34,10 @@ templ EventSearch(user repositories.User) {
 						</div>
 					</div>
 					<div
-						class="flex relative p-4 mb-2 w-full text-left bg-white rounded-md border border-gray-200 border-solid card-shadow"
+						hx-get="/event/123"
+						hx-target="body"
+						hx-push-url="true"
+						class="flex relative p-4 mb-2 w-full text-left bg-white rounded-md border border-gray-200 border-solid cursor-pointer hover:shadow-lg card-shadow"
 					>
 						<img class="mr-5 h-32 aspect-square" src="/static/img/events-1.png"/>
 						<div class="flex flex-col text-sm font-normal text-gray-500 grow">

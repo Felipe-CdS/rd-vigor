@@ -26,6 +26,12 @@ func (eh *EventHandler) GetEventSearchPage(c echo.Context) error {
 	return eh.View(c, events_views.EventSearch(usr))
 }
 
+func (eh *EventHandler) GetEventDetails(c echo.Context) error {
+	usr := repositories.User{}
+
+	return eh.View(c, events_views.EventDetails(usr))
+}
+
 func (eh *EventHandler) View(c echo.Context, cmp templ.Component) error {
 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
 
