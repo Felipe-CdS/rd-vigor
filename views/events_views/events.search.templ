@@ -6,95 +6,78 @@ import (
 )
 
 templ EventSearch(user repositories.User) {
-	@layout.Base("Eventos") {
-		<div x-data="{open: false}">
-			<div class="flex items-center py-4 px-8 h-14 border-b border-gray-200 border-solid">
-				<a class="flex items-center mr-3 w-28 sm:mr-4">
-					<img class="w-full" src="/static/img/logo-full-2.png"/>
-				</a>
-				<button
-					class="ml-auto lg:hidden size-8"
-					x-on:click="open = !open; document.body.classList.add('no-scroll');"
-				>
-					<img class="w-full" src="/static/img/menu.svg"/>
-				</button>
+	@layout.Base("Eventos", user, true) {
+		<div class="overflow-x-hidden flex flex-col py-5 px-5 lg:px-12 2xl:px-64 w-full lg:w-[calc(100vw-18rem)] h-full overflow-y-scroll bg-[#F0F2F5]">
+			<h1 class="mb-2 text-3xl font-bold">Eventos</h1>
+			<div class="flex mb-2 w-full text-sm font-normal text-gray-400 md:text-sm">
+				<h1 class=" pb-2 text-[#ed6c09] border-b-2 border-[#ed6c09]">Próximos Eventos</h1>
+				<h1 class="px-1 ml-3">Eventos Anteriores</h1>
 			</div>
-			<div class="flex relative w-screen h-[calc(100vh-3.5rem)]">
-				@layout.DesktopNavbar()
-				@layout.MobileNavbar(user)
-				<div class="overflow-x-hidden flex flex-col py-5 px-5 lg:px-12 2xl:px-64 w-full lg:w-[calc(100vw-18rem)] h-full overflow-y-scroll bg-[#F0F2F5]">
-					<h1 class="mb-2 text-3xl font-bold">Eventos</h1>
-					<div class="flex mb-2 w-full text-sm font-normal text-gray-400 md:text-sm">
-						<h1 class=" pb-2 text-[#ed6c09] border-b-2 border-[#ed6c09]">Próximos Eventos</h1>
-						<h1 class="px-1 ml-3">Eventos Anteriores</h1>
+			<!-- ################################################################################# -->
+			<div
+				hx-get="/event/123"
+				hx-target="body"
+				hx-push-url="true"
+				class="mb-2 w-full cursor-pointer card-shadow"
+			>
+				<!-- Desktop -->
+				<div class="hidden p-4 w-full bg-white rounded-md border border-gray-200 border-solid md:flex hover:shadow-lg card-shadow">
+					<img class="mr-5 h-32 aspect-square" src="/static/img/events-1.png"/>
+					<div class="flex flex-col text-sm font-normal text-gray-500 grow">
+						<div class="flex items-center">
+							<h1 class="text-3xl font-bold text-black">Negócios e Inteligência Relacional</h1>
+							<img class="ml-auto opacity-50 size-8" src="/static/img/star.svg"/>
+						</div>
+						<span>Organizado por RD vigor </span>
+						<span class="flex items-center mt-auto">
+							<img class="mr-1 opacity-50 size-5" src="/static/img/map.svg"/>
+							<span class="mt-auto">Praça Pio X, 79 - 2º andar | Centro - Rio de Janeiro</span>
+						</span>
+						<span class="flex items-center mt-1">
+							<img class="mr-1 opacity-50 size-5" src="/static/img/clock.svg"/>
+							<span>13 de agosto de 2024 a partir das 09:00h</span>
+						</span>
 					</div>
-					<!-- ################################################################################# -->
+				</div>
+				<!-- Mobile -->
+				<div class="flex flex-col w-full md:hidden">
 					<div
-						hx-get="/event/123"
-						hx-target="body"
-						hx-push-url="true"
-						class="mb-2 w-full cursor-pointer card-shadow"
+						class="overflow-hidden relative w-full h-32 rounded-t-md border border-b-0 border-gray-200 border-solid card-shadow"
 					>
-						<!-- Desktop -->
-						<div class="hidden p-4 w-full bg-white rounded-md border border-gray-200 border-solid md:flex hover:shadow-lg card-shadow">
-							<img class="mr-5 h-32 aspect-square" src="/static/img/events-1.png"/>
-							<div class="flex flex-col text-sm font-normal text-gray-500 grow">
-								<div class="flex items-center">
-									<h1 class="text-3xl font-bold text-black">Negócios e Inteligência Relacional</h1>
-									<img class="ml-auto opacity-50 size-8" src="/static/img/star.svg"/>
-								</div>
-								<span>Organizado por RD vigor </span>
-								<span class="flex items-center mt-auto">
-									<img class="mr-1 opacity-50 size-5" src="/static/img/map.svg"/>
-									<span class="mt-auto">Praça Pio X, 79 - 2º andar | Centro - Rio de Janeiro</span>
-								</span>
-								<span class="flex items-center mt-1">
-									<img class="mr-1 opacity-50 size-5" src="/static/img/clock.svg"/>
-									<span>13 de agosto de 2024 a partir das 09:00h</span>
-								</span>
-							</div>
+						<div
+							class="absolute w-full h-full bg-center bg-cover brightness-50"
+							style="background-image: url(/static/img/events-2.png);"
+						></div>
+						<h1 class="absolute bottom-2 left-4 z-10 text-2xl font-bold text-white">
+							Negócios e Inteligência Relacional
+							<p class="text-xs font-medium">Organizado por RD vigor </p>
+						</h1>
+					</div>
+					<div class="flex flex-col p-3 w-full text-sm font-normal text-gray-500 bg-white rounded-b-md border border-t-0 border-gray-200 border-solid h-fit card-shadow">
+						<div class="grid grid-cols-2 gap-1 w-full text-xs">
+							<span>
+								<img class="inline opacity-50 size-5" src="/static/img/date.svg"/>
+								<span>13 Ago 2024</span>
+							</span>
+							<span class="ml-auto">
+								<img class="inline opacity-50 size-5" src="/static/img/clock.svg"/>
+								<span>09:00h</span>
+							</span>
+							<span class="col-span-2">
+								<img class="inline opacity-50 size-5" src="/static/img/map.svg"/>
+								<span class="mt-auto">Centro, Rio de Janeiro</span>
+							</span>
 						</div>
-						<!-- Mobile -->
-						<div class="flex flex-col w-full md:hidden">
-							<div
-								class="overflow-hidden relative w-full h-32 rounded-t-md border border-b-0 border-gray-200 border-solid card-shadow"
-							>
-								<div
-									class="absolute w-full h-full bg-center bg-cover brightness-50"
-									style="background-image: url(/static/img/events-2.png);"
-								></div>
-								<h1 class="absolute bottom-2 left-4 z-10 text-2xl font-bold text-white">
-									Negócios e Inteligência Relacional
-									<p class="text-xs font-medium">Organizado por RD vigor </p>
-								</h1>
-							</div>
-							<div class="flex flex-col p-3 w-full text-sm font-normal text-gray-500 bg-white rounded-b-md border border-t-0 border-gray-200 border-solid h-fit card-shadow">
-								<div class="grid grid-cols-2 gap-1 w-full text-xs">
-									<span>
-										<img class="inline opacity-50 size-5" src="/static/img/date.svg"/>
-										<span>13 Ago 2024</span>
-									</span>
-									<span class="ml-auto">
-										<img class="inline opacity-50 size-5" src="/static/img/clock.svg"/>
-										<span>09:00h</span>
-									</span>
-									<span class="col-span-2">
-										<img class="inline opacity-50 size-5" src="/static/img/map.svg"/>
-										<span class="mt-auto">Centro, Rio de Janeiro</span>
-									</span>
-								</div>
-								<div class="flex justify-end mt-4 w-full">
-									<button class="text-gray-900">
-										Ver Detalhes
-										<img class="inline size-6" src="/static/img/arrow-right-2.svg"/>
-									</button>
-								</div>
-							</div>
+						<div class="flex justify-end mt-4 w-full">
+							<button class="text-gray-900">
+								Ver Detalhes
+								<img class="inline size-6" src="/static/img/arrow-right-2.svg"/>
+							</button>
 						</div>
 					</div>
-					<!-- ################################################################################# -->
 				</div>
 			</div>
+			<!-- ################################################################################# -->
 		</div>
 	}
 }

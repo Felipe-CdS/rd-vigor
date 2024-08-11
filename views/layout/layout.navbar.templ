@@ -2,31 +2,14 @@ package layout
 
 import "nugu.dev/rd-vigor/repositories"
 
-templ UserNavbar(user repositories.User) {
-	<div class="flex items-center py-4 px-8 h-14 border-b border-gray-200 border-solid">
-		<a class="flex items-center mr-3 w-28 sm:mr-4">
-			<img class="w-full" src="/static/img/logo-full-2.png"/>
-		</a>
-		<div class="flex items-center space-x-3 h-8">
-			<a class="p-1 text-[#71717A] cursor-pointer">Home</a>
-			<a class="p-1 text-[#71717A] cursor-pointer">Eventos</a>
-			<a class="p-1 text-[#71717A] cursor-pointer">Reuniões</a>
-		</div>
-		<div class="flex items-center ml-auto space-x-4">
-			<span class="sm:block">{ user.Username }</span>
-			<button
-				hx-get="/logout"
-				hx-target="body"
-				hx-push-url="true"
-				class="px-4 py-2 rounded-full bg-[#27272A] text-white font-medium text-sm"
-			>
-				<span class="sm:block">Logout</span>
-			</button>
-		</div>
-	</div>
+templ Navbar(user repositories.User, isLogged bool) {
+	if isLogged {
+		@mobileNavbar(user)
+		@desktopNavbar(user)
+	}
 }
 
-templ BaseNavbar() {
+templ baseNavbar() {
 	<div class="flex flex-col px-5 pt-4 space-y-2 w-full text-lg font-normal">
 		<a class="flex items-center text-[#71717A] cursor-pointer">
 			<img class="mr-2 opacity-50 size-5" src="/static/img/home.svg"/> Início
@@ -81,22 +64,22 @@ templ BaseNavbar() {
 	</div>
 }
 
-templ DesktopNavbar() {
+templ desktopNavbar(user repositories.User) {
 	<div
 		class="hidden lg:flex flex-col w-72 border-r border-gray-200 border-solid h-screen lg:h-[calc(100vh-3.5rem-1px)]"
 	>
-		@BaseNavbar()
+		@baseNavbar()
 	</div>
 }
 
-templ MobileNavbar(user repositories.User) {
+templ mobileNavbar(user repositories.User) {
 	<div
 		class="flex flex-col w-screen absolute z-50 right-0 border-r -top-14 border-gray-200 border-solid h-screen lg:h-[calc(100vh-3.5rem-1px)]"
-		x-show="open"
+		x-show="mobileNavbarOpen"
 	>
 		<button
 			class="flex overscroll-contain absolute right-0 z-40 flex-col w-screen h-screen bg-black bg-opacity-50 lg:hidden"
-			x-on:click="open = !open; document.body.classList.remove('no-scroll');"
+			x-on:click="mobileNavbarOpen = !mobileNavbarOpen; document.body.classList.remove('no-scroll');"
 			x-transition.opacity
 		></button>
 		<div
@@ -106,12 +89,12 @@ templ MobileNavbar(user repositories.User) {
 			<div class="flex py-4 px-4 w-full lg:hidden">
 				<button
 					class="ml-auto"
-					x-on:click="open = !open; document.body.classList.remove('no-scroll');"
+					x-on:click="mobileNavbarOpen = !mobileNavbarOpen; document.body.classList.remove('no-scroll');"
 				>
 					<img class="opacity-50 size-10" src="/static/img/close.svg"/>
 				</button>
 			</div>
-			@BaseNavbar()
+			@baseNavbar()
 		</div>
 	</div>
 }

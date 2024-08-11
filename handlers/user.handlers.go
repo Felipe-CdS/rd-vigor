@@ -168,12 +168,12 @@ func (uh *UserHandler) GetAdminUserList(c echo.Context) error {
 
 	users, queryErr := uh.UserServices.GetAllUsers()
 	if queryErr != nil {
-		return uh.View(c, admin_views.Base("Dashboard", []repositories.User{}))
+		return uh.View(c, admin_views.Base("Dashboard", []repositories.User{}, repositories.User{}))
 	}
 
 	c.Response().Header().Set("HX-Retarget", "body")
 	c.Response().Header().Set("HX-Push-Url", "/admin/dashboard")
-	return uh.View(c, admin_views.Base("Dashboard", users))
+	return uh.View(c, admin_views.Base("Dashboard", users, repositories.User{}))
 }
 
 func (uh *UserHandler) GetUserDetails(c echo.Context) error {
