@@ -98,6 +98,16 @@ func (us *UserService) GetUserByID(id string) (repositories.User, *ServiceLayerE
 	return users, nil
 }
 
+func (us *UserService) GetUserByUsername(username string) (repositories.User, *ServiceLayerErr) {
+
+	usr, err := us.Repository.GetUserByUsername(username)
+
+	if err != nil {
+		return repositories.User{}, &ServiceLayerErr{err.Error, "Query Err", http.StatusInternalServerError}
+	}
+	return usr, nil
+}
+
 func (us *UserService) AuthUser(login string, password string) (repositories.User, *ServiceLayerErr) {
 
 	var user repositories.User

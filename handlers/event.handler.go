@@ -21,15 +21,15 @@ type EventHandler struct {
 }
 
 func (eh *EventHandler) GetEventSearchPage(c echo.Context) error {
-	usr := repositories.User{}
 
-	return eh.View(c, events_views.EventSearch(usr))
+	loggedUser := c.Get("user").(repositories.User)
+	return eh.View(c, events_views.EventSearch(loggedUser))
 }
 
 func (eh *EventHandler) GetEventDetails(c echo.Context) error {
-	usr := repositories.User{}
 
-	return eh.View(c, events_views.EventDetails(usr))
+	loggedUser := c.Get("user").(repositories.User)
+	return eh.View(c, events_views.EventDetails(loggedUser))
 }
 
 func (eh *EventHandler) View(c echo.Context, cmp templ.Component) error {

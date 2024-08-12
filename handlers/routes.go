@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -18,8 +19,6 @@ func SetupRoutes(e *echo.Echo, uh *UserHandler, eh *EventHandler) {
 		return c.Redirect(http.StatusMovedPermanently, "/admin/dashboard")
 	})
 
-	e.GET("/user/:username", uh.GetUserProfile)
-
 	e.GET("/signup-done", signupFormDone)
 
 	e.GET("/signup", uh.CreateNewUser)
@@ -28,19 +27,19 @@ func SetupRoutes(e *echo.Echo, uh *UserHandler, eh *EventHandler) {
 	e.GET("/signin", uh.SigninUser)
 	e.POST("/signin", uh.SigninUser)
 
-	e.GET("/admin/dashboard", uh.GetAdminUserList)
-	e.GET("/admin/dashboard/details", uh.GetUserDetails)
-
 	e.GET("/logout", func(c echo.Context) error {
 		auth.ResetAuthCookies(c)
 		c.Response().Header().Set("HX-redirect", "/signin")
 		return c.NoContent(http.StatusMovedPermanently)
 	})
 
+	e.GET("/user/:username", authMiddleware(uh, uh.GetUserProfile))
+	e.GET("/admin/dashboard", authMiddleware(uh, uh.GetAdminUserList))
+	e.GET("/admin/dashboard/details", authMiddleware(uh, uh.GetUserDetails))
 	/* EVENTS ROUTES*/
 
-	e.GET("/events", eh.GetEventSearchPage)
-	e.GET("/event/:event_id", eh.GetEventDetails)
+	e.GET("/events", authMiddleware(uh, eh.GetEventSearchPage))
+	e.GET("/event/:event_id", authMiddleware(uh, eh.GetEventDetails))
 }
 
 func signupFormDone(c echo.Context) error {
@@ -51,4 +50,31 @@ func signupFormDone(c echo.Context) error {
 func signinFormDone(c echo.Context) error {
 	cmp := auth_views.SigninFormDone()
 	return cmp.Render(c.Request().Context(), c.Response().Writer)
+}
+
+func authMiddleware(uh *UserHandler, next echo.HandlerFunc) echo.HandlerFunc {
+
+	return func(c echo.Context) error {
+
+		cookieToken, err := c.Cookie("access-token")
+
+		if err != nil {
+			return c.Redirect(http.StatusMovedPermanently, "/signin")
+		}
+
+		claims, err := auth.DecodeToken(cookieToken.Value)
+
+		if err != nil {
+			return c.Redirect(http.StatusMovedPermanently, "/signin")
+		}
+
+		loggedUser, queryErr := uh.UserServices.GetUserByUsername(claims.Username)
+
+		if queryErr != nil {
+			fmt.Printf("!!!!!!%+v\n", queryErr)
+		}
+
+		c.Set("user", loggedUser)
+		return next(c)
+	}
 }

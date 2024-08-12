@@ -7,7 +7,7 @@ import (
 
 templ UserProfile(title string, user repositories.User) {
 	@layout.Base(title, user, true) {
-		<div class="overflow-x-hidden flex flex-col py-5 px-5 lg:px-32 2xl:px-64 w-full lg:w-[calc(100vw-18rem)] h-full overflow-y-scroll bg-[#F0F2F5] items-center">
+		<div class="flex flex-col py-5 px-5 lg:px-32 2xl:px-64 w-full lg:w-[calc(100vw-14rem)] h-[calc(100vh-4rem)] overflow-y-scroll bg-[#F0F2F5] items-center">
 			<div
 				class="flex flex-col w-full text-left rounded-t-md border border-b-0 border-gray-200 border-solid min-h-32 card-shadow"
 				style="background-image: linear-gradient(to right top, #ffdfa9, #fed18c, #fec371, #feb455, #fea439);"

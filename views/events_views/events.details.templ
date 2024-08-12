@@ -7,8 +7,8 @@ import (
 
 templ EventDetails(user repositories.User) {
 	@layout.Base("Eventos", user, true) {
-		<div class="overflow-x-hidden space-y-3 flex flex-col py-5 px-5 lg:px-12 2xl:px-64 w-full lg:w-[calc(100vw-18rem)] h-full overflow-y-scroll bg-[#F0F2F5]">
-			<!-- left -->
+		<div class="space-y-3 flex flex-col py-5 px-5 lg:px-12 2xl:px-64 w-full lg:w-[calc(100vw-14rem)] h-[calc(100vh-4rem)] overflow-y-scroll bg-[#F0F2F5]">
+			<!-- UP -->
 			<div class="flex flex-col w-full">
 				<h1 class="mb-1 text-xs text-gray-500">
 					<span class="text-gray-900">Evento / </span>
@@ -82,7 +82,7 @@ templ EventDetails(user repositories.User) {
 				</div>
 				<!-- ################################################################################# -->
 				<div
-					class="flex overflow-hidden w-full rounded-md border border-gray-200 border-solid md:w-4/12 md:h-full grow card-shadow"
+					class="flex overflow-hidden w-full rounded-md border border-gray-200 border-solid md:w-4/12 grow card-shadow"
 				>
 					<iframe
 						class="w-full h-full"

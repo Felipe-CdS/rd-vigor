@@ -1,6 +1,9 @@
 package layout
 
-import "nugu.dev/rd-vigor/repositories"
+import (
+	"fmt"
+	"nugu.dev/rd-vigor/repositories"
+)
 
 templ Base(title string, user repositories.User, isLogged bool) {
 	<!DOCTYPE html>
@@ -27,6 +30,10 @@ templ Base(title string, user repositories.User, isLogged bool) {
 			.no-scroll {
 				position:fixed;
 			}
+			.svg-hover-filter:hover > img {
+				opacity: 100%;
+				filter: invert(72%) sepia(57%) saturate(505%) hue-rotate(338deg) brightness(102%) contrast(103%);
+			}
 			[data-loading] {
 				display: none;
 			}
@@ -38,20 +45,38 @@ templ Base(title string, user repositories.User, isLogged bool) {
 			class="flex flex-col w-screen min-h-screen font-medium font-[Inter]"
 		>
 			if isLogged {
-				<div x-data="{mobileNavbarOpen: false}">
-					<div class="flex items-center py-4 px-8 h-14 border-b border-gray-200 border-solid">
-						<a class="flex items-center mr-3 w-28 sm:mr-4">
-							<img class="w-full" src="/static/img/logo-full-2.png"/>
-						</a>
-						<button
-							class="ml-auto lg:hidden size-8"
-							x-on:click="mobileNavbarOpen = !mobileNavbarOpen; document.body.classList.add('no-scroll');"
-						>
-							<img class="w-full" src="/static/img/menu.svg"/>
-						</button>
-					</div>
-					<div class="flex relative w-screen h-[calc(100vh-3.5rem)]">
-						@Navbar(user, isLogged)
+				<div class="flex" x-data="{mobileNavbarOpen: false}">
+					@Navbar(user, isLogged)
+					<div class="overflow-y-scroll flex relative flex-col w-screen card-shadow lg:w-[calc(100vw-14rem)] h-screen">
+						<div class="flex items-center h-16 border-b border-gray-200 border-solid">
+							<div class="flex items-center grow">
+								<img class="ml-2 size-8" src="/static/img/search.svg"/>
+								<input class="flex px-2 focus:outline-none grow truncate" placeholder="Pesquise por uma ocupação ou empresa"/>
+							</div>
+							<hr class="w-px h-4/6 bg-gray-300 border-0"/>
+							<button class="hidden ml-2 opacity-50 lg:block">
+								<img class="size-8" src="/static/img/notification.svg"/>
+							</button>
+							<div class="hidden items-center pl-2 lg:flex">
+								<div class="flex flex-col mr-1">
+									<span class="text-[#27272A] font-semibold text-base w-32 truncate">
+										{ fmt.Sprintf("%s %s", user.FirstName, user.LastName) }
+									</span>
+									<span class="text-[#71717A] w-24 text-xs truncate">
+										{ fmt.Sprintf("@%s", user.Username) }
+									</span>
+								</div>
+								<img class="bg-gray-200 rounded-full size-9" src="/static/img/user.svg"/>
+							</div>
+							<div class="flex justify-center items-center px-4 ml-auto h-full w-fit">
+								<button
+									class="lg:hidden size-8"
+									x-on:click="mobileNavbarOpen = !mobileNavbarOpen; document.body.classList.add('no-scroll');"
+								>
+									<img class="w-full opacity-50" src="/static/img/menu.svg"/>
+								</button>
+							</div>
+						</div>
 						{ children... }
 					</div>
 				</div>

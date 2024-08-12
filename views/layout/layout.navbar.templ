@@ -1,6 +1,9 @@
 package layout
 
-import "nugu.dev/rd-vigor/repositories"
+import (
+	"fmt"
+	"nugu.dev/rd-vigor/repositories"
+)
 
 templ Navbar(user repositories.User, isLogged bool) {
 	if isLogged {
@@ -9,72 +12,70 @@ templ Navbar(user repositories.User, isLogged bool) {
 	}
 }
 
-templ baseNavbar() {
+templ baseNavbar(user repositories.User) {
 	<div class="flex flex-col px-5 pt-4 space-y-2 w-full text-lg font-normal">
-		<a class="flex items-center text-[#71717A] cursor-pointer">
+		<a class="flex items-center mb-3 w-28 sm:mr-4">
+			<img class="w-full" src="/static/img/logo-full-2.png"/>
+		</a>
+		<a class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
 			<img class="mr-2 opacity-50 size-5" src="/static/img/home.svg"/> Início
 		</a>
 		<a
 			href="/events"
-			class="flex items-center text-[#71717A] cursor-pointer"
+			class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
 		>
 			<img class="mr-2 opacity-50 size-5" src="/static/img/events.svg"/> Eventos
 		</a>
-		<a class="flex items-center text-[#71717A] cursor-pointer">
+		<a class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
 			<img class="mr-2 opacity-50 size-5" src="/static/img/mail.svg"/> Mensagens
 		</a>
-		<a class="flex items-center text-[#71717A] cursor-pointer">
+		<a class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
 			<img class="mr-2 opacity-50 size-5" src="/static/img/group.svg"/> Grupos
 		</a>
-		<a class="flex items-center text-[#71717A] cursor-pointer">
+		<a
+			href={ templ.URL(fmt.Sprintf("/user/%s", user.Username)) }
+			class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
+		>
 			<img class="mr-2 opacity-50 size-5" src="/static/img/profile.svg"/> Seu Pefil
 		</a>
 	</div>
 	<div class="flex flex-col mt-auto w-full text-sm font-normal">
 		<div class="flex flex-col py-5 px-5 space-y-2 w-full border-t border-gray-200 border-solid">
-			<button class="flex items-center text-[#71717A] cursor-pointer">
+			<button class="lg:hidden flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
 				<img class="mr-1 w-6 opacity-50" src="/static/img/notification.svg"/> Notificações
 			</button>
-			<button class="flex items-center text-[#71717A] cursor-pointer">
+			<button class="lg:!mt-0 flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
 				<img class="mr-1 w-6 opacity-50" src="/static/img/settings.svg"/> Configurações
 			</button>
-			<a href="/admin/dashboard" class="flex items-center text-[#71717A] cursor-pointer">
+			<a
+				href="/admin/dashboard"
+				class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
+			>
 				<img class="mr-1 w-6 opacity-50" src="/static/img/shield.svg"/> Admin
 			</a>
 			<button
 				hx-get="/logout"
 				hx-target="body"
 				hx-push-url="true"
-				class="flex items-center text-[#71717A] cursor-pointer"
+				class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
 			>
 				<img class="mr-1 w-6 opacity-50" src="/static/img/logout.svg"/> Sair
 			</button>
-		</div>
-		<div class="flex items-center py-4 px-4 h-16 w-full bg-[#F0F2F5] lg:bg-white border-t border-gray-200 border-solid">
-			<img class="mr-2 h-full bg-white rounded-full" src="/static/img/musk.jpeg"/>
-			<div class="flex flex-col grow">
-				<span class="text-[#27272A] font-semibold overflow-x-hidden w-full text-base text-ellipsis">
-					Elon Musk
-				</span>
-				<span class="text-[#71717A] overflow-x-hidden w-full text-xs text-ellipsis">
-					hasdkhsdahjsda 
-				</span>
-			</div>
 		</div>
 	</div>
 }
 
 templ desktopNavbar(user repositories.User) {
 	<div
-		class="hidden lg:flex flex-col w-72 border-r border-gray-200 border-solid h-screen lg:h-[calc(100vh-3.5rem-1px)]"
+		class="hidden flex-col w-56 h-screen border-r border-gray-200 border-solid lg:flex"
 	>
-		@baseNavbar()
+		@baseNavbar(user)
 	</div>
 }
 
 templ mobileNavbar(user repositories.User) {
 	<div
-		class="flex flex-col w-screen absolute z-50 right-0 border-r -top-14 border-gray-200 border-solid h-screen lg:h-[calc(100vh-3.5rem-1px)]"
+		class="flex absolute right-0 z-50 flex-col w-screen h-screen border-r border-gray-200 border-solid"
 		x-show="mobileNavbarOpen"
 	>
 		<button
@@ -94,7 +95,18 @@ templ mobileNavbar(user repositories.User) {
 					<img class="opacity-50 size-10" src="/static/img/close.svg"/>
 				</button>
 			</div>
-			@baseNavbar()
+			@baseNavbar(user)
+			<div class="flex items-center py-4 px-4 h-16 w-full bg-[#F0F2F5] lg:bg-white border-t border-gray-200 border-solid">
+				<img class="mr-2 h-full bg-white rounded-full" src="/static/img/user.svg"/>
+				<div class="flex flex-col grow">
+					<span class="text-[#27272A] font-semibold overflow-x-hidden w-full text-base text-ellipsis">
+						{ fmt.Sprintf("%s %s", user.FirstName, user.LastName) }
+					</span>
+					<span class="text-[#71717A] overflow-x-hidden w-full text-xs text-ellipsis">
+						{ fmt.Sprintf("@%s", user.Username) }
+					</span>
+				</div>
+			</div>
 		</div>
 	</div>
 }

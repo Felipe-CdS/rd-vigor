@@ -19,6 +19,7 @@ type UserService interface {
 	AuthUser(login string, password string) (repositories.User, *services.ServiceLayerErr)
 	GetAllUsers() ([]repositories.User, *services.ServiceLayerErr)
 	GetUserByID(id string) (repositories.User, *services.ServiceLayerErr)
+	GetUserByUsername(username string) (repositories.User, *services.ServiceLayerErr)
 }
 
 func NewUserHandler(us UserService) *UserHandler {
@@ -154,26 +155,20 @@ func (uh *UserHandler) SigninUser(c echo.Context) error {
 
 func (uh *UserHandler) GetAdminUserList(c echo.Context) error {
 
-	cookieToken, err := c.Cookie("access-token")
+	loggedUser := c.Get("user").(repositories.User)
 
-	if err != nil {
-		return c.Redirect(http.StatusMovedPermanently, "/signin")
-	}
-
-	claims, err := auth.DecodeToken(cookieToken.Value)
-
-	if err != nil || claims.Role != "admin" {
+	if loggedUser.Role != "admin" {
 		return c.Redirect(http.StatusMovedPermanently, "/signin")
 	}
 
 	users, queryErr := uh.UserServices.GetAllUsers()
+
 	if queryErr != nil {
-		return uh.View(c, admin_views.Base("Dashboard", []repositories.User{}, repositories.User{}))
 	}
 
 	c.Response().Header().Set("HX-Retarget", "body")
 	c.Response().Header().Set("HX-Push-Url", "/admin/dashboard")
-	return uh.View(c, admin_views.Base("Dashboard", users, repositories.User{}))
+	return uh.View(c, admin_views.Base("Dashboard", users, loggedUser))
 }
 
 func (uh *UserHandler) GetUserDetails(c echo.Context) error {
@@ -195,11 +190,8 @@ func (uh *UserHandler) GetUserDetails(c echo.Context) error {
 
 func (uh *UserHandler) GetUserProfile(c echo.Context) error {
 
-	// usr, queryErr := uh.UserServices.GetUser(c.Param("user"))
-
-	user := repositories.User{}
-
-	return uh.View(c, user_views.UserProfile("aaa", user))
+	loggedUser := c.Get("user").(repositories.User)
+	return uh.View(c, user_views.UserProfile("aaa", loggedUser))
 }
 
 func (uh *UserHandler) View(c echo.Context, cmp templ.Component) error {
