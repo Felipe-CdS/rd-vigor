@@ -227,7 +227,67 @@ templ UserInfoDiv(user repositories.User) {
 						</button>
 					</div>
 				</form>
+				<form
+					autocomplete="off"
+					class="flex flex-col space-y-1 w-1/2 text-sm text-gray-400"
+				>
+					<label>
+						Adicionar Nova Tag
+					</label>
+					<div id="add-tag-section" class="flex relative mt-1 space-x-2 w-full flex-end">
+						<div class="relative w-full">
+							<input
+								name="user"
+								value={ user.Username }
+								class="hidden"
+							/>
+							<input
+								type="search"
+								name="search"
+								hx-post="/tags/search"
+								hx-trigger="input changed delay:500ms, search"
+								hx-target="#search-results"
+								hx-indicator=".htmx-indicator"
+								placeholder="Nome da Tag a ser inserida"
+								class="flex absolute z-10 py-1 px-2 w-full font-normal text-gray-800 bg-gray-200 rounded-md"
+							/>
+							<div
+								id="search-results"
+								class="flex absolute top-3 flex-col py-1 px-2 pt-3 w-full font-normal text-gray-800 bg-gray-100 rounded-b-md"
+							></div>
+						</div>
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>
+}
+
+templ TagsListResponse(list []repositories.Tag, user repositories.User) {
+	if len(list) == 0 {
+		<span class="mt-2">Nenhuma tag encontrada com esse nome.</span>
+	} else {
+		for _, tag := range list {
+			<form
+				hx-post="/user/tags"
+				hx-target="closest div"
+				class="flex mt-2 w-full"
+			>
+				<span class="flex grow">{ tag.Name }</span>
+				<input
+					name="tag"
+					value={ fmt.Sprintf("%s", tag.Name) }
+					class="hidden"
+				/>
+				<input
+					name="user"
+					value={ user.Username }
+					class="hidden"
+				/>
+				<button type="submit">
+					<img class="ml-auto size-4" src="/static/img/plus.svg"/>
+				</button>
+			</form>
+		}
+	}
 }

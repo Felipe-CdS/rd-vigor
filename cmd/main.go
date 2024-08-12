@@ -32,17 +32,17 @@ func main() {
 
 	store := db.NewStore()
 
-	ur := repositories.NewUserRepository(repositories.User{}, store)
-	us := services.NewUserService(ur)
-	uh := handlers.NewUserHandler(us)
-
-	er := repositories.NewEventRepository(repositories.Event{}, store)
-	es := services.NewEventService(er)
-	eh := handlers.NewEventHandler(es)
-
 	tr := repositories.NewTagRepository(repositories.Tag{}, store)
+	ur := repositories.NewUserRepository(repositories.User{}, store)
+	er := repositories.NewEventRepository(repositories.Event{}, store)
+
 	ts := services.NewTagService(tr)
-	th := handlers.NewTagHandler(ts)
+	us := services.NewUserService(ur, tr)
+	es := services.NewEventService(er)
+
+	th := handlers.NewTagHandler(ts, us)
+	uh := handlers.NewUserHandler(us)
+	eh := handlers.NewEventHandler(es)
 
 	handlers.SetupRoutes(e, uh, eh, th)
 

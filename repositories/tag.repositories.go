@@ -79,3 +79,29 @@ func (tr *TagRepository) GetAllTags() ([]Tag, *RepositoryLayerErr) {
 
 	return tags, nil
 }
+
+func (tr *TagRepository) SearchTagByName(name string) ([]Tag, *RepositoryLayerErr) {
+
+	var tags []Tag
+
+	stmt := "SELECT * FROM tags WHERE tag_name LIKE CONCAT('%%',$1::text,'%%')"
+
+	rows, err := tr.TagStore.Db.Query(stmt, name)
+
+	if err != nil {
+		return nil, &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	for rows.Next() {
+		var tag Tag
+		if err := rows.Scan(
+			&tag.ID,
+			&tag.Name,
+		); err != nil {
+			return nil, &RepositoryLayerErr{err, "Insert Error"}
+		}
+		tags = append(tags, tag)
+	}
+
+	return tags, nil
+}

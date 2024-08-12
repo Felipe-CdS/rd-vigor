@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"time"
 
@@ -223,4 +224,22 @@ func (ur *UserRepository) GetUserByID(id string) (User, error) {
 	}
 
 	return usr, nil
+}
+
+func (ur *UserRepository) SetNewTagUser(u User, t Tag) *RepositoryLayerErr {
+
+	stmt := `INSERT INTO users_tags (id, fk_tag_id, fk_user_id) VALUES ($1, $2, $3)`
+
+	_, err := ur.UserStore.Db.Exec(
+		stmt,
+		uuid.New(),
+		t.ID,
+		u.ID,
+	)
+
+	if err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	return nil
 }

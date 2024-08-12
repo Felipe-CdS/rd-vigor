@@ -26,15 +26,18 @@ type UserRepository interface {
 	GetUserByEmail(email string) (repositories.User, *repositories.RepositoryLayerErr)
 	GetUserByUsername(username string) (repositories.User, *repositories.RepositoryLayerErr)
 	GetUserPasswordByID(id string) (string, *repositories.RepositoryLayerErr)
+	SetNewTagUser(u repositories.User, t repositories.Tag) *repositories.RepositoryLayerErr
 }
 
 type UserService struct {
-	Repository UserRepository
+	Repository    UserRepository
+	TagRepository TagRepository
 }
 
-func NewUserService(ur UserRepository) *UserService {
+func NewUserService(ur UserRepository, tr TagRepository) *UserService {
 	return &UserService{
-		Repository: ur,
+		Repository:    ur,
+		TagRepository: tr,
 	}
 }
 
@@ -183,6 +186,29 @@ func putFileS3(f *multipart.FileHeader) *ServiceLayerErr {
 
 	if err != nil {
 		return &ServiceLayerErr{err, "Put Object S3", http.StatusInternalServerError}
+	}
+
+	return nil
+}
+
+func (us *UserService) SetNewTagUser(username string, tag_name string) *ServiceLayerErr {
+
+	user, err := us.Repository.GetUserByUsername(username)
+
+	if err != nil {
+		return &ServiceLayerErr{err.Error, "Query Err 1", http.StatusInternalServerError}
+	}
+
+	tag, err := us.TagRepository.SearchTagByName(tag_name)
+
+	if err != nil {
+		return &ServiceLayerErr{err.Error, "Query Err 2", http.StatusInternalServerError}
+	}
+
+	queryErr := us.Repository.SetNewTagUser(user, tag[0])
+
+	if queryErr != nil {
+		return &ServiceLayerErr{queryErr.Error, "Query Err 3", http.StatusInternalServerError}
 	}
 
 	return nil

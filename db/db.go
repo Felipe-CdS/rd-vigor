@@ -102,5 +102,19 @@ func createMigrations(db *sql.DB) error {
 		return fmt.Errorf("failed to create statement 2... Error: %s", err)
 	}
 
+	statement = `CREATE TABLE IF NOT EXISTS users_tags ( 
+		id UUID PRIMARY KEY
+		, fk_tag_id UUID NOT NULL
+		, FOREIGN KEY(fk_tag_id) REFERENCES tags(tag_id) ON DELETE CASCADE
+		, fk_user_id UUID NOT NULL
+		, FOREIGN KEY(fk_user_id) REFERENCES users(id) ON DELETE CASCADE
+	)`
+
+	_, err = db.Exec(statement)
+
+	if err != nil {
+		return fmt.Errorf("failed to create statement 2... Error: %s", err)
+	}
+
 	return nil
 }

@@ -20,6 +20,7 @@ type UserService interface {
 	GetAllUsers() ([]repositories.User, *services.ServiceLayerErr)
 	GetUserByID(id string) (repositories.User, *services.ServiceLayerErr)
 	GetUserByUsername(username string) (repositories.User, *services.ServiceLayerErr)
+	SetNewTagUser(username string, tag_name string) *services.ServiceLayerErr
 }
 
 func NewUserHandler(us UserService) *UserHandler {
@@ -192,6 +193,14 @@ func (uh *UserHandler) GetUserProfile(c echo.Context) error {
 
 	loggedUser := c.Get("user").(repositories.User)
 	return uh.View(c, user_views.UserProfile("aaa", loggedUser))
+}
+
+func (uh *UserHandler) SetUserTag(c echo.Context) error {
+	username := c.FormValue("user")
+	tagName := c.FormValue("tag")
+
+	uh.UserServices.SetNewTagUser(username, tagName)
+	return nil
 }
 
 func (uh *UserHandler) View(c echo.Context, cmp templ.Component) error {
