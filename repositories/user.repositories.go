@@ -243,3 +243,42 @@ func (ur *UserRepository) SetNewTagUser(u User, t Tag) *RepositoryLayerErr {
 
 	return nil
 }
+
+func (ur *UserRepository) GetUserTags(user User) ([]Tag, *RepositoryLayerErr) {
+
+	var tagsIdList []string
+	var tags []Tag
+
+	stmt := "SELECT fk_tag_id FROM users_tags WHERE fk_user_id = $1"
+
+	rows, err := ur.UserStore.Db.Query(stmt, user.ID)
+
+	if err != nil {
+		return nil, &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	for rows.Next() {
+		var tagId string
+		if err := rows.Scan(
+			&tagId,
+		); err != nil {
+			return nil, &RepositoryLayerErr{err, "Insert Error"}
+		}
+		tagsIdList = append(tagsIdList, tagId)
+	}
+
+	stmt = "SELECT * FROM tags WHERE tag_id = $1"
+
+	for _, id := range tagsIdList {
+		var tag Tag
+		if err := ur.UserStore.Db.QueryRow(stmt, id).Scan(
+			&tag.ID,
+			&tag.Name,
+		); err != nil {
+			return nil, &RepositoryLayerErr{err, "Insert Error"}
+		}
+		tags = append(tags, tag)
+	}
+
+	return tags, nil
+}

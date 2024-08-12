@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"net/mail"
 
@@ -21,6 +22,7 @@ type UserService interface {
 	GetUserByID(id string) (repositories.User, *services.ServiceLayerErr)
 	GetUserByUsername(username string) (repositories.User, *services.ServiceLayerErr)
 	SetNewTagUser(username string, tag_name string) *services.ServiceLayerErr
+	GetUserTags(user repositories.User) ([]repositories.Tag, *services.ServiceLayerErr)
 }
 
 func NewUserHandler(us UserService) *UserHandler {
@@ -192,7 +194,32 @@ func (uh *UserHandler) GetUserDetails(c echo.Context) error {
 func (uh *UserHandler) GetUserProfile(c echo.Context) error {
 
 	loggedUser := c.Get("user").(repositories.User)
-	return uh.View(c, user_views.UserProfile("aaa", loggedUser))
+
+	usr, queryErr := uh.UserServices.GetUserByUsername(c.Param("username"))
+
+	fmt.Printf("%+v\n", usr)
+
+	if queryErr != nil {
+		c.Response().Header().Set("HX-redirect", "/admin/dashboard/users")
+		return c.NoContent(http.StatusMovedPermanently)
+	}
+
+	tags, queryErr := uh.UserServices.GetUserTags(usr)
+
+	if queryErr != nil {
+		c.Response().Header().Set("HX-redirect", "/admin/dashboard/users")
+		return c.NoContent(http.StatusMovedPermanently)
+	}
+
+	fmt.Printf("%+v\n", tags)
+
+	return uh.View(c,
+		user_views.UserProfile(
+			fmt.Sprintf("%s %s", usr.FirstName, usr.LastName),
+			loggedUser,
+			usr,
+			tags,
+		))
 }
 
 func (uh *UserHandler) SetUserTag(c echo.Context) error {

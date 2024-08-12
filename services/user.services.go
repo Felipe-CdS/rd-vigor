@@ -27,6 +27,8 @@ type UserRepository interface {
 	GetUserByUsername(username string) (repositories.User, *repositories.RepositoryLayerErr)
 	GetUserPasswordByID(id string) (string, *repositories.RepositoryLayerErr)
 	SetNewTagUser(u repositories.User, t repositories.Tag) *repositories.RepositoryLayerErr
+
+	GetUserTags(user repositories.User) ([]repositories.Tag, *repositories.RepositoryLayerErr)
 }
 
 type UserService struct {
@@ -205,6 +207,8 @@ func (us *UserService) SetNewTagUser(username string, tag_name string) *ServiceL
 		return &ServiceLayerErr{err.Error, "Query Err 2", http.StatusInternalServerError}
 	}
 
+	//CHECK IF USER ALREADY HAS TAG
+
 	queryErr := us.Repository.SetNewTagUser(user, tag[0])
 
 	if queryErr != nil {
@@ -212,4 +216,16 @@ func (us *UserService) SetNewTagUser(username string, tag_name string) *ServiceL
 	}
 
 	return nil
+}
+
+func (us *UserService) GetUserTags(user repositories.User) ([]repositories.Tag, *ServiceLayerErr) {
+
+	tags, err := us.Repository.GetUserTags(user)
+
+	if err != nil {
+
+		fmt.Printf("%+v\n", err)
+		return nil, &ServiceLayerErr{err.Error, "Query Err 3", http.StatusInternalServerError}
+	}
+	return tags, nil
 }
