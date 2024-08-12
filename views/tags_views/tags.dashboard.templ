@@ -1,0 +1,38 @@
+package tags_views
+
+import (
+	"nugu.dev/rd-vigor/repositories"
+	"nugu.dev/rd-vigor/views/layout"
+)
+
+templ TagsDashboard(title string, user repositories.User, tags []repositories.Tag) {
+	@layout.Base(title, user, true) {
+		<div class="flex flex-col py-5 px-5 w-full lg:w-[calc(100vw-14rem)] grow bg-[#F0F2F5] items-center">
+			<form
+				hx-post="/admin/dashboard/tags"
+				hx-target="body"
+				hx-target-error="#error-alert"
+				class="flex mb-5"
+			>
+				<input name="tag-name" type="text" placeholder="Nome da nova tag"/>
+				<button type="submit">Criar</button>
+			</form>
+			<span class="mb-5" id="error-alert"></span>
+			<ul id="tags-list">
+				for _, tag := range tags {
+					<li>{ tag.Name } </li>
+				}
+			</ul>
+		</div>
+	}
+}
+
+templ ErrorAlert(message string) {
+	<span
+		id="error-alert"
+		class="block p-3 w-full text-sm text-justify rounded-md bg-[#fff1d4] border rounded-md font-normal border-[#fea439]"
+	>
+		<img class="inline size-5" src="/static/img/error.svg"/>
+		{ message }
+	</span>
+}

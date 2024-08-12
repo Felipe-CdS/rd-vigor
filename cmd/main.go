@@ -17,8 +17,6 @@ func main() {
 	godotenv.Load()
 	port := os.Getenv("PORT")
 
-	fmt.Printf("%s\n", port)
-
 	if port == "" {
 		port = "42069"
 	}
@@ -42,7 +40,11 @@ func main() {
 	es := services.NewEventService(er)
 	eh := handlers.NewEventHandler(es)
 
-	handlers.SetupRoutes(e, uh, eh)
+	tr := repositories.NewTagRepository(repositories.Tag{}, store)
+	ts := services.NewTagService(tr)
+	th := handlers.NewTagHandler(ts)
+
+	handlers.SetupRoutes(e, uh, eh, th)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", port)))
 }

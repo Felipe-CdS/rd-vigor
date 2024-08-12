@@ -119,7 +119,7 @@ func (uh *UserHandler) SigninUser(c echo.Context) error {
 			}
 
 			if claims.Role == "admin" {
-				return c.Redirect(http.StatusMovedPermanently, "/admin/dashboard")
+				return c.Redirect(http.StatusMovedPermanently, "/admin/dashboard/users")
 			}
 
 			return c.Redirect(http.StatusMovedPermanently, "/user/home")
@@ -142,7 +142,7 @@ func (uh *UserHandler) SigninUser(c echo.Context) error {
 				c.Response().WriteHeader(http.StatusInternalServerError)
 				return uh.View(c, auth_views.SigninFormErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
 			}
-			return c.Redirect(http.StatusMovedPermanently, "/admin/dashboard")
+			return c.Redirect(http.StatusMovedPermanently, "/admin/dashboard/users")
 		} else {
 			cmp := auth_views.SigninFormDone()
 			return cmp.Render(c.Request().Context(), c.Response().Writer)
@@ -167,21 +167,21 @@ func (uh *UserHandler) GetAdminUserList(c echo.Context) error {
 	}
 
 	c.Response().Header().Set("HX-Retarget", "body")
-	c.Response().Header().Set("HX-Push-Url", "/admin/dashboard")
+	c.Response().Header().Set("HX-Push-Url", "/admin/dashboard/users")
 	return uh.View(c, admin_views.Base("Dashboard", users, loggedUser))
 }
 
 func (uh *UserHandler) GetUserDetails(c echo.Context) error {
 
 	if c.Request().Header.Get("HX-Request") != "true" {
-		c.Response().Header().Set("HX-redirect", "/admin/dashboard")
+		c.Response().Header().Set("HX-redirect", "/admin/dashboard/users")
 		return c.NoContent(http.StatusMovedPermanently)
 	}
 
 	usr, queryErr := uh.UserServices.GetUserByID(c.QueryParam("user"))
 
 	if queryErr != nil {
-		c.Response().Header().Set("HX-redirect", "/admin/dashboard")
+		c.Response().Header().Set("HX-redirect", "/admin/dashboard/users")
 		return c.NoContent(http.StatusMovedPermanently)
 	}
 

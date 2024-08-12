@@ -49,7 +49,7 @@ templ usersList(users []repositories.User) {
 			} else {
 				for _, usr := range users {
 					<button
-						hx-get={ fmt.Sprintf("dashboard/details?user=%s", usr.ID) }
+						hx-get={ fmt.Sprintf("users/details?user=%s", usr.ID) }
 						hx-target="#user-info-div"
 						hx-target-3xx="body"
 						hx-swap="outerHTML"

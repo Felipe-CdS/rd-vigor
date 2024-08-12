@@ -9,14 +9,18 @@ import (
 	"nugu.dev/rd-vigor/views/auth_views"
 )
 
-func SetupRoutes(e *echo.Echo, uh *UserHandler, eh *EventHandler) {
+func SetupRoutes(e *echo.Echo, uh *UserHandler, eh *EventHandler, th *TagHandler) {
 
 	e.GET("/", func(c echo.Context) error {
 		return c.Redirect(http.StatusMovedPermanently, "/signin")
 	})
 
+	e.GET("/admin/dashboard", func(c echo.Context) error {
+		return c.Redirect(http.StatusMovedPermanently, "/admin/dashboard/users")
+	})
+
 	e.GET("/admin", func(c echo.Context) error {
-		return c.Redirect(http.StatusMovedPermanently, "/admin/dashboard")
+		return c.Redirect(http.StatusMovedPermanently, "/admin/dashboard/users")
 	})
 
 	e.GET("/signup-done", signupFormDone)
@@ -34,8 +38,10 @@ func SetupRoutes(e *echo.Echo, uh *UserHandler, eh *EventHandler) {
 	})
 
 	e.GET("/user/:username", authMiddleware(uh, uh.GetUserProfile))
-	e.GET("/admin/dashboard", authMiddleware(uh, uh.GetAdminUserList))
-	e.GET("/admin/dashboard/details", authMiddleware(uh, uh.GetUserDetails))
+	e.GET("/admin/dashboard/users", authMiddleware(uh, uh.GetAdminUserList))
+	e.GET("/admin/dashboard/users/details", authMiddleware(uh, uh.GetUserDetails))
+	e.GET("/admin/dashboard/tags", authMiddleware(uh, th.GetTagDashboard))
+	e.POST("/admin/dashboard/tags", authMiddleware(uh, th.CreateNewTag))
 	/* EVENTS ROUTES*/
 
 	e.GET("/events", authMiddleware(uh, eh.GetEventSearchPage))

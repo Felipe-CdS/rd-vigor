@@ -73,6 +73,7 @@ func (us *UserService) CreateUser(data map[string]string) *ServiceLayerErr {
 		return &ServiceLayerErr{nil, "Nome de usuário já cadastrado.", http.StatusBadRequest}
 	}
 
+	// CHECK ERROR
 	us.Repository.CreateUser(u)
 
 	return nil

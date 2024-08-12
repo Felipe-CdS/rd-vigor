@@ -91,5 +91,16 @@ func createMigrations(db *sql.DB) error {
 		return fmt.Errorf("failed to create statement 1... Error: %s", err)
 	}
 
+	statement = `CREATE TABLE IF NOT EXISTS tags ( 
+		tag_id UUID PRIMARY KEY
+		, tag_name TEXT NOT NULL
+	)`
+
+	_, err = db.Exec(statement)
+
+	if err != nil {
+		return fmt.Errorf("failed to create statement 2... Error: %s", err)
+	}
+
 	return nil
 }
