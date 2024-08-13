@@ -197,8 +197,6 @@ func (uh *UserHandler) GetUserProfile(c echo.Context) error {
 
 	usr, queryErr := uh.UserServices.GetUserByUsername(c.Param("username"))
 
-	fmt.Printf("%+v\n", usr)
-
 	if queryErr != nil {
 		c.Response().Header().Set("HX-redirect", "/admin/dashboard/users")
 		return c.NoContent(http.StatusMovedPermanently)
@@ -210,8 +208,6 @@ func (uh *UserHandler) GetUserProfile(c echo.Context) error {
 		c.Response().Header().Set("HX-redirect", "/admin/dashboard/users")
 		return c.NoContent(http.StatusMovedPermanently)
 	}
-
-	fmt.Printf("%+v\n", tags)
 
 	return uh.View(c,
 		user_views.UserProfile(
