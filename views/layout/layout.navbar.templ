@@ -8,16 +8,153 @@ import (
 templ Navbar(user repositories.User, isLogged bool) {
 	if isLogged {
 		@mobileNavbar(user)
-		@desktopNavbar(user)
+		<div
+			x-data="{
+			    open: false,
+			    toggle() {
+				if (this.open) {
+				    return this.close()
+				}
+		 
+				this.$refs.button.focus()
+		 
+				this.open = true
+			    },
+			    close(focusAfter) {
+				if (! this.open) return
+		 
+				this.open = false
+		 
+				focusAfter && focusAfter.focus()
+			    }
+			}"
+			x-on:keydown.escape.prevent.stop="close($refs.button)"
+			x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
+			x-id="['dropdown-button']"
+			id="navbar"
+			class="flex relative items-center py-4 px-8 w-full border-b border-gray-200 border-solid"
+		>
+			<a href="/">
+				<img class="mr-4 w-36" src="/static/img/logo-full-2.png"/>
+			</a>
+			<div
+				id="desktop-navbar"
+				class="flex hidden w-10/12 h-full lg:flex"
+			>
+				<button
+					x-on:click="searchModalOpen = !searchModalOpen; document.body.classList.add('no-scroll');"
+					class="flex items-center px-2 w-3/12 bg-gray-200 rounded-md group"
+				>
+					<img class="mr-2 w-6 opacity-50" src="/static/img/search-2.svg"/>
+					<span class="text-gray-500 transition group-hover:text-gray-800">Pesquisar</span>
+				</button>
+				<a
+					href="/"
+					class="flex flex-col items-center w-1/12 text-[#71717A] cursor-pointer text-xs hover:text-[#fea439] svg-hover-filter"
+				>
+					<img class="opacity-50 size-6" src="/static/img/home.svg"/> Início 
+				</a>
+				<a
+					href="/events"
+					class="flex flex-col items-center w-1/12 text-[#71717A] cursor-pointer text-xs hover:text-[#fea439] svg-hover-filter"
+				>
+					<img class="opacity-50 size-6" src="/static/img/events.svg"/> Eventos
+				</a>
+				<a
+					href=""
+					class="flex flex-col items-center w-1/12 text-[#71717A] cursor-pointer text-xs hover:text-[#fea439] svg-hover-filter"
+				>
+					<img class="opacity-50 size-6" src="/static/img/school.svg"/> Cursos
+				</a>
+				<a
+					href=""
+					class="flex flex-col items-center w-1/12 text-[#71717A] cursor-pointer text-xs hover:text-[#fea439] svg-hover-filter"
+				>
+					<img class="opacity-50 size-6" src="/static/img/group.svg"/> Núcleos
+				</a>
+				<a
+					href="/inbox"
+					class="flex flex-col items-center w-1/12 text-[#71717A] cursor-pointer text-xs hover:text-[#fea439] svg-hover-filter"
+				>
+					<img class="opacity-50 size-6" src="/static/img/mail.svg"/> Inbox
+				</a>
+				<a
+					href="/calendar"
+					class="flex flex-col items-center w-1/12 text-[#71717A] cursor-pointer text-xs hover:text-[#fea439] svg-hover-filter"
+				>
+					<img class="opacity-50 size-6" src="/static/img/calendar.svg"/> Agenda
+				</a>
+				<a
+					href=""
+					class="flex flex-col items-center w-1/12 text-[#71717A] cursor-pointer text-xs hover:text-[#fea439] svg-hover-filter"
+				>
+					<img class="opacity-50 size-6" src="/static/img/settings.svg"/> Ajustes
+				</a>
+				<button
+					x-ref="button"
+					x-on:click="toggle()"
+					class="flex !ml-auto h-full space-x-2 relative w-3/12 justify-end group"
+				>
+					<hr class="w-px h-full bg-gray-300 border-0"/>
+					<span class="flex flex-col text-[#27272A] items-start font-semibold text-base truncate">
+						{ fmt.Sprintf("%s %s", user.FirstName, user.LastName) }
+						<span class="text-[#71717A] text-xs truncate">
+							{ fmt.Sprintf("@%s", user.Username) }
+						</span>
+					</span>
+					<img class="bg-gray-200 rounded-full size-10" src="/static/img/user.svg"/>
+					<div
+						x-ref="panel"
+						x-show="open"
+						x-transition.origin.top.left
+						x-on:click.outside="close($refs.button)"
+						:id="$id('dropdown-button')"
+						style="display: none;"
+						class="absolute right-0 top-16 z-10 bg-white rounded border shadow-sm w-fit"
+					>
+						<a
+							href={ templ.URL(fmt.Sprintf("/user/%s", user.Username)) }
+							class="flex items-center py-3 px-4 w-full rounded-t-md cursor-pointer"
+						>
+							<img class="mr-2 size-4" src="/static/img/user-profile.svg"/>
+							<span class="font-normal">Meu Perfil</span>
+						</a>
+						<a
+							href="/admin/dashboard"
+							class="flex items-center py-3 px-4 w-full border-t border-b border-gray-200 border-solid cursor-pointer"
+						>
+							<img class="mr-2 size-4" src="/static/img/shield.svg"/>
+							<span class="font-normal">Admin</span>
+						</a>
+						<a
+							href="/logout"
+							class="flex items-center py-3 px-4 w-full rounded-b-md cursor-pointer"
+						>
+							<img class="mr-2 size-4" src="/static/img/logout.svg"/>
+							<span class="font-normal">Sair</span>
+						</a>
+					</div>
+				</button>
+			</div>
+			<button
+				class="inline ml-auto w-2/12 lg:hidden max-w-8"
+				x-on:click="mobileNavbarOpen = !mobileNavbarOpen; document.body.classList.add('no-scroll');"
+			>
+				<img class="w-full opacity-50" src="/static/img/menu.svg"/>
+			</button>
+		</div>
 	}
 }
 
 templ baseNavbar(user repositories.User) {
-	<div class="flex flex-col px-5 pt-4 space-y-2 w-full text-lg font-normal">
-		<a class="flex items-center mb-3 w-28 sm:mr-4">
+	<div class="flex flex-col px-5 mb-6 space-y-2 w-full text-lg font-normal lg:pt-4">
+		<a class="flex hidden items-center mb-3 w-28 sm:mr-4 lg:block">
 			<img class="w-full" src="/static/img/logo-full-2.png"/>
 		</a>
-		<a class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
+		<a
+			href="/"
+			class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
+		>
 			<img class="mr-2 opacity-50 size-5" src="/static/img/home.svg"/> Início
 		</a>
 		<a
@@ -30,7 +167,7 @@ templ baseNavbar(user repositories.User) {
 			<img class="mr-2 opacity-50 size-5" src="/static/img/mail.svg"/> Mensagens
 		</a>
 		<a class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
-			<img class="mr-2 opacity-50 size-5" src="/static/img/group.svg"/> Grupos
+			<img class="mr-2 opacity-50 size-5" src="/static/img/group.svg"/> Núcleos
 		</a>
 		<a
 			href={ templ.URL(fmt.Sprintf("/user/%s", user.Username)) }
@@ -65,14 +202,6 @@ templ baseNavbar(user repositories.User) {
 	</div>
 }
 
-templ desktopNavbar(user repositories.User) {
-	<div
-		class="hidden flex-col w-56 h-screen border-r border-gray-200 border-solid lg:flex"
-	>
-		@baseNavbar(user)
-	</div>
-}
-
 templ mobileNavbar(user repositories.User) {
 	<div
 		class="flex absolute right-0 z-50 flex-col w-screen h-screen border-r border-gray-200 border-solid"
@@ -84,10 +213,10 @@ templ mobileNavbar(user repositories.User) {
 			x-transition.opacity
 		></button>
 		<div
-			class="flex absolute right-0 z-50 flex-col w-3/5 h-full bg-white md:w-2/6 lg:relative lg:right-auto lg:z-0 lg:w-full"
+			class="flex overflow-y-scroll absolute right-0 z-50 flex-col w-3/5 h-full bg-white md:w-2/6 lg:relative lg:right-auto lg:z-0 lg:w-full"
 			x-transition.scale
 		>
-			<div class="flex py-4 px-4 w-full lg:hidden">
+			<div class="flex px-4 pt-4 w-full lg:hidden">
 				<button
 					class="ml-auto"
 					x-on:click="mobileNavbarOpen = !mobileNavbarOpen; document.body.classList.remove('no-scroll');"
@@ -109,4 +238,85 @@ templ mobileNavbar(user repositories.User) {
 			</div>
 		</div>
 	</div>
+}
+
+templ SearchModal() {
+	<div
+		class="flex overflow-y-scroll absolute z-50 justify-center p-6 w-screen h-screen bg-black bg-opacity-50 backdrop-blur-sm"
+		x-show="searchModalOpen"
+		x-on:click="searchModalOpen = false; document.body.classList.remove('no-scroll');"
+		@keyup.escape.window="searchModalOpen = false; document.body.classList.remove('no-scroll');"
+	>
+		<div
+			@click.stop
+			class="flex overflow-hidden relative flex-col justify-center items-center pb-11 space-y-4 w-full bg-white rounded md:w-7/12 lg:w-4/12 h-fit drop-shadow-md"
+		>
+			<div
+				class="flex p-3 w-full border-b border-gray-200 border-solid"
+			>
+				<form
+					autocomplete="off"
+					class="flex w-10/12"
+				>
+					<img class="mr-2 w-2/12 max-w-8" src="/static/img/search.svg"/>
+					<input
+						type="search"
+						name="search"
+						hx-post="/navbar/search"
+						hx-trigger="input changed delay:500ms, search"
+						hx-target="#search-navbar-results"
+						class="w-10/12 font-normal focus:outline-none grow truncate"
+						placeholder="Procure na RD Vigor"
+					/>
+				</form>
+				<button
+					class="ml-auto w-2/12 max-w-10"
+					x-on:click="searchModalOpen = false; document.body.classList.remove('no-scroll');"
+				>
+					<img class="w-full" src="/static/img/close.svg"/>
+				</button>
+			</div>
+			<div
+				id="search-navbar-results"
+				class="flex overflow-y-scroll flex-col justify-center items-center w-full border-b border-gray-200 border-solid max-h-4/6 min-h-40"
+			>
+				<h1 class="font-normal text-gray-400">Sem pesquisas recentes </h1>
+			</div>
+		</div>
+	</div>
+}
+
+templ SearchModalResponsePartial(list []repositories.Tag, input string) {
+	if len(input) == 0 {
+		<h1 class="font-normal text-gray-400">Sem pesquisas recentes </h1>
+	} else if len(list) == 0 {
+		<h1 class="font-normal text-gray-400">Sem resultados para "{ input }"</h1>
+	} else {
+		<h1 class="block pl-6 mb-2 w-full text-sm font-normal text-left text-gray-400">Especialidades</h1>
+		<div class="flex flex-col px-2 space-y-1 w-full">
+			for _, t := range list {
+				<div class="flex px-4 cursor-pointer py-2 w-full text-lg font-semibold rounded-md text-white bg-[#FFBD59] hover:bg-[#fea439]">
+					<img class="w-8 brightness-200 invert" src="/static/img/hashtag.svg"/>
+					<div class="flex flex-col">
+						<p class="text-base font-medium text-white">{ t.Name }</p>
+						<span class="text-xs font-normal text-white underline">TI</span>
+					</div>
+					<img class="ml-auto w-4 brightness-200" src="/static/img/arrow-right.svg"/>
+				</div>
+			}
+		</div>
+		<h1 class="block pl-6 mt-6 mb-2 w-full text-sm font-normal text-left text-gray-400">Outras Categorias</h1>
+		<div class="flex flex-col px-2 mb-4 space-y-1 w-full">
+			for _, t := range list {
+				<div class="flex px-4 cursor-pointer py-2 w-full text-lg font-semibold rounded-md text-white bg-[#FFBD59] hover:bg-[#fea439]">
+					<img class="w-8 brightness-200 invert" src="/static/img/hashtag.svg"/>
+					<div class="flex flex-col">
+						<p class="text-base font-medium text-white">{ t.Name }</p>
+						<span class="text-xs font-normal text-white underline">TI</span>
+					</div>
+					<img class="ml-auto w-4 brightness-200" src="/static/img/arrow-right.svg"/>
+				</div>
+			}
+		</div>
+	}
 }

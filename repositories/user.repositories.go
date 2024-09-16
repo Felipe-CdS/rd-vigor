@@ -147,6 +147,41 @@ func (ur *UserRepository) GetAllUsers() ([]User, error) {
 	return users, nil
 }
 
+func (ur *UserRepository) GetUsersByAny(any string) ([]User, error) {
+
+	var users []User
+
+	stmt := `SELECT id, username, first_name, last_name, email, occupation_area
+		FROM users
+		WHERE LOWER(username)
+		LIKE CONCAT(LOWER($1::text),'%%')
+		OR LOWER(CONCAT(first_name,' ',last_name))
+		LIKE CONCAT('%%',LOWER($1::text),'%%');`
+
+	rows, err := ur.UserStore.Db.Query(stmt, any)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var usr User
+		if err = rows.Scan(
+			&usr.ID,
+			&usr.Username,
+			&usr.FirstName,
+			&usr.LastName,
+			&usr.Email,
+			&usr.OccupationArea,
+		); err != nil {
+			return nil, err
+		}
+		users = append(users, usr)
+	}
+
+	return users, nil
+}
+
 func (ur *UserRepository) GetUserByEmail(email string) (User, *RepositoryLayerErr) {
 
 	var usr User

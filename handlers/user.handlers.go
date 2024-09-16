@@ -12,17 +12,23 @@ import (
 	"nugu.dev/rd-vigor/services"
 	admin_views "nugu.dev/rd-vigor/views/admin_views/dashboard"
 	"nugu.dev/rd-vigor/views/auth_views"
+	"nugu.dev/rd-vigor/views/home_views"
+	"nugu.dev/rd-vigor/views/inbox_views"
 	"nugu.dev/rd-vigor/views/user_views"
 )
 
 type UserService interface {
 	CreateUser(data map[string]string) *services.ServiceLayerErr
 	AuthUser(login string, password string) (repositories.User, *services.ServiceLayerErr)
+
 	GetAllUsers() ([]repositories.User, *services.ServiceLayerErr)
+	GetUsersByAny(any string) ([]repositories.User, *services.ServiceLayerErr)
+
 	GetUserByID(id string) (repositories.User, *services.ServiceLayerErr)
 	GetUserByUsername(username string) (repositories.User, *services.ServiceLayerErr)
-	SetNewTagUser(username string, tag_name string) *services.ServiceLayerErr
 	GetUserTags(user repositories.User) ([]repositories.Tag, *services.ServiceLayerErr)
+
+	SetNewTagUser(username string, tag_name string) *services.ServiceLayerErr
 }
 
 func NewUserHandler(us UserService) *UserHandler {
@@ -218,12 +224,50 @@ func (uh *UserHandler) GetUserProfile(c echo.Context) error {
 		))
 }
 
+func (uh *UserHandler) GetHome(c echo.Context) error {
+
+	loggedUser := c.Get("user").(repositories.User)
+
+	return uh.View(c,
+		home_views.Base(
+			"Home",
+			loggedUser,
+		))
+}
+
+func (uh *UserHandler) GetCalendar(c echo.Context) error {
+
+	loggedUser := c.Get("user").(repositories.User)
+
+	return uh.View(c,
+		user_views.Calendar(
+			"Agenda",
+			loggedUser,
+		))
+}
+
 func (uh *UserHandler) SetUserTag(c echo.Context) error {
 	username := c.FormValue("user")
 	tagName := c.FormValue("tag")
 
 	uh.UserServices.SetNewTagUser(username, tagName)
 	return nil
+}
+
+func (uh *UserHandler) SearchUserByAny(c echo.Context) error {
+	query := c.FormValue("query")
+
+	if query == "" {
+		return uh.View(c, inbox_views.SearchUserFormOptionsUndefined())
+	}
+
+	found, err := uh.UserServices.GetUsersByAny(query)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return uh.View(c, inbox_views.SearchUserFormOptions(found))
 }
 
 func (uh *UserHandler) View(c echo.Context, cmp templ.Component) error {

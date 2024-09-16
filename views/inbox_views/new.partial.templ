@@ -1,0 +1,160 @@
+package inbox_views
+
+import (
+	"fmt"
+	"nugu.dev/rd-vigor/repositories"
+)
+
+templ NewChatModal() {
+	<div
+		class="flex overflow-y-scroll absolute top-0 z-50 justify-center items-center p-6 w-screen h-screen bg-black bg-opacity-50 backdrop-blur-sm"
+		x-show="newChatModalOpen"
+		x-on:click="newChatModalOpen = false; document.body.classList.remove('no-scroll');"
+		@keyup.escape.window="newChatModalOpen = false; document.body.classList.remove('no-scroll');"
+	>
+		<div
+			@click.stop
+			class="flex overflow-hidden relative flex-col justify-center items-center w-full bg-white rounded md:w-7/12 lg:w-4/12 h-fit drop-shadow-md"
+		>
+			<div class="flex items-center py-4 px-5 w-full bg-white rounded-t-xl border-b border-gray-200 border-solid">
+				<h1 class="text-2xl font-semibold">Nova Conversa</h1>
+				<button
+					x-on:click="newChatModalOpen = false;"
+					class="ml-auto"
+				>
+					<img class="opacity-40 size-8" src="/static/img/close.svg"/>
+				</button>
+			</div>
+			<div
+				class="flex relative flex-col p-3 space-y-3 w-full"
+			>
+				<div
+					id="recipient-div"
+					class="flex relative flex-col space-y-1 w-full"
+				>
+					@RecipientToBeSelectedDiv()
+				</div>
+				@sendMessageForm()
+			</div>
+		</div>
+	</div>
+}
+
+templ RecipientToBeSelectedDiv() {
+	@searchUserForm()
+	@SearchUserFormOptionsUndefined()
+}
+
+templ RecipientSelectedDiv(recipient repositories.User) {
+	<div class="flex w-full">
+		<label class="text-sm font-normal">
+			Destinatário
+		</label>
+		<button
+			class="ml-auto text-sm opacity-60 hover:opacity-100"
+			hx-get="/chatroom/new/select-recipient"
+			hx-target="#recipient-div"
+		>
+			Mudar
+		</button>
+	</div>
+	<div
+		class="flex items-center py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid"
+	>
+		<img class="mr-2 bg-gray-200 rounded-full size-10" src="/static/img/user.svg"/>
+		<div class="flex flex-col items-center w-9/12">
+			<span class="flex text-[#27272A] items-center font-medium w-full text-base truncate">
+				{ fmt.Sprintf("%s %s", recipient.FirstName, recipient.LastName) }
+			</span>
+			<span class="text-[#71717A] text-xs ml-1 truncate w-full">
+				{ fmt.Sprintf("%s", recipient.Username) }
+			</span>
+		</div>
+	</div>
+	<input id="recipient-input" name="recipient" hx-swap-oob="true" class="hidden" value={ fmt.Sprintf("%s", recipient.Username) }/>
+}
+
+templ searchUserForm() {
+	<form
+		autocomplete="off"
+		class="flex flex-col space-y-3 w-full"
+	>
+		<div class="flex flex-col space-y-1 w-full">
+			<label class="text-sm font-normal">
+				Destinatário
+			</label>
+			<input
+				hx-post="/users/search"
+				hx-trigger="input changed delay:500ms, search"
+				hx-target="#search-user-options-div"
+				hx-swap="outerHTML"
+				type="text"
+				name="query"
+				class="py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid"
+				placeholder="Nome Completo ou Nome de usuário"
+			/>
+		</div>
+	</form>
+}
+
+templ SearchUserFormOptions(found []repositories.User) {
+	<div
+		id="search-user-options-div"
+		class="flex overflow-y-scroll flex-col max-h-40 rounded border border-gray-200 border-solid drop-shadow-sm"
+	>
+		if len(found) == 0 {
+			<span class="p-2 text-left bg-opacity-10">
+				<span class="text-[#71717A] text-xs ml-1 truncate w-full">
+					Nenhum resultado encontrado.
+				</span>
+			</span>
+		}
+		for _, u := range found {
+			<button
+				hx-get={ fmt.Sprintf("/chatroom/new/select-recipient?username=%s", u.Username) }
+				hx-target="#recipient-div"
+				class="p-2 text-left bg-opacity-10 hover:bg-gray-200"
+			>
+				<span class="flex text-[#27272A] items-center font-medium w-full text-base truncate">
+					{ fmt.Sprintf("%s", u.FirstName) }
+					<span class="text-[#71717A] text-xs ml-1 truncate w-full">
+						{ fmt.Sprintf("(@%s)", u.Username) }
+					</span>
+				</span>
+			</button>
+		}
+	</div>
+}
+
+templ SearchUserFormOptionsUndefined() {
+	<div id="search-user-options-div" class="hidden"></div>
+}
+
+templ sendMessageForm() {
+	<form
+		hx-post="/chatroom/new"
+		autocomplete="off"
+		hx-target="body"
+		hx-push-url="true"
+		class="flex flex-col space-y-3 w-full"
+	>
+		<div class="flex flex-col space-y-1 w-full">
+			<label class="text-sm font-normal">
+				Mensagem
+			</label>
+			<textarea
+				name="content"
+				rows="5"
+				class="py-3 px-4 w-full font-normal rounded-md border border-gray-200 border-solid"
+				placeholder="Insira a sua mensagem..."
+			></textarea>
+		</div>
+		<input id="recipient-input" name="recipient" class="hidden" value=""/>
+		<button
+			type="submit"
+			class="ml-auto py-1 px-3 w-fit text-sm font-medium rounded-md text-white bg-[#FFBD59]"
+		>
+			Enviar
+		</button>
+	</form>
+}

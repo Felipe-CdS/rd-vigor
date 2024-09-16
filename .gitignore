@@ -2,3 +2,4 @@ APP_DATA.db
 tmp/
 .env
 *_templ.go
+node_modules/

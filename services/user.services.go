@@ -21,7 +21,10 @@ type UserRepository interface {
 	CreateUser(u repositories.User) *repositories.RepositoryLayerErr
 	CheckEmailExists(email string) bool
 	CheckUsernameExists(username string) bool
+
 	GetAllUsers() ([]repositories.User, error)
+	GetUsersByAny(any string) ([]repositories.User, error)
+
 	GetUserByID(id string) (repositories.User, error)
 	GetUserByEmail(email string) (repositories.User, *repositories.RepositoryLayerErr)
 	GetUserByUsername(username string) (repositories.User, *repositories.RepositoryLayerErr)
@@ -114,11 +117,22 @@ func (us *UserService) GetUserByUsername(username string) (repositories.User, *S
 	return usr, nil
 }
 
+func (us *UserService) GetUsersByAny(any string) ([]repositories.User, *ServiceLayerErr) {
+
+	found, err := us.Repository.GetUsersByAny(any)
+
+	if err == nil {
+		return found, nil
+	}
+
+	return []repositories.User{}, &ServiceLayerErr{err, "Query Err", http.StatusInternalServerError}
+}
+
 func (us *UserService) AuthUser(login string, password string) (repositories.User, *ServiceLayerErr) {
 
 	var user repositories.User
 	var queryErr *repositories.RepositoryLayerErr
-	var isEmail bool = true
+	var isEmail = true
 
 	if login == "" || password == "" {
 		return repositories.User{}, &ServiceLayerErr{nil, "Por favor, preencha ambos os campos.", http.StatusBadRequest}

@@ -48,11 +48,7 @@ func (tr *TagRepository) CheckTagExists(name string) bool {
 
 	queryResult := tr.TagStore.Db.QueryRow(stmt, name).Scan()
 
-	if queryResult != sql.ErrNoRows {
-		return true
-	}
-
-	return false
+	return queryResult != sql.ErrNoRows
 }
 
 func (tr *TagRepository) GetAllTags() ([]Tag, *RepositoryLayerErr) {

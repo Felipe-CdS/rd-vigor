@@ -10,7 +10,7 @@ import (
 
 templ Base(title string, users []repositories.User, user repositories.User) {
 	@layout.Base(title, user, true) {
-		<div class="flex py-5 px-5 w-full lg:w-[calc(100vw-14rem)] grow bg-[#F0F2F5] items-center">
+		<div class="flex py-5 px-5 w-full grow bg-[#F0F2F5] items-center">
 			@usersList(users)
 			<div
 				id="user-info-div"

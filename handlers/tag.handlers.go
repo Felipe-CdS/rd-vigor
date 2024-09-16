@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/a-h/templ"
@@ -8,6 +9,7 @@ import (
 	"nugu.dev/rd-vigor/repositories"
 	"nugu.dev/rd-vigor/services"
 	admin_views "nugu.dev/rd-vigor/views/admin_views/dashboard"
+	"nugu.dev/rd-vigor/views/layout"
 	"nugu.dev/rd-vigor/views/tags_views"
 )
 
@@ -106,6 +108,32 @@ func (th *TagHandler) SearchTagByName(c echo.Context) error {
 	}
 
 	return th.View(c, admin_views.TagsListResponse(list, user))
+}
+
+func (th *TagHandler) SearchTagNavbar(c echo.Context) error {
+
+	searchInput := c.FormValue("search")
+	loggedUser := c.Get("user").(repositories.User)
+
+	if loggedUser.Role != "admin" {
+		return c.Redirect(http.StatusMovedPermanently, "/signin")
+	}
+
+	list, err := th.Service.SearchTagByName(searchInput)
+
+	if err != nil {
+		if err.Code == http.StatusInternalServerError {
+			c.Response().WriteHeader(http.StatusInternalServerError)
+			return th.View(c, tags_views.ErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
+		}
+
+		c.Response().WriteHeader(err.Code)
+		return th.View(c, tags_views.ErrorAlert(err.Message))
+	}
+
+	fmt.Println(list)
+
+	return th.View(c, layout.SearchModalResponsePartial(list, searchInput))
 }
 
 func (th *TagHandler) View(c echo.Context, cmp templ.Component) error {

@@ -1,0 +1,166 @@
+package home_views
+
+import (
+	"nugu.dev/rd-vigor/repositories"
+	"nugu.dev/rd-vigor/views/layout"
+)
+
+templ Base(title string, loggedUser repositories.User) {
+	@layout.Base(title, loggedUser, true) {
+		<div
+			class="space-y-3 flex flex-col w-full h-[calc(100vh-4rem)] overflow-y-scroll bg-[#F0F2F5]"
+		>
+			<div class="w-full pt-20 min-h-[60dvh] bg-[#ffdfa9] relative">
+				<div class="flex justify-center items-center w-full">
+					<h1></h1>
+				</div>
+				<div class="flex absolute bottom-0 z-20 justify-center items-center w-full">
+					<div class="flex py-2 px-5 w-6/12 font-normal bg-transparent bg-white rounded-full shadow-md">
+						<img class="mr-2 w-6 opacity-50" src="/static/img/search-2.svg"/>
+						<input class="flex focus:outline-none grow"/>
+					</div>
+				</div>
+				<div class="absolute bottom-0 w-full">
+					<img class="w-full" src="/static/img/curveNegative.svg"/>
+				</div>
+			</div>
+			<div class="px-5 lg:px-12 2xl:px-64 min-h-fit bg-[#F0F2F5]">
+				<div class="flex w-full">
+					<div class="flex flex-col">
+						<h1 class="flex items-center text-3xl font-semibold">
+							<img class="-mr-2 w-10" src="/static/img/slash.svg"/>
+							Eventos
+						</h1>
+						<h1 class="ml-10 text-sm font-normal text-gray-600">Participe dos próximos nossos encontros</h1>
+					</div>
+					<a href="/events" class="flex items-end pr-8 ml-auto">
+						<span>Ver&nbsp;Mais</span>
+						<img class="size-6" src="/static/img/arrow-right-3.svg"/>
+					</a>
+				</div>
+				<div class="flex p-5 w-full lg:flex-row lg:space-y-0 lg:space-x-2">
+					<div class="flex flex-col space-y-2 w-8/12 lg:space-y-0">
+						<div class="mb-2 w-full cursor-pointer card-shadow">
+							<div class="hidden p-4 w-full bg-white rounded-md md:flex hover:shadow-lg card-shadow">
+								<img class="mr-5 h-32 aspect-square" src="/static/img/events-1.png"/>
+								<div class="flex flex-col text-sm font-normal text-gray-500 grow">
+									<div class="flex items-center">
+										<h1 class="text-3xl font-bold text-black">Superando os Desafios e aproveitando as oportunidades</h1>
+									</div>
+									<span>Organizado por RD vigor </span>
+									<span class="flex items-center mt-auto">
+										<img class="mr-1 opacity-50 size-5" src="/static/img/map.svg"/>
+										<span class="mt-auto">Praça Pio X, 79 - 2º andar | Centro - Rio de Janeiro</span>
+									</span>
+									<span class="flex items-center mt-1">
+										<img class="mr-1 opacity-50 size-5" src="/static/img/clock.svg"/>
+										<span>11 de setembro de 2024 a partir das 09:00h</span>
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class="mb-2 w-full cursor-pointer card-shadow">
+							<div class="hidden p-4 w-full bg-white rounded-md md:flex hover:shadow-lg card-shadow">
+								<img class="mr-5 h-32 aspect-square" src="/static/img/events-1.png"/>
+								<div class="flex flex-col text-sm font-normal text-gray-500 grow">
+									<div class="flex items-center">
+										<h1 class="text-3xl font-bold text-black">Negócios e Inteligência Relacional</h1>
+									</div>
+									<span>Organizado por RD vigor </span>
+									<span class="flex items-center mt-auto">
+										<img class="mr-1 opacity-50 size-5" src="/static/img/map.svg"/>
+										<span class="mt-auto">Praça Pio X, 79 - 2º andar | Centro - Rio de Janeiro</span>
+									</span>
+									<span class="flex items-center mt-1">
+										<img class="mr-1 opacity-50 size-5" src="/static/img/clock.svg"/>
+										<span>13 de agosto de 2024 a partir das 09:00h</span>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div
+						class="flex overflow-hidden w-full rounded-md border border-gray-200 border-solid md:w-4/12 grow card-shadow"
+					>
+						<iframe
+							class="flex w-full rounded-lg focus:outline-none grow"
+							src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1837.6611426153117!2d-43.178432455100584!3d-22.901480656755396!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x997f592c15c54f%3A0x9575718825711b92!2sPra%C3%A7a%20Pio%20X%2C%2079%20-%202%C2%BA%20andar%20-%20Centro%2C%20Rio%20de%20Janeiro%20-%20RJ%2C%2020040-020!5e0!3m2!1sen!2sbr!4v1723061267284!5m2!1sen!2sbr&zoom=1500"
+							loading="lazy"
+							referrerpolicy="no-referrer-when-downgrade"
+						></iframe>
+					</div>
+				</div>
+			</div>
+			<!--
+			<div class="px-5 lg:px-12 2xl:px-64 min-h-fit bg-[#F0F2F5]">
+				<div class="flex">
+					<div class="flex flex-col">
+						<h1 class="flex items-center text-3xl font-semibold">
+							<img class="-mr-2 w-10" src="/static/img/slash.svg"/>
+							Cursos
+						</h1>
+						<h1 class="ml-10 text-sm font-normal text-gray-600">Ganhe destaque na RD Vigor estudando sobre a sua área</h1>
+					</div>
+				</div>
+				<div class="flex flex-col p-5 space-y-2 w-full lg:flex-row lg:space-y-0 lg:space-x-2">
+					for i := 0; i < 3; i++ {
+						<div class="p-5 w-full text-sm text-justify bg-white rounded-md border border-gray-200 border-solid lg:w-4/12 card-shadow h-fit">
+							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut semper metus a mauris condimentum, ut pharetra nisi tincidunt. Phasellus facilisis mauris orci, quis ornare odio placerat sed. Praesent finibus vehicula libero</p>
+							<div class="flex mt-2 w-full">
+								<img class="mr-2 w-12 rounded-full" src="/static/img/user.svg"/>
+								<div class="flex flex-col">
+									<span>AAAAAAA </span>
+									<span>CEO de BBBBB </span>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+			-->
+			<div class="px-5 lg:px-12 2xl:px-64 min-h-fit bg-[#F0F2F5]">
+				<div class="flex flex-col">
+					<h1 class="flex items-center text-3xl font-semibold">
+						<img class="-mr-2 w-10" src="/static/img/slash.svg"/>
+						Depoimentos de Afiliados
+					</h1>
+					<h1 class="ml-10 text-sm font-normal text-gray-600">Usado e comprovado por pessoas das mais diversas áreas</h1>
+				</div>
+				<div class="flex flex-col p-5 space-y-2 w-full lg:flex-row lg:space-y-0 lg:space-x-2">
+					<!-- Cards -->
+					<div class="flex flex-col justify-between p-5 w-full text-sm text-justify bg-white rounded-md border border-gray-200 border-solid lg:w-6/12 card-shadow">
+						<p>
+							Considerei muito importante o evento da RD/Vigor - “Negócios e Inteligência Relacional”, ocorrido em 13 de agosto, pela relevância do tema e pela aderência dos assuntos abordados na Gestão das nossas Empresas.
+							Tivemos a oportunidade de conhecer e trocar informações com diversos Empresários, de diferentes segmentos de negócio e de assistir a palestras de Empresários e Consultores, com exemplos de “Casos de Sucesso“ sobre temas diretamente ligados à Gestão do dia a dia dos nossos negócios. 
+						</p>
+						<div class="flex mt-2 w-full">
+							<img class="mr-2 w-12 rounded-full" src="/static/img/user.svg"/>
+							<div class="flex flex-col">
+								<span>Evandro Rua</span>
+								<span>Consultor Empresarial com mais de 30 anos de atividade na Empresa ERP Consultoria Empresarial</span>
+							</div>
+						</div>
+					</div>
+					<div class="flex flex-col justify-between p-5 w-full text-sm text-justify bg-white rounded-md border border-gray-200 border-solid lg:w-6/12 card-shadow">
+						<p>
+							Nas palestras promovidas pela RD/Vigor, tive a oportunidade de realizar NetWork, aprimorar conhecimentos e debates.	RD/Vigor se destaca pelo dinamismo, qualidade em temas atuais, trazendo empresas de vários segmentos. 	Em uma das reuniões realizamos parceria com uma empresa participante para atender um cliente nosso do segmento hospitalar.	
+						</p>
+						<div class="flex w-full">
+							<img class="mr-2 w-12 rounded-full" src="/static/img/user.svg"/>
+							<div class="flex flex-col">
+								<span>Fábio Camargo</span>
+								<span>Camargo & Oliveira Assessoria Contábil</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="py-5 bg-gray-200 lg:px-12 2xl:px-64 bg-px-5 min-h-fit">
+				<div class="flex flex-col justify-center items-center px-24">
+					<h1 class="text-sm font-normal text-gray-600">RD Vigor © 2024</h1>
+				</div>
+				<div></div>
+			</div>
+		</div>
+	}
+}

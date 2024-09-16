@@ -6,13 +6,26 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"nugu.dev/rd-vigor/auth"
+	"nugu.dev/rd-vigor/chat"
 	"nugu.dev/rd-vigor/views/auth_views"
 )
 
-func SetupRoutes(e *echo.Echo, uh *UserHandler, eh *EventHandler, th *TagHandler) {
+func SetupRoutes(e *echo.Echo,
+	wsServer *chat.WsServer,
+	uh *UserHandler,
+	eh *EventHandler,
+	th *TagHandler,
+	ch *ChatroomHandler,
+) {
 
-	e.GET("/", func(c echo.Context) error {
-		return c.Redirect(http.StatusMovedPermanently, "/signin")
+	e.GET("/", authMiddleware(uh, uh.GetHome))
+
+	e.GET("/ws-chatroom/:chatroom_id", func(c echo.Context) error {
+
+		hub := wsServer.NewHub(c, c.Param("chatroom_id"))
+
+		chat.ServeWs(hub, c.Response().Writer, c.Request())
+		return nil
 	})
 
 	e.GET("/admin/dashboard", func(c echo.Context) error {
@@ -48,7 +61,23 @@ func SetupRoutes(e *echo.Echo, uh *UserHandler, eh *EventHandler, th *TagHandler
 	e.GET("/events", authMiddleware(uh, eh.GetEventSearchPage))
 	e.GET("/event/:event_id", authMiddleware(uh, eh.GetEventDetails))
 
+	e.POST("/users/search", authMiddleware(uh, uh.SearchUserByAny))
 	e.POST("/tags/search", authMiddleware(uh, th.SearchTagByName))
+	e.POST("/navbar/search", authMiddleware(uh, th.SearchTagNavbar))
+
+	/* INBOX ROUTES*/
+	e.GET("/calendar", authMiddleware(uh, uh.GetCalendar))
+
+	/* INBOX ROUTES*/
+
+	e.GET("/inbox", authMiddleware(uh, ch.GetInboxBase))
+	e.POST("/chatroom/new", authMiddleware(uh, ch.CreateChatroom))
+	e.GET("/chatroom/new/select-recipient", authMiddleware(uh, ch.SelectRecipient))
+	e.GET("/chatroom/list", authMiddleware(uh, ch.GetUserChatroomsList))
+
+	e.GET("/chatroom/:chatroom_id", authMiddleware(uh, ch.GetChat))
+	// e.GET("/chatroom/:chatroom_id/chat", authMiddleware(uh, ch.GetChat))
+	e.GET("/chatroom/:chatroom_id/details", authMiddleware(uh, ch.GetChatroomDetails))
 }
 
 func signupFormDone(c echo.Context) error {

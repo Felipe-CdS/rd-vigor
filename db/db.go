@@ -113,7 +113,46 @@ func createMigrations(db *sql.DB) error {
 	_, err = db.Exec(statement)
 
 	if err != nil {
-		return fmt.Errorf("failed to create statement 2... Error: %s", err)
+		return fmt.Errorf("failed to create statement 3... Error: %s", err)
+	}
+
+	statement = `CREATE TABLE IF NOT EXISTS chatrooms ( 
+		chatroom_id UUID PRIMARY KEY
+	)`
+
+	_, err = db.Exec(statement)
+
+	if err != nil {
+		return fmt.Errorf("failed to create statement 4... Error: %s", err)
+	}
+
+	statement = `CREATE TABLE IF NOT EXISTS chatrooms_users ( 
+		fk_user_id UUID NOT NULL
+		, fk_chatroom_id UUID NOT NULL
+		, FOREIGN KEY(fk_user_id) REFERENCES users(id) ON DELETE CASCADE
+		, FOREIGN KEY(fk_chatroom_id) REFERENCES chatrooms(chatroom_id) ON DELETE CASCADE
+	)`
+
+	_, err = db.Exec(statement)
+
+	if err != nil {
+		return fmt.Errorf("failed to create statement 5... Error: %s", err)
+	}
+
+	statement = `CREATE TABLE IF NOT EXISTS messages ( 
+		message_id UUID PRIMARY KEY
+		, fk_sender_id UUID NOT NULL
+		, fk_chatroom_id UUID NOT NULL
+		, content TEXT NOT NULL
+		, created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+		, FOREIGN KEY(fk_sender_id) REFERENCES users(id) ON DELETE CASCADE
+		, FOREIGN KEY(fk_chatroom_id) REFERENCES chatrooms(chatroom_id) ON DELETE CASCADE
+	)`
+
+	_, err = db.Exec(statement)
+
+	if err != nil {
+		return fmt.Errorf("failed to create statement 6... Error: %s", err)
 	}
 
 	return nil
