@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"nugu.dev/rd-vigor/repositories"
-	"nugu.dev/rd-vigor/views/user_views"
+	"nugu.dev/rd-vigor/views/settings_views"
 )
 
 func (uh *UserHandler) GetSettingsPage(c echo.Context) error {
@@ -13,7 +13,7 @@ func (uh *UserHandler) GetSettingsPage(c echo.Context) error {
 	loggedUser := c.Get("user").(repositories.User)
 
 	return uh.View(c,
-		user_views.Settings(
+		settings_views.Base(
 			"Ajustes",
 			loggedUser,
 		))
@@ -28,7 +28,7 @@ func (uh *UserHandler) GetContactInfoSettings(c echo.Context) error {
 		return c.NoContent(http.StatusMovedPermanently)
 	}
 
-	return uh.View(c, user_views.ContactInfoSettings(loggedUser))
+	return uh.View(c, settings_views.ContactInfoSettings(loggedUser))
 }
 
 func (uh *UserHandler) GetBillingSettings(c echo.Context) error {
@@ -38,7 +38,7 @@ func (uh *UserHandler) GetBillingSettings(c echo.Context) error {
 		return c.NoContent(http.StatusMovedPermanently)
 	}
 
-	return uh.View(c, user_views.BillingSettings())
+	return uh.View(c, settings_views.BillingSettings())
 }
 
 func (uh *UserHandler) GetProfileSettings(c echo.Context) error {
@@ -48,7 +48,7 @@ func (uh *UserHandler) GetProfileSettings(c echo.Context) error {
 		return c.NoContent(http.StatusMovedPermanently)
 	}
 
-	return uh.View(c, user_views.ProfileSettings())
+	return uh.View(c, settings_views.ProfileSettings())
 }
 
 func (uh *UserHandler) GetSecuritySettings(c echo.Context) error {
@@ -58,5 +58,5 @@ func (uh *UserHandler) GetSecuritySettings(c echo.Context) error {
 		return c.NoContent(http.StatusMovedPermanently)
 	}
 
-	return uh.View(c, user_views.SecuritySettings())
+	return uh.View(c, settings_views.SecuritySettings())
 }

@@ -1,0 +1,113 @@
+package settings_views
+
+import (
+	"nugu.dev/rd-vigor/repositories"
+	"nugu.dev/rd-vigor/views/layout"
+)
+
+templ Base(title string, loggedUser repositories.User) {
+	@layout.Base(title, loggedUser, true) {
+		<div
+			x-data="{ state: 'menu', selected: 'billing' }"
+			x-init="state = window.innerWidth > 810 ? 'all' : 'menu'"
+			class="bg-[#F0F2F5] flex overflow-y-scroll justify-center items-center py-5 px-5 2xl:px-16  lg:space-x-2 w-full grow"
+		>
+			@SettingsMenu()
+			@SettingsGenericWindow()
+		</div>
+	}
+}
+
+templ SettingsMenu() {
+	<div
+		x-show="state == 'menu' || state == 'all'"
+		class="flex-col w-full h-full text-left bg-white rounded-xl border border-gray-200 border-solid lg:flex lg:w-3/12 2xl:w-2/12 card-shadow"
+	>
+		<div class="flex flex-col items-center pt-3 w-full">
+			<div class="flex px-2 mb-3 w-full">
+				<img class="inline -mr-1 w-8" src="/static/img/slash.svg"/>
+				<span class="text-2xl font-bold">Ajustes</span>
+			</div>
+			<!-- ############################################################################################### -->
+			<button
+				hx-get="/settings/billing"
+				hx-target="#generic-settings-div"
+				hx-trigger="load, click"
+				x-on:click="selected = 'billing'; if(state != 'all'){ state = 'generic'; }"
+				x-bind:style="selected == 'billing' && { 'border-left': '4px solid #ED6C09', 'opacity': '1', 'background-color': '#fff9ed'  }"
+				class="flex py-2 px-4 w-full border-b border-gray-200 border-solid opacity-60 cursor-pointer hover:opacity-100"
+			>
+				<span class="text-lg font-normal">Cobrança e pagamentos</span>
+				<img class="inline ml-auto w-6" src="/static/img/arrow-right-3.svg"/>
+			</button>
+			<!-- ############################################################################################### -->
+			<button
+				hx-get="/settings/contact-info"
+				hx-target="#generic-settings-div"
+				x-on:click="selected = 'contact-info'; if(state != 'all'){ state = 'generic'; }"
+				x-bind:style="selected == 'contact-info' && { 'border-left': '4px solid #ED6C09', 'opacity': '1', 'background-color': '#fff9ed'  }"
+				class="flex py-2 px-4 w-full border-b border-gray-200 border-solid opacity-60 cursor-pointer hover:opacity-100"
+			>
+				<span class="text-lg font-normal">Informações de contato</span>
+				<img class="inline ml-auto w-6" src="/static/img/arrow-right-3.svg"/>
+			</button>
+			<!-- ############################################################################################### -->
+			<button
+				hx-get="/settings/profile"
+				hx-target="#generic-settings-div"
+				x-on:click="selected = 'profile'; if(state != 'all'){ state = 'generic'; }"
+				x-bind:style="selected == 'profile' && { 'border-left': '4px solid #ED6C09', 'opacity': '1', 'background-color': '#fff9ed'  }"
+				class="flex py-2 px-4 w-full border-b border-gray-200 border-solid opacity-60 cursor-pointer hover:opacity-100"
+			>
+				<span class="text-lg font-normal">Meu Perfil</span>
+				<img class="inline ml-auto w-6" src="/static/img/arrow-right-3.svg"/>
+			</button>
+			<!-- ############################################################################################### -->
+			<button
+				hx-get="/settings/security"
+				hx-target="#generic-settings-div"
+				x-on:click="selected = 'security'; if(state != 'all'){ state = 'generic'; }"
+				x-bind:style="selected == 'security' && { 'border-left': '4px solid #ED6C09', 'opacity': '1', 'background-color': '#fff9ed'  }"
+				class="flex py-2 px-4 w-full border-b border-gray-200 border-solid opacity-60 cursor-pointer hover:opacity-100"
+			>
+				<span class="text-lg font-normal">Senha e segurança</span>
+				<img class="inline ml-auto w-6" src="/static/img/arrow-right-3.svg"/>
+			</button>
+			<!-- ############################################################################################### -->
+		</div>
+	</div>
+}
+
+templ SettingsGenericWindow() {
+	<div
+		id="generic-settings-div"
+		x-show="state == 'generic' || state == 'all'"
+		class="flex flex-col w-full h-full bg-white rounded-xl border border-gray-200 border-solid lg:flex lg:w-6/12 2xl:w-8/12 card-shadow"
+	>
+		<div class="flex flex-col justify-center items-center p-4 w-full h-full text-center">
+			<h1 class="mt-1 text-xl font-normal text-gray-400">Nenhuma configuração selecionada</h1>
+		</div>
+	</div>
+}
+
+templ ProfileSettings() {
+	<div class="flex flex-col justify-center items-center p-4 w-full h-full text-center">
+		ProfileSettings
+	</div>
+}
+
+templ SecuritySettings() {
+	<div class="flex flex-col justify-center items-center p-4 w-full h-full text-center">
+		Security Settings
+	</div>
+}
+
+templ UpdateErrorAlert(message string) {
+	<span
+		id="error-alert"
+		class="block p-3 w-full text-sm text-justify rounded-md bg-[#fff1d4] border rounded-md font-normal border-[#fea439]"
+	>
+		<img class="inline size-5" src="static/img/error.svg"/>
+		{ message }
+	</span>
+}

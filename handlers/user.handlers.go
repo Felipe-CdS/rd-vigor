@@ -14,6 +14,7 @@ import (
 	"nugu.dev/rd-vigor/views/auth_views"
 	"nugu.dev/rd-vigor/views/home_views"
 	"nugu.dev/rd-vigor/views/inbox_views"
+	"nugu.dev/rd-vigor/views/settings_views"
 	"nugu.dev/rd-vigor/views/user_views"
 )
 
@@ -284,27 +285,27 @@ func (uh *UserHandler) UpdateUserAccountInfo(c echo.Context) error {
 
 	if formData.FirstName == "" {
 		c.Response().WriteHeader(http.StatusBadRequest)
-		return uh.View(c, user_views.UpdateErrorAlert("Por favor, insira um Nome válido."))
+		return uh.View(c, settings_views.UpdateErrorAlert("Por favor, insira um Nome válido."))
 	}
 
 	if formData.LastName == "" {
 		c.Response().WriteHeader(http.StatusBadRequest)
-		return uh.View(c, user_views.UpdateErrorAlert("Por favor, insira um Sobrenome válido."))
+		return uh.View(c, settings_views.UpdateErrorAlert("Por favor, insira um Sobrenome válido."))
 	}
 
 	if formData.Email == "" {
 		c.Response().WriteHeader(http.StatusBadRequest)
-		return uh.View(c, user_views.UpdateErrorAlert("Por favor, insira um email válido."))
+		return uh.View(c, settings_views.UpdateErrorAlert("Por favor, insira um email válido."))
 	}
 
 	if _, err := mail.ParseAddress(formData.Email); err != nil {
 		c.Response().WriteHeader(http.StatusBadRequest)
-		return uh.View(c, user_views.UpdateErrorAlert("Por favor, insira um email válido."))
+		return uh.View(c, settings_views.UpdateErrorAlert("Por favor, insira um email válido."))
 	}
 
 	if formData.Username == "" {
 		c.Response().WriteHeader(http.StatusBadRequest)
-		return uh.View(c, user_views.UpdateErrorAlert("Por favor, insira um nome de usuário válido."))
+		return uh.View(c, settings_views.UpdateErrorAlert("Por favor, insira um nome de usuário válido."))
 	}
 
 	if err := uh.UserServices.UpdateUser(loggedUser, formData); err != nil {
@@ -314,7 +315,7 @@ func (uh *UserHandler) UpdateUserAccountInfo(c echo.Context) error {
 		}
 
 		c.Response().WriteHeader(err.Code)
-		return uh.View(c, user_views.UpdateErrorAlert(err.Message))
+		return uh.View(c, settings_views.UpdateErrorAlert(err.Message))
 	}
 
 	updatedUser, queryErr := uh.UserServices.GetUserByID(loggedUser.ID)
@@ -328,7 +329,7 @@ func (uh *UserHandler) UpdateUserAccountInfo(c echo.Context) error {
 		c.Response().WriteHeader(http.StatusInternalServerError)
 		return uh.View(c, auth_views.SignupFormErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
 	}
-	return uh.View(c, user_views.ContactInfoSettings(updatedUser))
+	return uh.View(c, settings_views.ContactInfoSettings(updatedUser))
 }
 
 func (uh *UserHandler) UpdateUserLocationInfo(c echo.Context) error {
@@ -353,7 +354,7 @@ func (uh *UserHandler) UpdateUserLocationInfo(c echo.Context) error {
 		}
 
 		c.Response().WriteHeader(err.Code)
-		return uh.View(c, user_views.UpdateErrorAlert(err.Message))
+		return uh.View(c, settings_views.UpdateErrorAlert(err.Message))
 	}
 
 	updatedUser, queryErr := uh.UserServices.GetUserByID(loggedUser.ID)
@@ -363,7 +364,7 @@ func (uh *UserHandler) UpdateUserLocationInfo(c echo.Context) error {
 		return uh.View(c, auth_views.SignupFormErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
 	}
 
-	return uh.View(c, user_views.ContactInfoSettings(updatedUser))
+	return uh.View(c, settings_views.ContactInfoSettings(updatedUser))
 }
 
 func (uh *UserHandler) View(c echo.Context, cmp templ.Component) error {

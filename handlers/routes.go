@@ -1,10 +1,14 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/stripe/stripe-go/v79"
+	"github.com/stripe/stripe-go/v79/paymentintent"
 	"nugu.dev/rd-vigor/auth"
 	"nugu.dev/rd-vigor/chat"
 	"nugu.dev/rd-vigor/repositories"
@@ -94,6 +98,9 @@ func SetupRoutes(e *echo.Echo,
 
 	e.POST("/settings/contact-info/account", authMiddleware(uh, uh.UpdateUserAccountInfo))
 	e.POST("/settings/contact-info/location", authMiddleware(uh, uh.UpdateUserLocationInfo))
+
+	/* STRIPE ROUTES*/
+	e.POST("/create-payment-intent", authMiddleware(uh, CreatePaymentIntent))
 }
 
 func signupFormDone(c echo.Context) error {
@@ -131,4 +138,44 @@ func authMiddleware(uh *UserHandler, next echo.HandlerFunc) echo.HandlerFunc {
 		c.Set("user", loggedUser)
 		return next(c)
 	}
+}
+
+func CreatePaymentIntent(c echo.Context) error {
+	var i int64 = 10000
+
+	loggedUser := c.Get("user").(repositories.User)
+	stripe.Key = "sk_test_51PtsLPP4MxIMgAthuIYfpAKo8RHjeg5Ny4tIILV02TOzUZOE79M18WTbdQcnJavci6HmlgZLNqIABm5CD7J9vaog00sS478WGK"
+
+	params := &stripe.PaymentIntentParams{
+		Amount:   &i,
+		Currency: stripe.String(string(stripe.CurrencyBRL)),
+		Customer: &loggedUser.Username,
+		AutomaticPaymentMethods: &stripe.PaymentIntentAutomaticPaymentMethodsParams{
+			Enabled: stripe.Bool(true),
+		},
+	}
+
+	pi, err := paymentintent.New(params)
+
+	if err != nil {
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		return err
+	}
+
+	type v struct {
+		ClientSecret   string `json:"clientSecret"`
+		DpmCheckerLink string `json:"dpmCheckerLink"`
+	}
+
+	x := &v{
+		ClientSecret:   pi.ClientSecret,
+		DpmCheckerLink: fmt.Sprintf("https://dashboard.stripe.com/settings/payment_methods/review?transaction_id=%s", pi.ID),
+	}
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(x); err != nil {
+		return err
+	}
+
+	return c.JSONBlob(http.StatusOK, buf.Bytes())
 }

@@ -1,0 +1,59 @@
+package settings_views
+
+templ BillingSettings() {
+	<div class="flex overflow-y-scroll flex-col p-5 space-y-3 w-full h-full text-center">
+		<h1 class="hidden font-semibold lg:block lg:text-2xl text-start">Inscrição Afiliado</h1>
+		<button
+			x-on:click="state = 'menu'"
+			class="font-medium lg:hidden text-start"
+		>
+			<img class="inline ml-auto w-6 rotate-180" src="/static/img/arrow-right-3.svg"/>
+			Voltar
+		</button>
+		<!-- ############################################################################################### -->
+		<div
+			x-data="{ checkout: false }"
+			class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
+		>
+			<template x-if="!checkout">
+				<div class="flex flex-col space-y-3 w-full">
+					<div class="flex w-full">
+						<span class="text-xl font-medium">Situação Atual</span>
+					</div>
+					<span class="text-base font-normal text-start">
+						<p class="text-xs opacity-50">Inscrição</p>
+						Sua afiliação na RD Vigor está inativa no momento.
+					</span>
+					<button
+						x-on:click="checkout = !checkout"
+						class="py-1 px-3 w-fit font-normal text-base rounded-md text-white bg-[#FFBD59]"
+					>
+						Renovar Inscrição
+					</button>
+				</div>
+			</template>
+			<template x-if="checkout" x-init="$watch('checkout', () => initialize())">
+				<form class="w-full" id="payment-form">
+					<div id="payment-element"></div>
+					<div id="payment-message" class="hidden"></div>
+					<div class="flex items-center mt-3 space-x-3">
+						<button
+							id="submit"
+							type="submit"
+							class="py-1 px-3 w-fit font-normal text-base rounded-md text-white bg-[#FFBD59]"
+						>
+							<div class="hidden spinner" id="spinner"></div>
+							<span id="button-text">Concluir Compra</span>
+						</button>
+						<button
+							x-on:click="checkout = !checkout"
+							class="text-base font-normal w-fit"
+						>
+							Cancelar
+						</button>
+					</div>
+				</form>
+			</template>
+		</div>
+	</div>
+}
