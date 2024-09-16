@@ -1,9 +1,6 @@
 package handlers
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 	"nugu.dev/rd-vigor/repositories"
@@ -121,14 +118,17 @@ func (ch *ChatroomHandler) CreateChatroom(c echo.Context) error {
 	chatroomId, err := ch.ChatroomServices.CreateChatroom(loggedUser.ID, recipient.ID)
 
 	if err != nil {
-		fmt.Println(err)
 	}
 
 	if err = ch.MessageServices.CreateMessage(loggedUser.ID, content, chatroomId); err != nil {
-
 	}
 
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/inbox?chatroom=%s", chatroomId))
+	m, queryErr := ch.MessageServices.GetChatroomMessages(chatroomId)
+
+	if queryErr != nil {
+	}
+
+	return ch.View(c, inbox_views.Chat(recipient, m, chatroomId))
 }
 
 func (ch *ChatroomHandler) GetChatroomDetails(c echo.Context) error {
@@ -167,10 +167,9 @@ func (ch *ChatroomHandler) GetChat(c echo.Context) error {
 	m, queryErr := ch.MessageServices.GetChatroomMessages(chatroomId)
 
 	if queryErr != nil {
-		fmt.Println(queryErr)
 	}
 
-	return ch.View(c, inbox_views.ChatDiv(r, m, chatroomId))
+	return ch.View(c, inbox_views.Chat(r, m, chatroomId))
 }
 
 func (ch *ChatroomHandler) View(c echo.Context, cmp templ.Component) error {

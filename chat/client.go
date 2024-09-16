@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"nugu.dev/rd-vigor/repositories"
 )
@@ -32,7 +31,7 @@ const (
 	maxMessageSize = 512
 )
 
-func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request, userId string) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 
 	if err != nil {
@@ -40,10 +39,8 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := uuid.New()
-
 	client := &Client{
-		id:   id.String(),
+		id:   userId,
 		hub:  hub,
 		conn: conn,
 		send: make(chan []byte, 256),

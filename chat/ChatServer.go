@@ -25,13 +25,13 @@ func (w *WsServer) NewHub(c echo.Context, chatroomId string) *Hub {
 		}
 	}
 
-	messages, err := w.mr.GetChatroomMessages("2")
+	messages, err := w.mr.GetChatroomMessages(chatroomId)
 
 	if err != nil {
 
 	}
 
-	hub := NewHub(chatroomId, messages)
+	hub := NewHub(chatroomId, messages, w.mr)
 
 	w.chatrooms[hub] = true
 

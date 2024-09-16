@@ -39,6 +39,7 @@ templ RecipientsList(recipientsList []services.ChatroomLastData) {
 			<button
 				hx-get={ fmt.Sprintf("/chatroom/%s", r.Chatroom.ChatroomId) }
 				hx-target="#chat-div"
+				hx-swap="outerHTML"
 				x-on:click="if(state != 'all'){ state = 'chat'; }"
 				class="flex py-3 px-3 w-full text-left border-b border-gray-200 border-solid"
 			>
@@ -47,13 +48,15 @@ templ RecipientsList(recipientsList []services.ChatroomLastData) {
 					<div class="flex flex-col items-center w-9/12">
 						<span class="flex text-[#27272A] items-center font-medium w-full text-base truncate">
 							{ fmt.Sprintf("%s %s", r.Recipient.FirstName, r.Recipient.LastName) }
-							<span class="text-[#71717A] text-xs ml-1 truncate w-full">
-								{ fmt.Sprintf("(@%s)", r.LastSender.Username) }
-							</span>
 						</span>
+						<span class="text-[#71717A] text-xs ml-1 truncate w-full">
+							{ fmt.Sprintf("(@%s)", r.Recipient.Username) }
+						</span>
+						<!--
 						<span class="flex text-[#27272A] items-center font-normal text-gray-700 w-full text-xs">
 							{ fmt.Sprintf("%s", r.LastMessage.Content) }
 						</span>
+						-->
 					</div>
 				</div>
 			</button>

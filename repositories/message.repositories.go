@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -78,6 +79,7 @@ func (mr *MessageRepository) GetLastChatroomMessage(chatroom_id string) (Message
 
 func (mr *MessageRepository) CreateMessage(sender_id string, content string, chatroom_id string) *RepositoryLayerErr {
 
+	fmt.Println(sender_id, content, chatroom_id)
 	stmt := `INSERT INTO messages 
 		(message_id, fk_sender_id, fk_chatroom_id, content, created_at) 
 		VALUES ($1, $2, $3, $4, $5)`

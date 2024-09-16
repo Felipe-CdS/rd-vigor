@@ -134,8 +134,8 @@ templ sendMessageForm() {
 	<form
 		hx-post="/chatroom/new"
 		autocomplete="off"
-		hx-target="body"
-		hx-push-url="true"
+		hx-target="#chat-div"
+		hx-swap="outerHTML"
 		class="flex flex-col space-y-3 w-full"
 	>
 		<div class="flex flex-col space-y-1 w-full">

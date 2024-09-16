@@ -9,18 +9,16 @@ import (
 // Chat
 // Details
 // All
-//ws-connect="/ws-chatroom/2"
 templ Base(title string, loggedUser repositories.User, chatroomId string) {
 	@layout.Base(title, loggedUser, true) {
 		<div
-			hx-on::ws-after-message="document.getElementById('chatroom').scrollTop = document.getElementById('chatroom').scrollHeight"
 			x-data="{state: 'inbox', newChatModalOpen: false}"
 			x-init="state = window.innerWidth > 810 ? 'all' : 'inbox'"
 			class="bg-[#F0F2F5] flex overflow-y-scroll justify-center items-center py-5 px-5 2xl:px-16  lg:space-x-2 w-full grow"
 		>
 			@NewChatModal()
 			@InboxList()
-			@Chat(chatroomId)
+			@EmptyChat()
 			@Details(chatroomId)
 		</div>
 	}

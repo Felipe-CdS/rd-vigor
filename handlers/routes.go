@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"nugu.dev/rd-vigor/auth"
 	"nugu.dev/rd-vigor/chat"
+	"nugu.dev/rd-vigor/repositories"
 	"nugu.dev/rd-vigor/views/auth_views"
 )
 
@@ -20,13 +21,18 @@ func SetupRoutes(e *echo.Echo,
 
 	e.GET("/", authMiddleware(uh, uh.GetHome))
 
-	e.GET("/ws-chatroom/:chatroom_id", func(c echo.Context) error {
+	e.GET("/ws-chatroom/:chatroom_id", authMiddleware(
+		uh,
+		func(c echo.Context) error {
 
-		hub := wsServer.NewHub(c, c.Param("chatroom_id"))
+			loggedUser := c.Get("user").(repositories.User)
 
-		chat.ServeWs(hub, c.Response().Writer, c.Request())
-		return nil
-	})
+			hub := wsServer.NewHub(c, c.Param("chatroom_id"))
+
+			chat.ServeWs(hub, c.Response().Writer, c.Request(), loggedUser.ID)
+			return nil
+		}),
+	)
 
 	e.GET("/admin/dashboard", func(c echo.Context) error {
 		return c.Redirect(http.StatusMovedPermanently, "/admin/dashboard/users")
@@ -76,7 +82,7 @@ func SetupRoutes(e *echo.Echo,
 	e.GET("/chatroom/list", authMiddleware(uh, ch.GetUserChatroomsList))
 
 	e.GET("/chatroom/:chatroom_id", authMiddleware(uh, ch.GetChat))
-	// e.GET("/chatroom/:chatroom_id/chat", authMiddleware(uh, ch.GetChat))
+	e.GET("/chatroom/:chatroom_id/chat", authMiddleware(uh, ch.GetChat))
 	e.GET("/chatroom/:chatroom_id/details", authMiddleware(uh, ch.GetChatroomDetails))
 }
 

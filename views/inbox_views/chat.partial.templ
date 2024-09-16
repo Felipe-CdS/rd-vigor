@@ -5,43 +5,33 @@ import (
 	"nugu.dev/rd-vigor/repositories"
 )
 
-templ Chat(chatroomId string) {
-	if chatroomId == "" {
-		@EmptyChat()
-	} else {
-		<div
-			hx-get={ fmt.Sprintf("/chatroom/%s/chat", chatroomId) }
-			hx-target="#chat-div"
-			hx-trigger="intersect once"
-			x-show="state == 'chat' || state == 'all'"
-			class="flex flex-col w-full h-full text-left bg-white rounded-xl border border-gray-200 border-solid lg:flex lg:w-6/12 2xl:w-8/12 card-shadow"
-		>
-			<div id="chat-div" class="flex flex-col h-full"></div>
-		</div>
-	}
-}
-
-templ ChatDiv(recipient repositories.User, messages []repositories.Message, chatroomId string) {
+templ Chat(recipient repositories.User, messages []repositories.Message, chatroomId string) {
 	<div
-		class="flex items-center py-4 pr-5 pl-2 w-full bg-white rounded-t-xl border-b border-gray-200 border-solid lg:px-5"
+		id="chat-div"
+		ws-connect={ fmt.Sprintf("/ws-chatroom/%s", chatroomId) }
+		hx-on::ws-after-message="document.getElementById('chatroom').scrollTop = document.getElementById('chatroom').scrollHeight"
+		x-show="state == 'chat' || state == 'all'"
+		class="flex flex-col w-full h-full text-left bg-white rounded-xl border border-gray-200 border-solid lg:flex lg:w-6/12 2xl:w-8/12 card-shadow"
 	>
-		<button
-			x-on:click="if(state != 'all'){ state = 'inbox'; }"
-			title="filtrar"
-			class="lg:hidden"
-		>
-			<img class="rotate-90 size-6" src="/static/img/arrow-down.svg"/>
-		</button>
-		<h1 class="text-2xl font-semibold">{ fmt.Sprintf("%s %s", recipient.FirstName, recipient.LastName) }</h1>
-		<button
-			x-on:click="if(state != 'all'){ state = 'details'; }"
-			title="filtrar"
-			class="ml-auto lg:hidden"
-		>
-			<img class="size-6" src="/static/img/address-book.svg"/>
-		</button>
+		<div class="flex items-center py-4 pr-5 pl-2 w-full bg-white rounded-t-xl border-b border-gray-200 border-solid lg:px-5">
+			<button
+				x-on:click="if(state != 'all'){ state = 'inbox'; }"
+				title="filtrar"
+				class="lg:hidden"
+			>
+				<img class="rotate-90 size-6" src="/static/img/arrow-down.svg"/>
+			</button>
+			<h1 class="text-2xl font-semibold">{ fmt.Sprintf("%s %s", recipient.FirstName, recipient.LastName) }</h1>
+			<button
+				x-on:click="if(state != 'all'){ state = 'details'; }"
+				title="filtrar"
+				class="ml-auto lg:hidden"
+			>
+				<img class="size-6" src="/static/img/address-book.svg"/>
+			</button>
+		</div>
+		@MessageSection(messages)
 	</div>
-	@MessageSection(messages)
 	@Details(chatroomId)
 }
 

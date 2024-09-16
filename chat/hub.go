@@ -23,9 +23,10 @@ type Hub struct {
 	unregister chan *Client
 
 	messages []repositories.Message
+	mr       *repositories.MessageRepository
 }
 
-func NewHub(chatroomId string, messages []repositories.Message) *Hub {
+func NewHub(chatroomId string, messages []repositories.Message, mr *repositories.MessageRepository) *Hub {
 	return &Hub{
 		Id:         chatroomId,
 		clients:    map[*Client]bool{},
@@ -33,6 +34,7 @@ func NewHub(chatroomId string, messages []repositories.Message) *Hub {
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		messages:   messages,
+		mr:         mr,
 	}
 }
 
@@ -60,11 +62,17 @@ func (h *Hub) Run(c echo.Context) {
 		case msg := <-h.broadcast:
 			h.RLock()
 			h.messages = append(h.messages, *msg)
-			m := []repositories.Message{*msg}
+
+			err := h.mr.CreateMessage(msg.UserId, msg.Content, h.Id)
+
+			if err != nil {
+				h.RUnlock()
+				return
+			}
 
 			for client := range h.clients {
 				select {
-				case client.send <- getMessageTemplate(c, m):
+				case client.send <- getMessageTemplate(c, h.messages):
 				default:
 					close(client.send)
 					delete(h.clients, client)
@@ -85,14 +93,3 @@ func getMessageTemplate(c echo.Context, m []repositories.Message) []byte {
 
 	return buf.Bytes()
 }
-
-// func getBulkTemplate(c echo.Context, m []*repositories.Message) []byte {
-//
-// 	var buf bytes.Buffer
-//
-// 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
-//
-// 	inbox_views.Bulk(m).Render(c.Request().Context(), io.Writer(&buf))
-//
-// 	return buf.Bytes()
-// }
