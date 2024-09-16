@@ -626,6 +626,10 @@ video {
   margin-left: auto !important;
 }
 
+.-mr-1 {
+  margin-right: -0.25rem;
+}
+
 .-mr-2 {
   margin-right: -0.5rem;
 }
@@ -953,6 +957,10 @@ video {
 
 .w-screen {
   width: 100vw;
+}
+
+.w-1\/2 {
+  width: 50%;
 }
 
 .max-w-10 {
@@ -1381,6 +1389,10 @@ video {
   padding-top: 5rem;
 }
 
+.pt-3 {
+  padding-top: 0.75rem;
+}
+
 .pt-4 {
   padding-top: 1rem;
 }
@@ -1395,6 +1407,10 @@ video {
 
 .text-justify {
   text-align: justify;
+}
+
+.text-start {
+  text-align: start;
 }
 
 .font-\[Inter\] {
@@ -1745,6 +1761,11 @@ video {
 
   .lg\:pt-4 {
     padding-top: 1rem;
+  }
+
+  .lg\:text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
   }
 }
 

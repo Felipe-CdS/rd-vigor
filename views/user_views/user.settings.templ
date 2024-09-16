@@ -1,0 +1,340 @@
+package user_views
+
+import (
+	"fmt"
+	"nugu.dev/rd-vigor/repositories"
+	"nugu.dev/rd-vigor/views/layout"
+)
+
+templ Settings(title string, loggedUser repositories.User) {
+	@layout.Base(title, loggedUser, true) {
+		<div
+			x-data="{ state: 'menu', selected: 'contact-info' }"
+			x-init="state = window.innerWidth > 810 ? 'all' : 'menu'"
+			class="bg-[#F0F2F5] flex overflow-y-scroll justify-center items-center py-5 px-5 2xl:px-16  lg:space-x-2 w-full grow"
+		>
+			@SettingsMenu()
+			@SettingsGenericWindow()
+		</div>
+	}
+}
+
+templ SettingsMenu() {
+	<div
+		x-show="state == 'menu' || state == 'all'"
+		class="flex-col w-full h-full text-left bg-white rounded-xl border border-gray-200 border-solid lg:flex lg:w-3/12 2xl:w-2/12 card-shadow"
+	>
+		<div class="flex flex-col items-center pt-3 w-full">
+			<div class="flex px-2 mb-3 w-full">
+				<img class="inline -mr-1 w-8" src="/static/img/slash.svg"/>
+				<span class="text-2xl font-bold">Ajustes</span>
+			</div>
+			<!-- ############################################################################################### -->
+			<button
+				hx-get="/settings/billing"
+				hx-target="#generic-settings-div"
+				x-on:click="selected = 'billing'; if(state != 'all'){ state = 'generic'; }"
+				x-bind:style="selected == 'billing' && { 'border-left': '4px solid #ED6C09', 'opacity': '1', 'background-color': '#fff9ed'  }"
+				class="flex py-2 px-4 w-full border-b border-gray-200 border-solid opacity-60 cursor-pointer hover:opacity-100"
+			>
+				<span class="text-lg font-normal">Cobrança e pagamentos</span>
+				<img class="inline ml-auto w-6" src="/static/img/arrow-right-3.svg"/>
+			</button>
+			<!-- ############################################################################################### -->
+			<button
+				hx-get="/settings/contact-info"
+				hx-target="#generic-settings-div"
+				hx-trigger="load, click"
+				x-on:click="selected = 'contact-info'; if(state != 'all'){ state = 'generic'; }"
+				x-bind:style="selected == 'contact-info' && { 'border-left': '4px solid #ED6C09', 'opacity': '1', 'background-color': '#fff9ed'  }"
+				class="flex py-2 px-4 w-full border-b border-gray-200 border-solid opacity-60 cursor-pointer hover:opacity-100"
+			>
+				<span class="text-lg font-normal">Informações de contato</span>
+				<img class="inline ml-auto w-6" src="/static/img/arrow-right-3.svg"/>
+			</button>
+			<!-- ############################################################################################### -->
+			<button
+				hx-get="/settings/profile"
+				hx-target="#generic-settings-div"
+				x-on:click="selected = 'profile'; if(state != 'all'){ state = 'generic'; }"
+				x-bind:style="selected == 'profile' && { 'border-left': '4px solid #ED6C09', 'opacity': '1', 'background-color': '#fff9ed'  }"
+				class="flex py-2 px-4 w-full border-b border-gray-200 border-solid opacity-60 cursor-pointer hover:opacity-100"
+			>
+				<span class="text-lg font-normal">Meu Perfil</span>
+				<img class="inline ml-auto w-6" src="/static/img/arrow-right-3.svg"/>
+			</button>
+			<!-- ############################################################################################### -->
+			<button
+				hx-get="/settings/security"
+				hx-target="#generic-settings-div"
+				x-on:click="selected = 'security'; if(state != 'all'){ state = 'generic'; }"
+				x-bind:style="selected == 'security' && { 'border-left': '4px solid #ED6C09', 'opacity': '1', 'background-color': '#fff9ed'  }"
+				class="flex py-2 px-4 w-full border-b border-gray-200 border-solid opacity-60 cursor-pointer hover:opacity-100"
+			>
+				<span class="text-lg font-normal">Senha e segurança</span>
+				<img class="inline ml-auto w-6" src="/static/img/arrow-right-3.svg"/>
+			</button>
+			<!-- ############################################################################################### -->
+		</div>
+	</div>
+}
+
+templ SettingsGenericWindow() {
+	<div
+		id="generic-settings-div"
+		x-show="state == 'generic' || state == 'all'"
+		class="flex flex-col w-full h-full bg-white rounded-xl border border-gray-200 border-solid lg:flex lg:w-6/12 2xl:w-8/12 card-shadow"
+	>
+		<div class="flex flex-col justify-center items-center p-4 w-full h-full text-center">
+			<h1 class="mt-1 text-xl font-normal text-gray-400">Nenhuma configuração selecionada</h1>
+		</div>
+	</div>
+}
+
+templ BillingSettings() {
+	<div class="flex flex-col justify-center items-center p-4 w-full h-full text-center">
+		Billing Settings
+	</div>
+}
+
+templ ContactInfoSettings(user repositories.User) {
+	<div class="flex overflow-y-scroll flex-col p-5 space-y-3 w-full h-full text-center">
+		<h1 class="hidden font-semibold lg:block lg:text-2xl text-start">Informações de contato</h1>
+		<button
+			x-on:click="state = 'menu'"
+			class="font-medium lg:hidden text-start"
+		>
+			<img class="inline ml-auto w-6 rotate-180" src="/static/img/arrow-right-3.svg"/>
+			Voltar
+		</button>
+		<!-- ############################################################################################### -->
+		<div
+			x-data="{ edit: false }"
+			class="flex flex-col items-start p-6 w-full rounded-xl border border-gray-200"
+		>
+			<template x-if="!edit">
+				<div class="flex flex-col space-y-3 w-full">
+					<div class="flex w-full">
+						<span class="text-xl font-medium">Conta</span>
+						<button
+							x-on:click="edit = !edit"
+							class="ml-auto"
+						>
+							<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/edit.svg"/>
+						</button>
+					</div>
+					<span class="text-base font-normal text-start">
+						<p class="text-xs opacity-50">Nome de usuário</p>
+						{ fmt.Sprintf("%s", user.Username) }
+					</span>
+					<span class="text-base font-normal text-start">
+						<p class="text-xs opacity-50">Nome Completo</p>
+						{ fmt.Sprintf("%s %s", user.FirstName, user.LastName) }
+					</span>
+					<span class="text-base font-normal text-start">
+						<p class="text-xs opacity-50">E-mail</p>
+						{ fmt.Sprintf("%s", user.Email) }
+					</span>
+				</div>
+			</template>
+			<template x-if="edit">
+				<div class="flex flex-col space-y-3 w-full">
+					<div class="flex w-full">
+						<span class="text-xl font-medium">Conta</span>
+						<button
+							x-on:click="edit = !edit"
+							class="ml-auto"
+						>
+							<img class="opacity-40 hover:opacity-100 size-8" src="/static/img/close.svg"/>
+						</button>
+					</div>
+					<form class="flex flex-col space-y-3 w-full">
+						<div class="flex flex-col justify-between items-center space-y-3 w-full md:flex-row md:space-y-0 md:space-x-3">
+							<label class="w-1/2 text-sm font-normal text-left text-gray-500">
+								Primeiro Nome
+								<input
+									type="text"
+									name="first_name"
+									placeholder="Primeiro Nome"
+									value={ fmt.Sprintf("%s", user.FirstName) }
+									class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+								/>
+							</label>
+							<label class="w-1/2 text-sm font-normal text-left text-gray-500">
+								Sobrenome
+								<input
+									type="text"
+									name="last_name"
+									placeholder="Sobrenome"
+									value={ fmt.Sprintf("%s", user.LastName) }
+									class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+								/>
+							</label>
+						</div>
+						<label class="text-sm font-normal text-left text-gray-500">
+							Nome de Usuário
+							<input
+								type="text"
+								name="username"
+								value={ fmt.Sprintf("%s", user.Username) }
+								class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+							/>
+						</label>
+						<label class="text-sm font-normal text-left text-gray-500">
+							Email
+							<input
+								type="text"
+								name="email"
+								placeholder="E-mail"
+								value={ fmt.Sprintf("%s", user.Email) }
+								class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+							/>
+						</label>
+						<span id="error-alert"></span>
+						<div class="flex space-x-3">
+							<button
+								type="submit"
+								data-loading-disable
+								data-loading-class="hidden"
+								class="py-1 px-3 w-fit font-normal text-base rounded-md text-white bg-[#FFBD59]"
+							>
+								Atualizar
+							</button>
+							<button
+								x-on:click="edit = !edit"
+								class="text-base font-normal w-fit"
+							>
+								Cancelar
+							</button>
+						</div>
+					</form>
+				</div>
+			</template>
+		</div>
+		<!-- ############################################################################################### -->
+		<div
+			x-data="{ edit: true }"
+			class="flex flex-col items-start p-6 w-full rounded-xl border border-gray-200"
+		>
+			<template x-if="!edit">
+				<div class="flex flex-col space-y-3 w-full">
+					<div class="flex w-full">
+						<span class="text-xl font-medium">Localização</span>
+						<button
+							x-on:click="edit = !edit"
+							class="ml-auto"
+						>
+							<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/edit.svg"/>
+						</button>
+					</div>
+					<span class="text-base font-normal text-start">
+						<p class="text-xs opacity-50">Endereço</p>
+						Nenhum endereço informado
+					</span>
+					<span class="text-base font-normal text-start">
+						<p class="text-xs opacity-50">Telefone</p>
+						{ fmt.Sprintf("%s", user.Telephone) }
+					</span>
+				</div>
+			</template>
+			<template x-if="edit">
+				<div class="flex flex-col space-y-3 w-full">
+					<div class="flex w-full">
+						<span class="text-xl font-medium">Localização</span>
+						<button
+							x-on:click="edit = !edit"
+							class="ml-auto"
+						>
+							<img class="opacity-40 hover:opacity-100 size-8" src="/static/img/close.svg"/>
+						</button>
+					</div>
+					<form class="flex flex-col space-y-3 w-full">
+						<div class="flex flex-col justify-between items-center space-y-3 w-full md:flex-row md:space-y-0 md:space-x-3">
+							<label class="w-1/2 text-sm font-normal text-left text-gray-500">
+								Endereço
+								<input
+									type="text"
+									name="address"
+									class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+								/>
+							</label>
+							<label class="w-1/2 text-sm font-normal text-left text-gray-500">
+								Complemento
+								<input
+									type="text"
+									name="complement"
+									class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+								/>
+							</label>
+						</div>
+						<div class="flex flex-col justify-between items-center space-y-3 w-full md:flex-row md:space-y-0 md:space-x-3">
+							<label class="w-1/2 text-sm font-normal text-left text-gray-500">
+								Cidade
+								<input
+									type="text"
+									name="city"
+									class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+								/>
+							</label>
+							<label class="w-1/2 text-sm font-normal text-left text-gray-500">
+								Estado
+								<input
+									type="text"
+									name="state"
+									class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+								/>
+							</label>
+						</div>
+						<label class="text-sm font-normal text-left text-gray-500">
+							CEP
+							<input
+								type="text"
+								name="cep"
+								value={ fmt.Sprintf("%s", user.Telephone) }
+								class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+							/>
+						</label>
+						<label class="text-sm font-normal text-left text-gray-500">
+							Telefone
+							<input
+								type="text"
+								name="telephone"
+								value={ fmt.Sprintf("%s", user.Telephone) }
+								class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+							/>
+						</label>
+						<span id="error-alert"></span>
+						<div class="flex space-x-3">
+							<button
+								type="submit"
+								data-loading-disable
+								data-loading-class="hidden"
+								class="py-1 px-3 w-fit font-normal text-base rounded-md text-white bg-[#FFBD59]"
+							>
+								Atualizar
+							</button>
+							<button
+								x-on:click="edit = !edit"
+								class="text-base font-normal w-fit"
+							>
+								Cancelar
+							</button>
+						</div>
+					</form>
+				</div>
+			</template>
+		</div>
+	</div>
+}
+
+templ ProfileSettings() {
+	<div class="flex flex-col justify-center items-center p-4 w-full h-full text-center">
+		ProfileSettings
+	</div>
+}
+
+templ SecuritySettings() {
+	<div class="flex flex-col justify-center items-center p-4 w-full h-full text-center">
+		Security Settings
+	</div>
+}

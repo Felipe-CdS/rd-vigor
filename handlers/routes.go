@@ -84,6 +84,13 @@ func SetupRoutes(e *echo.Echo,
 	e.GET("/chatroom/:chatroom_id", authMiddleware(uh, ch.GetChat))
 	e.GET("/chatroom/:chatroom_id/chat", authMiddleware(uh, ch.GetChat))
 	e.GET("/chatroom/:chatroom_id/details", authMiddleware(uh, ch.GetChatroomDetails))
+
+	/* SETTINGS ROUTES*/
+	e.GET("/settings", authMiddleware(uh, uh.GetSettingsPage))
+	e.GET("/settings/billing", authMiddleware(uh, uh.GetBillingSettings))
+	e.GET("/settings/contact-info", authMiddleware(uh, uh.GetContactInfoSettings))
+	e.GET("/settings/profile", authMiddleware(uh, uh.GetProfileSettings))
+	e.GET("/settings/security", authMiddleware(uh, uh.GetSecuritySettings))
 }
 
 func signupFormDone(c echo.Context) error {
