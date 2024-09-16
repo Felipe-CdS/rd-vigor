@@ -110,7 +110,7 @@ templ ContactInfoSettings(user repositories.User) {
 		<!-- ############################################################################################### -->
 		<div
 			x-data="{ edit: false }"
-			class="flex flex-col items-start p-6 w-full rounded-xl border border-gray-200"
+			class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
 		>
 			<template x-if="!edit">
 				<div class="flex flex-col space-y-3 w-full">
@@ -137,8 +137,10 @@ templ ContactInfoSettings(user repositories.User) {
 					</span>
 				</div>
 			</template>
-			<template x-if="edit">
-				<div class="flex flex-col space-y-3 w-full">
+			<template x-if="edit" x-init="$watch('edit', () => htmx.process(htmx.find('#contact-info-form')))">
+				<div
+					class="flex flex-col space-y-3 w-full"
+				>
 					<div class="flex w-full">
 						<span class="text-xl font-medium">Conta</span>
 						<button
@@ -148,9 +150,15 @@ templ ContactInfoSettings(user repositories.User) {
 							<img class="opacity-40 hover:opacity-100 size-8" src="/static/img/close.svg"/>
 						</button>
 					</div>
-					<form class="flex flex-col space-y-3 w-full">
+					<form
+						id="contact-info-form"
+						hx-post="/settings/contact-info/account"
+						hx-target="#generic-settings-div"
+						hx-target-error="#error-alert"
+						class="flex flex-col space-y-3 w-full"
+					>
 						<div class="flex flex-col justify-between items-center space-y-3 w-full md:flex-row md:space-y-0 md:space-x-3">
-							<label class="w-1/2 text-sm font-normal text-left text-gray-500">
+							<label class="text-sm font-normal text-left text-gray-500 lg:w-1/2">
 								Primeiro Nome
 								<input
 									type="text"
@@ -160,7 +168,7 @@ templ ContactInfoSettings(user repositories.User) {
 									class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
 								/>
 							</label>
-							<label class="w-1/2 text-sm font-normal text-left text-gray-500">
+							<label class="text-sm font-normal text-left text-gray-500 lg:w-1/2">
 								Sobrenome
 								<input
 									type="text"
@@ -194,8 +202,6 @@ templ ContactInfoSettings(user repositories.User) {
 						<div class="flex space-x-3">
 							<button
 								type="submit"
-								data-loading-disable
-								data-loading-class="hidden"
 								class="py-1 px-3 w-fit font-normal text-base rounded-md text-white bg-[#FFBD59]"
 							>
 								Atualizar
@@ -213,8 +219,8 @@ templ ContactInfoSettings(user repositories.User) {
 		</div>
 		<!-- ############################################################################################### -->
 		<div
-			x-data="{ edit: true }"
-			class="flex flex-col items-start p-6 w-full rounded-xl border border-gray-200"
+			x-data="{ edit: false }"
+			class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
 		>
 			<template x-if="!edit">
 				<div class="flex flex-col space-y-3 w-full">
@@ -228,8 +234,16 @@ templ ContactInfoSettings(user repositories.User) {
 						</button>
 					</div>
 					<span class="text-base font-normal text-start">
-						<p class="text-xs opacity-50">Endereço</p>
-						Nenhum endereço informado
+						<p class="text-xs opacity-50">Endereço/Complemento</p>
+						{ fmt.Sprintf("%s %s", user.Address, user.Address2) }
+					</span>
+					<span class="text-base font-normal text-start">
+						<p class="text-xs opacity-50">Cidade/Estado</p>
+						{ fmt.Sprintf("%s %s", user.City, user.State) }
+					</span>
+					<span class="text-base font-normal text-start">
+						<p class="text-xs opacity-50">CEP</p>
+						{ fmt.Sprintf("%s", user.Zipcode) }
 					</span>
 					<span class="text-base font-normal text-start">
 						<p class="text-xs opacity-50">Telefone</p>
@@ -237,7 +251,7 @@ templ ContactInfoSettings(user repositories.User) {
 					</span>
 				</div>
 			</template>
-			<template x-if="edit">
+			<template x-if="edit" x-init="$watch('edit', () => htmx.process(htmx.find('#location-info-form')))">
 				<div class="flex flex-col space-y-3 w-full">
 					<div class="flex w-full">
 						<span class="text-xl font-medium">Localização</span>
@@ -248,39 +262,49 @@ templ ContactInfoSettings(user repositories.User) {
 							<img class="opacity-40 hover:opacity-100 size-8" src="/static/img/close.svg"/>
 						</button>
 					</div>
-					<form class="flex flex-col space-y-3 w-full">
+					<form
+						id="location-info-form"
+						hx-post="/settings/contact-info/location"
+						hx-target="#generic-settings-div"
+						hx-target-error="#error-alert"
+						class="flex flex-col space-y-3 w-full"
+					>
 						<div class="flex flex-col justify-between items-center space-y-3 w-full md:flex-row md:space-y-0 md:space-x-3">
-							<label class="w-1/2 text-sm font-normal text-left text-gray-500">
+							<label class="text-sm font-normal text-left text-gray-500 lg:w-1/2">
 								Endereço
 								<input
 									type="text"
 									name="address"
+									value={ fmt.Sprintf("%s", user.Address) }
 									class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
 								/>
 							</label>
-							<label class="w-1/2 text-sm font-normal text-left text-gray-500">
+							<label class="text-sm font-normal text-left text-gray-500 lg:w-1/2">
 								Complemento
 								<input
 									type="text"
-									name="complement"
+									name="address2"
+									value={ fmt.Sprintf("%s", user.Address2) }
 									class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
 								/>
 							</label>
 						</div>
 						<div class="flex flex-col justify-between items-center space-y-3 w-full md:flex-row md:space-y-0 md:space-x-3">
-							<label class="w-1/2 text-sm font-normal text-left text-gray-500">
+							<label class="text-sm font-normal text-left text-gray-500 lg:w-1/2">
 								Cidade
 								<input
 									type="text"
 									name="city"
+									value={ fmt.Sprintf("%s", user.City) }
 									class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
 								/>
 							</label>
-							<label class="w-1/2 text-sm font-normal text-left text-gray-500">
+							<label class="text-sm font-normal text-left text-gray-500 lg:w-1/2">
 								Estado
 								<input
 									type="text"
 									name="state"
+									value={ fmt.Sprintf("%s", user.State) }
 									class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
 								/>
 							</label>
@@ -289,8 +313,8 @@ templ ContactInfoSettings(user repositories.User) {
 							CEP
 							<input
 								type="text"
-								name="cep"
-								value={ fmt.Sprintf("%s", user.Telephone) }
+								name="zipcode"
+								value={ fmt.Sprintf("%s", user.Zipcode) }
 								class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
 							/>
 						</label>
@@ -337,4 +361,14 @@ templ SecuritySettings() {
 	<div class="flex flex-col justify-center items-center p-4 w-full h-full text-center">
 		Security Settings
 	</div>
+}
+
+templ UpdateErrorAlert(message string) {
+	<span
+		id="error-alert"
+		class="block p-3 w-full text-sm text-justify rounded-md bg-[#fff1d4] border rounded-md font-normal border-[#fea439]"
+	>
+		<img class="inline size-5" src="static/img/error.svg"/>
+		{ message }
+	</span>
 }

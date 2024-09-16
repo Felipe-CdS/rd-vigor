@@ -155,5 +155,18 @@ func createMigrations(db *sql.DB) error {
 		return fmt.Errorf("failed to create statement 6... Error: %s", err)
 	}
 
+	statement = `ALTER TABLE users
+		ADD COLUMN IF NOT EXISTS address TEXT DEFAULT '' NOT NULL
+		, ADD COLUMN IF NOT EXISTS address2 TEXT DEFAULT '' NOT NULL
+		, ADD COLUMN IF NOT EXISTS city TEXT DEFAULT '' NOT NULL
+		, ADD COLUMN IF NOT EXISTS state TEXT DEFAULT '' NOT NULL
+		, ADD COLUMN IF NOT EXISTS zipcode TEXT DEFAULT '' NOT NULL;`
+
+	_, err = db.Exec(statement)
+
+	if err != nil {
+		return fmt.Errorf("failed to create statement 7... Error: %s", err)
+	}
+
 	return nil
 }

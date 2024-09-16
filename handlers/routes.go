@@ -91,6 +91,9 @@ func SetupRoutes(e *echo.Echo,
 	e.GET("/settings/contact-info", authMiddleware(uh, uh.GetContactInfoSettings))
 	e.GET("/settings/profile", authMiddleware(uh, uh.GetProfileSettings))
 	e.GET("/settings/security", authMiddleware(uh, uh.GetSecuritySettings))
+
+	e.POST("/settings/contact-info/account", authMiddleware(uh, uh.UpdateUserAccountInfo))
+	e.POST("/settings/contact-info/location", authMiddleware(uh, uh.UpdateUserLocationInfo))
 }
 
 func signupFormDone(c echo.Context) error {
@@ -122,7 +125,7 @@ func authMiddleware(uh *UserHandler, next echo.HandlerFunc) echo.HandlerFunc {
 		loggedUser, queryErr := uh.UserServices.GetUserByUsername(claims.Username)
 
 		if queryErr != nil {
-			fmt.Printf("!!!!!!%+v\n", queryErr)
+			fmt.Printf("Middleware: %+v\n", queryErr)
 		}
 
 		c.Set("user", loggedUser)

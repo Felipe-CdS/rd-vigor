@@ -19,6 +19,7 @@ import (
 
 type UserRepository interface {
 	CreateUser(u repositories.User) *repositories.RepositoryLayerErr
+	UpdateUser(u repositories.User, newUserData repositories.User) *repositories.RepositoryLayerErr
 	CheckEmailExists(email string) bool
 	CheckUsernameExists(username string) bool
 
@@ -148,6 +149,8 @@ func (us *UserService) AuthUser(login string, password string) (repositories.Use
 		user, queryErr = us.Repository.GetUserByUsername(login)
 	}
 
+	fmt.Println(login)
+
 	if queryErr != nil {
 		if queryErr.Error == sql.ErrNoRows {
 			return repositories.User{}, &ServiceLayerErr{queryErr.Error, "Login ou senha incorretos.", http.StatusBadRequest}
@@ -156,6 +159,8 @@ func (us *UserService) AuthUser(login string, password string) (repositories.Use
 	}
 
 	userPassword, queryErr := us.Repository.GetUserPasswordByID(user.ID)
+
+	fmt.Println(userPassword)
 
 	if queryErr != nil {
 		return repositories.User{}, &ServiceLayerErr{queryErr.Error, "Query Err", http.StatusInternalServerError}
@@ -242,4 +247,26 @@ func (us *UserService) GetUserTags(user repositories.User) ([]repositories.Tag, 
 		return nil, &ServiceLayerErr{err.Error, "Query Err 3", http.StatusInternalServerError}
 	}
 	return tags, nil
+}
+
+func (us *UserService) UpdateUser(u repositories.User, newUserData repositories.User) *ServiceLayerErr {
+
+	if _, err := mail.ParseAddress(newUserData.Email); err != nil {
+		return &ServiceLayerErr{nil, "E-mail inválido.", http.StatusBadRequest}
+	}
+
+	if u.Email != newUserData.Email && us.Repository.CheckEmailExists(newUserData.Email) {
+		fmt.Println(u.Email, newUserData.Email)
+		return &ServiceLayerErr{nil, "Email já cadastrado.", http.StatusBadRequest}
+	}
+
+	if u.Username != newUserData.Username && us.Repository.CheckUsernameExists(newUserData.Username) {
+		return &ServiceLayerErr{nil, "Nome de usuário já cadastrado.", http.StatusBadRequest}
+	}
+
+	if err := us.Repository.UpdateUser(u, newUserData); err != nil {
+		return &ServiceLayerErr{nil, "Update Error.", http.StatusBadRequest}
+	}
+
+	return nil
 }

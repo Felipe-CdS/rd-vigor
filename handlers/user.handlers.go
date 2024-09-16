@@ -19,6 +19,7 @@ import (
 
 type UserService interface {
 	CreateUser(data map[string]string) *services.ServiceLayerErr
+	UpdateUser(user repositories.User, newUserData repositories.User) *services.ServiceLayerErr
 	AuthUser(login string, password string) (repositories.User, *services.ServiceLayerErr)
 
 	GetAllUsers() ([]repositories.User, *services.ServiceLayerErr)
@@ -268,6 +269,101 @@ func (uh *UserHandler) SearchUserByAny(c echo.Context) error {
 	}
 
 	return uh.View(c, inbox_views.SearchUserFormOptions(found))
+}
+
+func (uh *UserHandler) UpdateUserAccountInfo(c echo.Context) error {
+
+	loggedUser := c.Get("user").(repositories.User)
+
+	formData := repositories.User{
+		Username:  c.FormValue("username"),
+		FirstName: c.FormValue("first_name"),
+		LastName:  c.FormValue("last_name"),
+		Email:     c.FormValue("email"),
+	}
+
+	if formData.FirstName == "" {
+		c.Response().WriteHeader(http.StatusBadRequest)
+		return uh.View(c, user_views.UpdateErrorAlert("Por favor, insira um Nome válido."))
+	}
+
+	if formData.LastName == "" {
+		c.Response().WriteHeader(http.StatusBadRequest)
+		return uh.View(c, user_views.UpdateErrorAlert("Por favor, insira um Sobrenome válido."))
+	}
+
+	if formData.Email == "" {
+		c.Response().WriteHeader(http.StatusBadRequest)
+		return uh.View(c, user_views.UpdateErrorAlert("Por favor, insira um email válido."))
+	}
+
+	if _, err := mail.ParseAddress(formData.Email); err != nil {
+		c.Response().WriteHeader(http.StatusBadRequest)
+		return uh.View(c, user_views.UpdateErrorAlert("Por favor, insira um email válido."))
+	}
+
+	if formData.Username == "" {
+		c.Response().WriteHeader(http.StatusBadRequest)
+		return uh.View(c, user_views.UpdateErrorAlert("Por favor, insira um nome de usuário válido."))
+	}
+
+	if err := uh.UserServices.UpdateUser(loggedUser, formData); err != nil {
+		if err.Code == http.StatusInternalServerError {
+			c.Response().WriteHeader(http.StatusInternalServerError)
+			return uh.View(c, auth_views.SignupFormErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
+		}
+
+		c.Response().WriteHeader(err.Code)
+		return uh.View(c, user_views.UpdateErrorAlert(err.Message))
+	}
+
+	updatedUser, queryErr := uh.UserServices.GetUserByID(loggedUser.ID)
+
+	if queryErr != nil {
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		return uh.View(c, auth_views.SignupFormErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
+	}
+
+	if err := auth.GenerateTokensAndSetCookies(updatedUser, c); err != nil {
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		return uh.View(c, auth_views.SignupFormErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
+	}
+	return uh.View(c, user_views.ContactInfoSettings(updatedUser))
+}
+
+func (uh *UserHandler) UpdateUserLocationInfo(c echo.Context) error {
+
+	loggedUser := c.Get("user").(repositories.User)
+
+	formData := repositories.User{
+		Username:  loggedUser.Username,
+		Email:     loggedUser.Email,
+		Address:   c.FormValue("address"),
+		Address2:  c.FormValue("address2"),
+		City:      c.FormValue("city"),
+		State:     c.FormValue("state"),
+		Zipcode:   c.FormValue("zipcode"),
+		Telephone: c.FormValue("telephone"),
+	}
+
+	if err := uh.UserServices.UpdateUser(loggedUser, formData); err != nil {
+		if err.Code == http.StatusInternalServerError {
+			c.Response().WriteHeader(http.StatusInternalServerError)
+			return uh.View(c, auth_views.SignupFormErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
+		}
+
+		c.Response().WriteHeader(err.Code)
+		return uh.View(c, user_views.UpdateErrorAlert(err.Message))
+	}
+
+	updatedUser, queryErr := uh.UserServices.GetUserByID(loggedUser.ID)
+
+	if queryErr != nil {
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		return uh.View(c, auth_views.SignupFormErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
+	}
+
+	return uh.View(c, user_views.ContactInfoSettings(updatedUser))
 }
 
 func (uh *UserHandler) View(c echo.Context, cmp templ.Component) error {

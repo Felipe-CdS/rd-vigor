@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"time"
 
@@ -39,6 +40,13 @@ type User struct {
 	RegistrationStatus string    `json:"registration_status"`
 	CreatedAt          time.Time `json:"created_at"`
 	UpdatedAt          time.Time `json:"updated_at"`
+
+	// Migration 7
+	Address  string `json:"address"`
+	Address2 string `json:"address2"`
+	City     string `json:"city"`
+	State    string `json:"state"`
+	Zipcode  string `json:"zipcode"`
 }
 
 type UserRepository struct {
@@ -91,17 +99,68 @@ func (ur *UserRepository) CreateUser(u User) *RepositoryLayerErr {
 	return nil
 }
 
+func (ur *UserRepository) UpdateUser(u User, newUserData User) *RepositoryLayerErr {
+
+	var aux = func(oldValue, newValue, column string) error {
+		if newValue != "" && oldValue != newValue {
+			stmt := fmt.Sprintf("UPDATE users SET %s = $1 WHERE id = $2;", column)
+			if _, err := ur.UserStore.Db.Exec(stmt, newValue, u.ID); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	if err := aux(u.Username, newUserData.Username, "username"); err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	if err := aux(u.Email, newUserData.Email, "email"); err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	if err := aux(u.FirstName, newUserData.FirstName, "first_name"); err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	if err := aux(u.LastName, newUserData.LastName, "last_name"); err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	if err := aux(u.Address, newUserData.Address, "address"); err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	if err := aux(u.Address2, newUserData.Address2, "address2"); err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	if err := aux(u.City, newUserData.City, "city"); err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	if err := aux(u.State, newUserData.State, "state"); err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	if err := aux(u.Zipcode, newUserData.Zipcode, "zipcode"); err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	if err := aux(u.Telephone, newUserData.Telephone, "telephone"); err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	return nil
+}
+
 func (ur *UserRepository) CheckEmailExists(email string) bool {
 
 	stmt := "SELECT email FROM users WHERE email = $1"
 
 	queryResult := ur.UserStore.Db.QueryRow(stmt, email).Scan()
 
-	if queryResult != sql.ErrNoRows {
-		return true
-	}
-
-	return false
+	return queryResult != sql.ErrNoRows
 }
 
 func (ur *UserRepository) CheckUsernameExists(username string) bool {
@@ -110,11 +169,7 @@ func (ur *UserRepository) CheckUsernameExists(username string) bool {
 
 	queryResult := ur.UserStore.Db.QueryRow(stmt, username).Scan()
 
-	if queryResult != sql.ErrNoRows {
-		return true
-	}
-
-	return false
+	return queryResult != sql.ErrNoRows
 }
 
 func (ur *UserRepository) GetAllUsers() ([]User, error) {
@@ -199,10 +254,31 @@ func (ur *UserRepository) GetUserByEmail(email string) (User, *RepositoryLayerEr
 func (ur *UserRepository) GetUserByUsername(username string) (User, *RepositoryLayerErr) {
 
 	var usr User
+	var trashPassword string
 
-	stmt := "SELECT id FROM users WHERE username = $1"
+	stmt := "SELECT * FROM users WHERE username = $1"
 
-	if err := ur.UserStore.Db.QueryRow(stmt, username).Scan(&usr.ID); err != nil {
+	if err := ur.UserStore.Db.QueryRow(stmt, username).Scan(
+		&usr.ID,
+		&usr.Username,
+		&usr.FirstName,
+		&usr.LastName,
+		&usr.Email,
+		&usr.OccupationArea,
+		&usr.Telephone,
+		&usr.ReferFriend,
+		&trashPassword,
+		&usr.Role,
+		&usr.RegistrationStatus,
+		&usr.CreatedAt,
+		&usr.UpdatedAt,
+		&usr.Address,
+		&usr.Address2,
+		&usr.City,
+		&usr.State,
+		&usr.Zipcode,
+	); err != nil {
+		fmt.Println(err)
 		return User{}, &RepositoryLayerErr{sql.ErrNoRows, "Usuario inexistente."}
 	}
 	usr, _ = ur.GetUserByID(usr.ID)
@@ -225,20 +301,9 @@ func (ur *UserRepository) GetUserPasswordByID(id string) (string, *RepositoryLay
 func (ur *UserRepository) GetUserByID(id string) (User, error) {
 
 	var usr User
+	var trashPassword string
 
-	stmt := `SELECT id
-		, username
-		, first_name
-		, last_name
-		, email
-		, occupation_area
-		, telephone
-		, refer_friend
-		, role
-		, registration_status
-		, created_at
-		, updated_at
-		FROM users WHERE id = $1`
+	stmt := `SELECT * FROM users WHERE id = $1`
 
 	if err := ur.UserStore.Db.QueryRow(stmt, id).Scan(
 		&usr.ID,
@@ -249,10 +314,16 @@ func (ur *UserRepository) GetUserByID(id string) (User, error) {
 		&usr.OccupationArea,
 		&usr.Telephone,
 		&usr.ReferFriend,
+		&trashPassword,
 		&usr.Role,
 		&usr.RegistrationStatus,
 		&usr.CreatedAt,
 		&usr.UpdatedAt,
+		&usr.Address,
+		&usr.Address2,
+		&usr.City,
+		&usr.State,
+		&usr.Zipcode,
 	); err != nil {
 		return usr, err
 	}
