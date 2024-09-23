@@ -5,15 +5,15 @@ import (
 	"nugu.dev/rd-vigor/views/layout"
 )
 
-templ Base(title string, loggedUser repositories.User) {
+templ Base(title string, loggedUser repositories.User, cmp templ.Component) {
 	@layout.Base(title, loggedUser, true) {
 		<div
-			x-data="{ state: 'menu', selected: 'billing' }"
+			x-data="{ state: 'menu', selected: '' }"
 			x-init="state = window.innerWidth > 810 ? 'all' : 'menu'"
 			class="bg-[#F0F2F5] flex overflow-y-scroll justify-center items-center py-5 px-5 2xl:px-16  lg:space-x-2 w-full grow"
 		>
 			@SettingsMenu()
-			@SettingsGenericWindow()
+			@SettingsGenericWindow(cmp)
 		</div>
 	}
 }
@@ -32,7 +32,6 @@ templ SettingsMenu() {
 			<button
 				hx-get="/settings/billing"
 				hx-target="#generic-settings-div"
-				hx-trigger="load, click"
 				x-on:click="selected = 'billing'; if(state != 'all'){ state = 'generic'; }"
 				x-bind:style="selected == 'billing' && { 'border-left': '4px solid #ED6C09', 'opacity': '1', 'background-color': '#fff9ed'  }"
 				class="flex py-2 px-4 w-full border-b border-gray-200 border-solid opacity-60 cursor-pointer hover:opacity-100"
@@ -78,15 +77,19 @@ templ SettingsMenu() {
 	</div>
 }
 
-templ SettingsGenericWindow() {
+templ SettingsGenericWindow(cmp templ.Component) {
 	<div
 		id="generic-settings-div"
 		x-show="state == 'generic' || state == 'all'"
 		class="flex flex-col w-full h-full bg-white rounded-xl border border-gray-200 border-solid lg:flex lg:w-6/12 2xl:w-8/12 card-shadow"
 	>
-		<div class="flex flex-col justify-center items-center p-4 w-full h-full text-center">
-			<h1 class="mt-1 text-xl font-normal text-gray-400">Nenhuma configuração selecionada</h1>
-		</div>
+		if cmp != nil {
+			@cmp
+		} else {
+			<div class="flex flex-col justify-center items-center p-4 w-full h-full text-center">
+				<h1 class="mt-1 text-xl font-normal text-gray-400">Nenhuma configuração selecionada</h1>
+			</div>
+		}
 	</div>
 }
 

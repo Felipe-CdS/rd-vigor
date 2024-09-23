@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/stripe/stripe-go/v79"
 	"nugu.dev/rd-vigor/chat"
 	"nugu.dev/rd-vigor/db"
 	"nugu.dev/rd-vigor/handlers"
@@ -22,7 +23,9 @@ func main() {
 		port = "42069"
 	}
 
+	stripe.Key = os.Getenv("STRIPE")
 	e := echo.New()
+
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Static("/static", "assets")
 

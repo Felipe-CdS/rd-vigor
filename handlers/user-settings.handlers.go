@@ -16,6 +16,7 @@ func (uh *UserHandler) GetSettingsPage(c echo.Context) error {
 		settings_views.Base(
 			"Ajustes",
 			loggedUser,
+			nil,
 		))
 }
 
@@ -34,8 +35,16 @@ func (uh *UserHandler) GetContactInfoSettings(c echo.Context) error {
 func (uh *UserHandler) GetBillingSettings(c echo.Context) error {
 
 	if c.Request().Header.Get("HX-Request") != "true" {
-		c.Response().Header().Set("HX-redirect", "/settings")
-		return c.NoContent(http.StatusMovedPermanently)
+
+		loggedUser := c.Get("user").(repositories.User)
+		txResult := c.QueryParam("payment_intent_client_secret")
+
+		return uh.View(c,
+			settings_views.Base(
+				"Ajustes",
+				loggedUser,
+				settings_views.BillingSettingsComplete(txResult),
+			))
 	}
 
 	return uh.View(c, settings_views.BillingSettings())

@@ -168,5 +168,13 @@ func createMigrations(db *sql.DB) error {
 		return fmt.Errorf("failed to create statement 7... Error: %s", err)
 	}
 
+	statement = `ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_id TEXT DEFAULT '' NOT NULL;`
+
+	_, err = db.Exec(statement)
+
+	if err != nil {
+		return fmt.Errorf("failed to create statement 8... Error: %s", err)
+	}
+
 	return nil
 }

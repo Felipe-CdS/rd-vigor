@@ -47,6 +47,9 @@ type User struct {
 	City     string `json:"city"`
 	State    string `json:"state"`
 	Zipcode  string `json:"zipcode"`
+
+	// Migration 8
+	StripeID string `json:"stripe_id"`
 }
 
 type UserRepository struct {
@@ -277,6 +280,7 @@ func (ur *UserRepository) GetUserByUsername(username string) (User, *RepositoryL
 		&usr.City,
 		&usr.State,
 		&usr.Zipcode,
+		&usr.StripeID,
 	); err != nil {
 		fmt.Println(err)
 		return User{}, &RepositoryLayerErr{sql.ErrNoRows, "Usuario inexistente."}
@@ -324,6 +328,7 @@ func (ur *UserRepository) GetUserByID(id string) (User, error) {
 		&usr.City,
 		&usr.State,
 		&usr.Zipcode,
+		&usr.StripeID,
 	); err != nil {
 		return usr, err
 	}
