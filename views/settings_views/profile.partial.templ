@@ -1,0 +1,315 @@
+package settings_views
+
+templ ProfileSettings() {
+	<div class="flex overflow-y-scroll flex-col p-5 space-y-3 w-full h-full text-center">
+		<h1 class="hidden font-semibold lg:block lg:text-2xl text-start">Editar Perfil</h1>
+		<button
+			x-on:click="state = 'menu'"
+			class="font-medium lg:hidden text-start"
+		>
+			<img class="inline ml-auto w-6 rotate-180" src="/static/img/arrow-right-3.svg"/>
+			Voltar
+		</button>
+		<!-- ############################################################################################### -->
+		<div
+			x-data="{ edit: false }"
+			class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
+		>
+			<template x-if="!edit">
+				@readDescription()
+			</template>
+			<template
+				x-if="edit"
+				x-init="$watch('edit', () => htmx.process(htmx.find('#contact-info-form')))"
+			>
+				@editDescription()
+			</template>
+		</div>
+		<!-- ############################################################################################### -->
+		<div
+			x-data="{ state: 'read' }"
+			class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
+		>
+			<template x-if="state == 'read'">
+				@readPortifolio()
+			</template>
+			<template x-if="state == 'new'">
+				@addNewPortifolio()
+			</template>
+			<template x-if="state == 'edit'">
+				@editPortifolio()
+			</template>
+		</div>
+	</div>
+}
+
+templ readDescription() {
+	<div class="flex flex-col space-y-3 w-full">
+		<div class="flex w-full">
+			<span class="text-xl font-medium">Sobre Mim</span>
+			<button
+				x-on:click="edit = !edit"
+				class="ml-auto"
+			>
+				<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/edit.svg"/>
+			</button>
+		</div>
+		<span class="text-base font-normal text-start">
+			<p class="text-xs opacity-50">Descrição</p>
+			<p class="text-xs">Não preenchido</p>
+		</span>
+		<span class="text-base font-normal text-start">
+			<p class="text-xs opacity-50">Produto Principal</p>
+			<p class="text-xs">Não preenchido</p>
+		</span>
+	</div>
+}
+
+templ editDescription() {
+	<div
+		class="flex flex-col space-y-3 w-full"
+	>
+		<div class="flex w-full">
+			<span class="text-xl font-medium">Conta</span>
+			<button
+				x-on:click="edit = !edit"
+				class="ml-auto"
+			>
+				<img class="opacity-40 hover:opacity-100 size-8" src="/static/img/close.svg"/>
+			</button>
+		</div>
+		<form
+			id="contact-info-form"
+			hx-post="/settings/contact-info/account"
+			hx-target="#generic-settings-div"
+			hx-target-error="#error-alert"
+			class="flex flex-col space-y-3 w-full"
+		>
+			<div class="flex flex-col justify-between items-center space-y-3 w-full md:flex-row md:space-y-0 md:space-x-3">
+				<label class="text-sm font-normal text-left text-gray-500 lg:w-1/2">
+					Primeiro Nome
+					<input
+						type="text"
+						name="first_name"
+						placeholder="Primeiro Nome"
+						class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+					/>
+				</label>
+				<label class="text-sm font-normal text-left text-gray-500 lg:w-1/2">
+					Sobrenome
+					<input
+						type="text"
+						name="last_name"
+						placeholder="Sobrenome"
+						class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+					/>
+				</label>
+			</div>
+			<label class="text-sm font-normal text-left text-gray-500">
+				Nome de Usuário
+				<input
+					type="text"
+					name="username"
+					class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+				/>
+			</label>
+			<label class="text-sm font-normal text-left text-gray-500">
+				Email
+				<input
+					type="text"
+					name="email"
+					placeholder="E-mail"
+					class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+				/>
+			</label>
+			<span id="error-alert"></span>
+			<div class="flex space-x-3">
+				<button
+					type="submit"
+					class="py-1 px-3 w-fit font-normal text-base rounded-md text-white bg-[#FFBD59]"
+				>
+					Atualizar
+				</button>
+				<button
+					x-on:click="edit = !edit"
+					class="text-base font-normal w-fit"
+				>
+					Cancelar
+				</button>
+			</div>
+		</form>
+	</div>
+}
+
+templ readPortifolio() {
+	<div class="flex flex-col w-full">
+		<div class="flex w-full mb-5">
+			<span class="text-xl font-medium">Portifólio</span>
+			<button
+				x-on:click="state = 'new'"
+				class="ml-auto"
+			>
+				<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/plus.svg"/>
+			</button>
+		</div>
+		<div
+			x-data="{ innerState: 'read' }"
+			class="flex mb-3 p-3 w-full rounded-xl border border-gray-200"
+		>
+			<template x-if="innerState == 'read'">
+				<div class="flex w-full">
+					<span class="text-xl font-medium">Portifólio</span>
+					<button
+						x-on:click="state = 'edit'"
+						class="flex ml-auto"
+					>
+						<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/edit.svg"/>
+					</button>
+					<button
+						x-on:click="innerState = 'delete'"
+						class="flex ml-3"
+					>
+						<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/error.svg"/>
+					</button>
+				</div>
+			</template>
+			<template x-if="innerState == 'delete'">
+				<div class="flex flex-col lg:flex-row w-full space-y-3 lg:justify-between">
+					<span class="text-base font-normal lg:text-start">
+						<p class="text-base">Deletar Portifólio?</p>
+						<p class="text-sm opacity-50">Tem certeza que deseja fazer isso?</p>
+					</span>
+					<div class="flex w-full lg:w-fit justify-around lg:space-x-3">
+						<button
+							class=" opacity-40 hover:opacity-100 flex"
+						>
+							Sim
+							<img class="size-6" src="/static/img/circle-check.svg"/>
+						</button>
+						<button
+							x-on:click="innerState = 'read'"
+							class=" opacity-40 hover:opacity-100 flex"
+						>
+							Não
+							<img class="size-6" src="/static/img/circle-x.svg"/>
+						</button>
+					</div>
+				</div>
+			</template>
+		</div>
+	</div>
+}
+
+templ addNewPortifolio() {
+	<div
+		class="flex flex-col space-y-3 w-full"
+	>
+		<div class="flex w-full">
+			<span class="text-xl font-medium">Novo portifólio</span>
+			<button
+				x-on:click="state = 'read'"
+				class="ml-auto"
+			>
+				<img class="opacity-40 hover:opacity-100 size-8" src="/static/img/close.svg"/>
+			</button>
+		</div>
+		<form
+			id="contact-info-form"
+			hx-post="/settings/contact-info/account"
+			hx-target="#generic-settings-div"
+			hx-target-error="#error-alert"
+			class="flex flex-col space-y-3 w-full"
+		>
+			<label class="text-sm font-normal text-left text-gray-500">
+				Título
+				<input
+					type="text"
+					name="first_name"
+					placeholder="Titulo"
+					class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+				/>
+			</label>
+			<label class="text-sm font-normal text-left text-gray-500">
+				Descrição
+				<textarea
+					rows="5"
+					name="last_name"
+					placeholder="Breve descrição do projeto"
+					class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+				></textarea>
+			</label>
+			<span id="error-alert"></span>
+			<div class="flex space-x-3">
+				<button
+					type="submit"
+					class="py-1 px-3 w-fit font-normal text-base rounded-md text-white bg-[#FFBD59]"
+				>
+					Criar
+				</button>
+				<button
+					x-on:click="state = 'read'"
+					class="text-base font-normal w-fit"
+				>
+					Cancelar
+				</button>
+			</div>
+		</form>
+	</div>
+}
+
+templ editPortifolio() {
+	<div
+		class="flex flex-col space-y-3 w-full"
+	>
+		<div class="flex w-full">
+			<span class="text-xl font-medium">Editar portifólio</span>
+			<button
+				x-on:click="state = 'read'"
+				class="ml-auto"
+			>
+				<img class="opacity-40 hover:opacity-100 size-8" src="/static/img/close.svg"/>
+			</button>
+		</div>
+		<form
+			id="contact-info-form"
+			hx-post="/settings/contact-info/account"
+			hx-target="#generic-settings-div"
+			hx-target-error="#error-alert"
+			class="flex flex-col space-y-3 w-full"
+		>
+			<label class="text-sm font-normal text-left text-gray-500">
+				Título
+				<input
+					type="text"
+					name="first_name"
+					placeholder="Titulo"
+					class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+				/>
+			</label>
+			<label class="text-sm font-normal text-left text-gray-500">
+				Descrição
+				<textarea
+					rows="5"
+					name="last_name"
+					placeholder="Breve descrição do projeto"
+					class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+				></textarea>
+			</label>
+			<span id="error-alert"></span>
+			<div class="flex space-x-3">
+				<button
+					type="submit"
+					class="py-1 px-3 w-fit font-normal text-base rounded-md text-white bg-[#FFBD59]"
+				>
+					Criar
+				</button>
+				<button
+					x-on:click="state = 'read'"
+					class="text-base font-normal w-fit"
+				>
+					Cancelar
+				</button>
+			</div>
+		</form>
+	</div>
+}

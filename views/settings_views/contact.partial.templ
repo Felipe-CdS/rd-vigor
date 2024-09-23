@@ -43,6 +43,10 @@ templ ContactInfoSettings(user repositories.User) {
 						<p class="text-xs opacity-50">E-mail</p>
 						{ fmt.Sprintf("%s", user.Email) }
 					</span>
+					<span class="text-base font-normal text-start">
+						<p class="text-xs opacity-50">Nome da empresa</p>
+						RD Vigor
+					</span>
 				</div>
 			</template>
 			<template x-if="edit" x-init="$watch('edit', () => htmx.process(htmx.find('#contact-info-form')))">

@@ -149,8 +149,6 @@ func (us *UserService) AuthUser(login string, password string) (repositories.Use
 		user, queryErr = us.Repository.GetUserByUsername(login)
 	}
 
-	fmt.Println(login)
-
 	if queryErr != nil {
 		if queryErr.Error == sql.ErrNoRows {
 			return repositories.User{}, &ServiceLayerErr{queryErr.Error, "Login ou senha incorretos.", http.StatusBadRequest}
