@@ -5,3 +5,5 @@ type ServiceLayerErr struct {
 	Message string
 	Code    int
 }
+
+type BadRequestErr error

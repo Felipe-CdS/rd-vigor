@@ -33,10 +33,15 @@ templ ProfileSettings() {
 			<template x-if="state == 'read'">
 				@readPortifolio()
 			</template>
-			<template x-if="state == 'new'">
+			<template
+				x-if="state == 'new'"
+				x-init="$watch(state == 'new', () => htmx.process(htmx.find('#new-portifolio-form')))"
+			>
 				@addNewPortifolio()
 			</template>
-			<template x-if="state == 'edit'">
+			<template
+				x-if="state == 'edit'"
+			>
 				@editPortifolio()
 			</template>
 		</div>
@@ -214,8 +219,8 @@ templ addNewPortifolio() {
 			</button>
 		</div>
 		<form
-			id="contact-info-form"
-			hx-post="/settings/contact-info/account"
+			id="new-portifolio-form"
+			hx-post="/settings/profile/portifolio"
 			hx-target="#generic-settings-div"
 			hx-target-error="#error-alert"
 			class="flex flex-col space-y-3 w-full"
@@ -224,7 +229,7 @@ templ addNewPortifolio() {
 				Título
 				<input
 					type="text"
-					name="first_name"
+					name="title"
 					placeholder="Titulo"
 					class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
 				/>
@@ -233,7 +238,7 @@ templ addNewPortifolio() {
 				Descrição
 				<textarea
 					rows="5"
-					name="last_name"
+					name="description"
 					placeholder="Breve descrição do projeto"
 					class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
 				></textarea>

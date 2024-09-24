@@ -176,5 +176,19 @@ func createMigrations(db *sql.DB) error {
 		return fmt.Errorf("failed to create statement 8... Error: %s", err)
 	}
 
+	statement = `CREATE TABLE IF NOT EXISTS portifolios ( 
+		portifolio_id UUID PRIMARY KEY
+		, fk_user_id UUID NOT NULL
+		, FOREIGN KEY(fk_user_id) REFERENCES users(id) ON DELETE CASCADE
+		, title TEXT  NOT NULL
+		, description TEXT NOT NULL
+	)`
+
+	_, err = db.Exec(statement)
+
+	if err != nil {
+		return fmt.Errorf("failed to create statement 9... Error: %s", err)
+	}
+
 	return nil
 }
