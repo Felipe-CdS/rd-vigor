@@ -62,17 +62,6 @@ templ SettingsMenu() {
 				<img class="inline ml-auto w-6" src="/static/img/arrow-right-3.svg"/>
 			</button>
 			<!-- ############################################################################################### -->
-			<button
-				hx-get="/settings/security"
-				hx-target="#generic-settings-div"
-				x-on:click="selected = 'security'; if(state != 'all'){ state = 'generic'; }"
-				x-bind:style="selected == 'security' && { 'border-left': '4px solid #ED6C09', 'opacity': '1', 'background-color': '#fff9ed'  }"
-				class="flex py-2 px-4 w-full border-b border-gray-200 border-solid opacity-60 cursor-pointer hover:opacity-100"
-			>
-				<span class="text-lg font-normal">Senha e segurança</span>
-				<img class="inline ml-auto w-6" src="/static/img/arrow-right-3.svg"/>
-			</button>
-			<!-- ############################################################################################### -->
 		</div>
 	</div>
 }
