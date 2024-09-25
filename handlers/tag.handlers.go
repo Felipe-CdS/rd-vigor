@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/a-h/templ"
@@ -10,6 +9,7 @@ import (
 	"nugu.dev/rd-vigor/services"
 	admin_views "nugu.dev/rd-vigor/views/admin_views/dashboard"
 	"nugu.dev/rd-vigor/views/layout"
+	"nugu.dev/rd-vigor/views/settings_views"
 	"nugu.dev/rd-vigor/views/tags_views"
 )
 
@@ -17,6 +17,7 @@ type TagService interface {
 	CreateTag(n string) *services.ServiceLayerErr
 	SearchTagByName(n string) ([]repositories.Tag, *services.ServiceLayerErr)
 	GetAllTags() ([]repositories.Tag, *services.ServiceLayerErr)
+	GetUserTags(u repositories.User) ([]repositories.Tag, *services.ServiceLayerErr)
 }
 
 type TagHandler struct {
@@ -131,9 +132,21 @@ func (th *TagHandler) SearchTagNavbar(c echo.Context) error {
 		return th.View(c, tags_views.ErrorAlert(err.Message))
 	}
 
-	fmt.Println(list)
-
 	return th.View(c, layout.SearchModalResponsePartial(list, searchInput))
+}
+
+func (th *TagHandler) GetUserTags(c echo.Context) error {
+
+	loggedUser := c.Get("user").(repositories.User)
+
+	list, err := th.Service.GetUserTags(loggedUser)
+
+	if err != nil {
+		c.Response().WriteHeader(err.Code)
+		return nil
+	}
+
+	return th.View(c, settings_views.UserTagsList(list))
 }
 
 func (th *TagHandler) View(c echo.Context, cmp templ.Component) error {

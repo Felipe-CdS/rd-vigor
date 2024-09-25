@@ -101,3 +101,51 @@ func (tr *TagRepository) SearchTagByName(name string) ([]Tag, *RepositoryLayerEr
 
 	return tags, nil
 }
+
+func (tr *TagRepository) GetUserTags(u User) ([]Tag, *RepositoryLayerErr) {
+
+	var tags []Tag
+	var relationsIDs []string
+
+	stmt := "SELECT fk_tag_id FROM users_tags WHERE fk_user_id = $1"
+
+	rows, err := tr.TagStore.Db.Query(stmt, u.ID)
+
+	if err != nil {
+		return nil, &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	for rows.Next() {
+		var s string
+		if err := rows.Scan(
+			&s,
+		); err != nil {
+			return nil, &RepositoryLayerErr{err, "Insert Error"}
+		}
+		relationsIDs = append(relationsIDs, s)
+	}
+
+	stmt = "SELECT * FROM tags WHERE tag_id = $1"
+
+	for i := range relationsIDs {
+
+		rows, err = tr.TagStore.Db.Query(stmt, i)
+
+		if err != nil {
+			return nil, &RepositoryLayerErr{err, "Search Error"}
+		}
+
+		for rows.Next() {
+			var t Tag
+			if err := rows.Scan(
+				&t.ID,
+				&t.Name,
+			); err != nil {
+				return nil, &RepositoryLayerErr{err, "Search Error"}
+			}
+			tags = append(tags, t)
+		}
+	}
+
+	return tags, nil
+}

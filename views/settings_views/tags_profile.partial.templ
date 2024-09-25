@@ -1,0 +1,41 @@
+package settings_views
+
+import "nugu.dev/rd-vigor/repositories"
+
+templ TagsSection() {
+	<div
+		id="portifolio-section"
+		x-data="{ state: 'read', selected: '' }"
+		class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
+	>
+		<div class="flex flex-col w-full">
+			<div class="flex mb-5 w-full">
+				<span class="text-xl font-medium">Minhas Tags</span>
+				<button class="ml-auto">
+					<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/plus.svg"/>
+				</button>
+			</div>
+			<div
+				id="portifolio-list"
+				hx-get="/settings/profile/tags"
+				class="flex w-full"
+				hx-trigger="revealed"
+			></div>
+		</div>
+	</div>
+}
+
+templ UserTagsList(list []repositories.Tag) {
+	if len(list) == 0 {
+		<span class="text-xl font-normal">
+			Nenhuma tag encontrada
+		</span>
+	}
+	for _, t := range list {
+		<div>
+			<div class="flex p-3 mb-3 w-full rounded-xl border border-gray-200">
+				{ t.Name }
+			</div>
+		</div>
+	}
+}

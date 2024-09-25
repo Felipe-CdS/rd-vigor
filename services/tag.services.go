@@ -11,6 +11,7 @@ type TagRepository interface {
 	CheckTagExists(name string) bool
 	GetAllTags() ([]repositories.Tag, *repositories.RepositoryLayerErr)
 	SearchTagByName(name string) ([]repositories.Tag, *repositories.RepositoryLayerErr)
+	GetUserTags(u repositories.User) ([]repositories.Tag, *repositories.RepositoryLayerErr)
 }
 
 type TagService struct {
@@ -56,6 +57,17 @@ func (ts *TagService) GetAllTags() ([]repositories.Tag, *ServiceLayerErr) {
 func (ts *TagService) SearchTagByName(name string) ([]repositories.Tag, *ServiceLayerErr) {
 
 	tags, err := ts.Repository.SearchTagByName(name)
+
+	if err != nil {
+		return nil, &ServiceLayerErr{err.Error, "Query Err", http.StatusInternalServerError}
+	}
+
+	return tags, nil
+}
+
+func (ts *TagService) GetUserTags(u repositories.User) ([]repositories.Tag, *ServiceLayerErr) {
+
+	tags, err := ts.Repository.GetUserTags(u)
 
 	if err != nil {
 		return nil, &ServiceLayerErr{err.Error, "Query Err", http.StatusInternalServerError}
