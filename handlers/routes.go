@@ -100,6 +100,7 @@ func SetupRoutes(e *echo.Echo,
 	e.POST("/settings/profile/portifolio", authMiddleware(uh, ph.CreatePortifolio))
 	e.PATCH("/settings/profile/portifolio", authMiddleware(uh, ph.EditPortifolio))
 	e.DELETE("/settings/profile/portifolio", authMiddleware(uh, ph.DeletePortifolio))
+
 	/* STRIPE ROUTES*/
 	e.POST("/create-subscription", authMiddleware(uh, HandleCreateSubscrition))
 }

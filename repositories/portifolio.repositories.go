@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"database/sql"
+
 	"github.com/google/uuid"
 	"nugu.dev/rd-vigor/db"
 )
@@ -36,6 +38,39 @@ func (pr *PortifolioRepository) CreatePortifolio(u User, p Portifolio) *Reposito
 		u.ID,
 		p.Title,
 		p.Description,
+	)
+
+	if err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	return nil
+}
+
+func (pr *PortifolioRepository) EditPortifolio(u User, p Portifolio) *RepositoryLayerErr {
+
+	var ownerID string
+
+	stmt := "SELECT fk_user_id FROM portifolios WHERE portifolio_id = $1"
+
+	err := pr.PortifolioStore.Db.QueryRow(stmt, p.Portifolio_ID).Scan(&ownerID)
+
+	if err != nil {
+		return &RepositoryLayerErr{sql.ErrNoRows, "Portifolio inexistente."}
+	}
+
+	if u.ID != ownerID {
+		return &RepositoryLayerErr{nil, "Permissão negada."}
+	}
+
+	stmt = `UPDATE portifolios SET title = $1, description = $2
+		WHERE  portifolio_id = $3;`
+
+	_, err = pr.PortifolioStore.Db.Exec(
+		stmt,
+		p.Title,
+		p.Description,
+		p.Portifolio_ID,
 	)
 
 	if err != nil {

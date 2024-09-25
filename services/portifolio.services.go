@@ -6,6 +6,7 @@ import (
 
 type PortifolioRepository interface {
 	CreatePortifolio(u repositories.User, p repositories.Portifolio) *repositories.RepositoryLayerErr
+	EditPortifolio(u repositories.User, p repositories.Portifolio) *repositories.RepositoryLayerErr
 	DeletePortifolio(u repositories.User, portifolioId string) *repositories.RepositoryLayerErr
 	GetUserPortifolios(u repositories.User) ([]repositories.Portifolio, *repositories.RepositoryLayerErr)
 }
@@ -71,6 +72,39 @@ func (s *PortifolioService) GetUserPortifolios(u repositories.User) ([]repositor
 func (s *PortifolioService) DeletePortifolio(u repositories.User, portifolioId string) *ServiceLayerErr {
 
 	if err := s.Repository.DeletePortifolio(u, portifolioId); err != nil {
+		return &ServiceLayerErr{
+			Error:   nil,
+			Message: "Error Creating portifolio",
+			Code:    500,
+		}
+	}
+
+	return nil
+}
+
+func (s *PortifolioService) EditPortifolio(
+	u repositories.User,
+	portifolioId string,
+	t string,
+	d string,
+) *ServiceLayerErr {
+
+	if t == "" || d == "" {
+		return &ServiceLayerErr{
+			Error:   nil,
+			Message: "Error Creating portifolio",
+			Code:    400,
+		}
+	}
+
+	p := repositories.Portifolio{
+		Fk_user_ID:    u.ID,
+		Portifolio_ID: portifolioId,
+		Title:         t,
+		Description:   d,
+	}
+
+	if err := s.Repository.EditPortifolio(u, p); err != nil {
 		return &ServiceLayerErr{
 			Error:   nil,
 			Message: "Error Creating portifolio",

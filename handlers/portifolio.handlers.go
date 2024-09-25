@@ -10,6 +10,7 @@ import (
 
 type PortifolioService interface {
 	CreatePortifolio(u repositories.User, t string, d string) *services.ServiceLayerErr
+	EditPortifolio(u repositories.User, portifolioId string, t string, d string) *services.ServiceLayerErr
 	DeletePortifolio(u repositories.User, portifolioId string) *services.ServiceLayerErr
 	GetUserPortifolios(u repositories.User) ([]repositories.Portifolio, *services.ServiceLayerErr)
 }
@@ -35,18 +36,21 @@ func (ph *PortifolioHandler) CreatePortifolio(c echo.Context) error {
 		return nil
 	}
 
-	c.Response().Header().Set("HX-Request", "false")
-
-	return ph.View(c,
-		settings_views.Base(
-			"Ajustes",
-			loggedUser,
-			nil,
-		))
+	return ph.View(c, settings_views.PortifolioSection())
 }
 
 func (ph *PortifolioHandler) EditPortifolio(c echo.Context) error {
-	return nil
+	loggedUser := c.Get("user").(repositories.User)
+	id := c.FormValue("id")
+	t := c.FormValue("title")
+	d := c.FormValue("description")
+
+	if err := ph.Service.EditPortifolio(loggedUser, id, t, d); err != nil {
+		c.Response().WriteHeader(err.Code)
+		return nil
+	}
+
+	return ph.View(c, settings_views.PortifolioSection())
 }
 
 func (ph *PortifolioHandler) DeletePortifolio(c echo.Context) error {
@@ -58,12 +62,7 @@ func (ph *PortifolioHandler) DeletePortifolio(c echo.Context) error {
 		return nil
 	}
 
-	return ph.View(c,
-		settings_views.Base(
-			"Ajustes",
-			loggedUser,
-			nil,
-		))
+	return ph.View(c, settings_views.PortifolioSection())
 }
 
 func (ph *PortifolioHandler) GetUserPortifolios(c echo.Context) error {
