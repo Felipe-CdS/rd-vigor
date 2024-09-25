@@ -1,5 +1,10 @@
 package settings_views
 
+import (
+	"fmt"
+	"nugu.dev/rd-vigor/repositories"
+)
+
 templ ProfileSettings() {
 	<div class="flex overflow-y-scroll flex-col p-5 space-y-3 w-full h-full text-center">
 		<h1 class="hidden font-semibold lg:block lg:text-2xl text-start">Editar Perfil</h1>
@@ -30,12 +35,15 @@ templ ProfileSettings() {
 			x-data="{ state: 'read' }"
 			class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
 		>
-			<template x-if="state == 'read'">
-				@readPortifolio()
+			<template
+				x-if="state == 'read'"
+				x-init="$watch('state', () => htmx.process(htmx.find('#portifolio-list')))"
+			>
+				@ReadPortifolio()
 			</template>
 			<template
 				x-if="state == 'new'"
-				x-init="$watch(state == 'new', () => htmx.process(htmx.find('#new-portifolio-form')))"
+				x-init="$watch('state', () => htmx.process(htmx.find('#new-portifolio-form')))"
 			>
 				@addNewPortifolio()
 			</template>
@@ -146,9 +154,9 @@ templ editDescription() {
 	</div>
 }
 
-templ readPortifolio() {
+templ ReadPortifolio() {
 	<div class="flex flex-col w-full">
-		<div class="flex w-full mb-5">
+		<div class="flex mb-5 w-full">
 			<span class="text-xl font-medium">Portifólio</span>
 			<button
 				x-on:click="state = 'new'"
@@ -158,50 +166,11 @@ templ readPortifolio() {
 			</button>
 		</div>
 		<div
-			x-data="{ innerState: 'read' }"
-			class="flex mb-3 p-3 w-full rounded-xl border border-gray-200"
-		>
-			<template x-if="innerState == 'read'">
-				<div class="flex w-full">
-					<span class="text-xl font-medium">Portifólio</span>
-					<button
-						x-on:click="state = 'edit'"
-						class="flex ml-auto"
-					>
-						<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/edit.svg"/>
-					</button>
-					<button
-						x-on:click="innerState = 'delete'"
-						class="flex ml-3"
-					>
-						<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/error.svg"/>
-					</button>
-				</div>
-			</template>
-			<template x-if="innerState == 'delete'">
-				<div class="flex flex-col lg:flex-row w-full space-y-3 lg:justify-between">
-					<span class="text-base font-normal lg:text-start">
-						<p class="text-base">Deletar Portifólio?</p>
-						<p class="text-sm opacity-50">Tem certeza que deseja fazer isso?</p>
-					</span>
-					<div class="flex w-full lg:w-fit justify-around lg:space-x-3">
-						<button
-							class=" opacity-40 hover:opacity-100 flex"
-						>
-							Sim
-							<img class="size-6" src="/static/img/circle-check.svg"/>
-						</button>
-						<button
-							x-on:click="innerState = 'read'"
-							class=" opacity-40 hover:opacity-100 flex"
-						>
-							Não
-							<img class="size-6" src="/static/img/circle-x.svg"/>
-						</button>
-					</div>
-				</div>
-			</template>
-		</div>
+			id="portifolio-list"
+			hx-get="/settings/profile/portifolio"
+			class="flex flex-col w-full"
+			hx-trigger="revealed"
+		></div>
 	</div>
 }
 
@@ -221,8 +190,6 @@ templ addNewPortifolio() {
 		<form
 			id="new-portifolio-form"
 			hx-post="/settings/profile/portifolio"
-			hx-target="#generic-settings-div"
-			hx-target-error="#error-alert"
 			class="flex flex-col space-y-3 w-full"
 		>
 			<label class="text-sm font-normal text-left text-gray-500">
@@ -317,4 +284,63 @@ templ editPortifolio() {
 			</div>
 		</form>
 	</div>
+}
+
+templ PortifolioList(list []repositories.Portifolio) {
+	if len(list) == 0 {
+		<span class="text-xl font-normal">
+			Nenhum portfólio encontrado
+		</span>
+	}
+	for _, p := range list {
+		<div x-data="{ innerState: 'read' }">
+			<template x-if="innerState == 'read'">
+				<div class="flex p-3 mb-3 w-full rounded-xl border border-gray-200">
+					<span class="text-xl font-medium">
+						{ fmt.Sprintf("%s", p.Title) }
+					</span>
+					<button
+						x-on:click="state = 'edit'"
+						class="flex ml-auto"
+					>
+						<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/edit.svg"/>
+					</button>
+					<button
+						x-on:click="innerState = 'delete'"
+						class="flex ml-3"
+					>
+						<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/trash.svg"/>
+					</button>
+				</div>
+			</template>
+			<template
+				x-if="innerState == 'delete'"
+				x-init="$watch('innerState', () => htmx.process(htmx.find('#delete-portifolio-form')))"
+			>
+				<div class="flex flex-col p-3 mb-3 w-full rounded-xl border border-gray-200 lg:flex-row lg:justify-between">
+					<span class="text-base font-normal lg:text-start">
+						<p class="text-base">Deletar Portifólio?</p>
+						<p class="text-sm opacity-50">Tem certeza que deseja fazer isso?</p>
+					</span>
+					<div class="flex justify-around w-full lg:space-x-3 lg:w-fit">
+						<button
+							id="delete-portifolio-form"
+							hx-delete={ fmt.Sprintf("/settings/profile/portifolio?id=%s", p.Portifolio_ID) }
+							class="flex opacity-40 hover:opacity-100"
+						>
+							Sim
+							<img class="size-6" src="/static/img/circle-check.svg"/>
+						</button>
+						<button
+							x-on:click="innerState = 'read'"
+							class="flex opacity-40 hover:opacity-100"
+						>
+							Não
+							<img class="size-6" src="/static/img/circle-x.svg"/>
+						</button>
+					</div>
+				</div>
+			</template>
+		</div>
+	}
 }

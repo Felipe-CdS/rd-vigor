@@ -45,14 +45,41 @@ func (pr *PortifolioRepository) CreatePortifolio(u User, p Portifolio) *Reposito
 	return nil
 }
 
-func (pr *PortifolioRepository) GetUserPortifolios(u User) *RepositoryLayerErr {
+func (pr *PortifolioRepository) GetUserPortifolios(u User) ([]Portifolio, *RepositoryLayerErr) {
 
-	stmt := `SELECT * FROM portifolios WHERE fk_user_id = $1;`
+	var list []Portifolio
 
-	_, err := pr.PortifolioStore.Db.Exec(stmt, u.ID)
+	stmt := `SELECT portifolio_id, title, description FROM portifolios WHERE fk_user_id = $1;`
+
+	rows, err := pr.PortifolioStore.Db.Query(stmt, u.ID)
 
 	if err != nil {
-		return &RepositoryLayerErr{err, "Insert Error"}
+		return nil, &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	for rows.Next() {
+		var p Portifolio
+		if err := rows.Scan(
+			&p.Portifolio_ID,
+			&p.Title,
+			&p.Description,
+		); err != nil {
+			return nil, &RepositoryLayerErr{err, "Insert Error"}
+		}
+		list = append(list, p)
+	}
+
+	return list, nil
+}
+
+func (pr *PortifolioRepository) DeletePortifolio(u User, portifolioId string) *RepositoryLayerErr {
+
+	stmt := `DELETE FROM portifolios WHERE portifolio_id = $1`
+
+	_, err := pr.PortifolioStore.Db.Exec(stmt, portifolioId)
+
+	if err != nil {
+		return &RepositoryLayerErr{err, "Delete Error"}
 	}
 
 	return nil

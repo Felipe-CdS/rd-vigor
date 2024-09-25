@@ -1,16 +1,17 @@
 package handlers
 
 import (
-	"net/http"
-
+	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 	"nugu.dev/rd-vigor/repositories"
 	"nugu.dev/rd-vigor/services"
+	"nugu.dev/rd-vigor/views/settings_views"
 )
 
 type PortifolioService interface {
 	CreatePortifolio(u repositories.User, t string, d string) *services.ServiceLayerErr
-	GetUserPortifolios(u repositories.User) *services.ServiceLayerErr
+	DeletePortifolio(u repositories.User, portifolioId string) *services.ServiceLayerErr
+	GetUserPortifolios(u repositories.User) ([]repositories.Portifolio, *services.ServiceLayerErr)
 }
 
 type PortifolioHandler struct {
@@ -31,26 +32,56 @@ func (ph *PortifolioHandler) CreatePortifolio(c echo.Context) error {
 
 	if err := ph.Service.CreatePortifolio(loggedUser, t, d); err != nil {
 		c.Response().WriteHeader(err.Code)
-		// return th.View(c, tags_views.ErrorAlert("Nome Inválido."))
 		return nil
 	}
 
-	return c.Redirect(http.StatusSeeOther, "/admin/dashboard/tags")
+	c.Response().Header().Set("HX-Request", "false")
+
+	return ph.View(c,
+		settings_views.Base(
+			"Ajustes",
+			loggedUser,
+			nil,
+		))
 }
 
 func (ph *PortifolioHandler) EditPortifolio(c echo.Context) error {
 	return nil
 }
 
+func (ph *PortifolioHandler) DeletePortifolio(c echo.Context) error {
+	loggedUser := c.Get("user").(repositories.User)
+	portifolioId := c.QueryParam("id")
+
+	if err := ph.Service.DeletePortifolio(loggedUser, portifolioId); err != nil {
+		c.Response().WriteHeader(err.Code)
+		return nil
+	}
+
+	return ph.View(c,
+		settings_views.Base(
+			"Ajustes",
+			loggedUser,
+			nil,
+		))
+}
+
 func (ph *PortifolioHandler) GetUserPortifolios(c echo.Context) error {
 
 	loggedUser := c.Get("user").(repositories.User)
 
-	if err := ph.Service.GetUserPortifolios(loggedUser); err != nil {
+	p, err := ph.Service.GetUserPortifolios(loggedUser)
+
+	if err != nil {
 		c.Response().WriteHeader(err.Code)
-		// return th.View(c, tags_views.ErrorAlert("Nome Inválido."))
 		return nil
 	}
 
-	return c.Redirect(http.StatusSeeOther, "/admin/dashboard/tags")
+	return ph.View(c, settings_views.PortifolioList(p))
+}
+
+func (ph *PortifolioHandler) View(c echo.Context, cmp templ.Component) error {
+	c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
+
+	return cmp.Render(c.Request().Context(), c.Response().Writer)
 }

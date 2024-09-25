@@ -6,7 +6,8 @@ import (
 
 type PortifolioRepository interface {
 	CreatePortifolio(u repositories.User, p repositories.Portifolio) *repositories.RepositoryLayerErr
-	GetUserPortifolios(u repositories.User) *repositories.RepositoryLayerErr
+	DeletePortifolio(u repositories.User, portifolioId string) *repositories.RepositoryLayerErr
+	GetUserPortifolios(u repositories.User) ([]repositories.Portifolio, *repositories.RepositoryLayerErr)
 }
 
 type PortifolioService struct {
@@ -54,9 +55,22 @@ func (s *PortifolioService) CreatePortifolio(u repositories.User, t string, d st
 	return nil
 }
 
-func (s *PortifolioService) GetUserPortifolios(u repositories.User) *ServiceLayerErr {
+func (s *PortifolioService) GetUserPortifolios(u repositories.User) ([]repositories.Portifolio, *ServiceLayerErr) {
 
-	if err := s.Repository.GetUserPortifolios(u); err != nil {
+	var list []repositories.Portifolio
+
+	list, err := s.Repository.GetUserPortifolios(u)
+
+	if err != nil {
+		return list, &ServiceLayerErr{Error: nil, Message: "Error Creating portifolio", Code: 500}
+	}
+
+	return list, nil
+}
+
+func (s *PortifolioService) DeletePortifolio(u repositories.User, portifolioId string) *ServiceLayerErr {
+
+	if err := s.Repository.DeletePortifolio(u, portifolioId); err != nil {
 		return &ServiceLayerErr{
 			Error:   nil,
 			Message: "Error Creating portifolio",
