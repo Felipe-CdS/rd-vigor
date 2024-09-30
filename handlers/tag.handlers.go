@@ -80,11 +80,15 @@ func (th *TagHandler) SearchTagByName(c echo.Context) error {
 
 	loggedUser := c.Get("user").(repositories.User)
 
-	if loggedUser.Role != "admin" {
-		return c.Redirect(http.StatusMovedPermanently, "/signin")
-	}
+	// if triggerInput == settings-tag-search:
+	// request from settings
+	// if triggerInput == search:
+	// request from admin dashboard
 
-	list, err := th.Service.SearchTagByName(c.FormValue("search"))
+	triggerInput := c.Request().Header.Get("HX-Trigger-Name")
+	tagName := c.FormValue(triggerInput)
+
+	list, err := th.Service.SearchTagByName(tagName)
 
 	if err != nil {
 		if err.Code == http.StatusInternalServerError {
@@ -94,6 +98,11 @@ func (th *TagHandler) SearchTagByName(c echo.Context) error {
 
 		c.Response().WriteHeader(err.Code)
 		return th.View(c, tags_views.ErrorAlert(err.Message))
+
+	}
+
+	if triggerInput == "settings-tag-search" {
+		return th.View(c, settings_views.UserTagsList(list, loggedUser))
 	}
 
 	user, err := th.UserService.GetUserByUsername(c.FormValue("user"))
@@ -146,7 +155,7 @@ func (th *TagHandler) GetUserTags(c echo.Context) error {
 		return nil
 	}
 
-	return th.View(c, settings_views.UserTagsList(list))
+	return th.View(c, settings_views.UserTagsList(list, loggedUser))
 }
 
 func (th *TagHandler) View(c echo.Context, cmp templ.Component) error {

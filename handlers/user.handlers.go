@@ -30,7 +30,7 @@ type UserService interface {
 	GetUserByUsername(username string) (repositories.User, *services.ServiceLayerErr)
 	GetUserTags(user repositories.User) ([]repositories.Tag, *services.ServiceLayerErr)
 
-	SetNewTagUser(username string, tag_name string) *services.ServiceLayerErr
+	SetNewTagUser(username string, tagId string) *services.ServiceLayerErr
 }
 
 func NewUserHandler(us UserService) *UserHandler {
@@ -249,10 +249,19 @@ func (uh *UserHandler) GetCalendar(c echo.Context) error {
 }
 
 func (uh *UserHandler) SetUserTag(c echo.Context) error {
-	username := c.FormValue("user")
-	tagName := c.FormValue("tag")
 
-	uh.UserServices.SetNewTagUser(username, tagName)
+	username := c.FormValue("user")
+	tagId := c.FormValue("tag")
+
+	triggerInput := c.Request().Header.Get("HX-Trigger-Name")
+
+	if triggerInput == "settings-set-tag" {
+		loggedUser := c.Get("user").(repositories.User)
+		username = loggedUser.Username
+		tagId = c.QueryParam("tag")
+	}
+
+	uh.UserServices.SetNewTagUser(username, tagId)
 	return nil
 }
 

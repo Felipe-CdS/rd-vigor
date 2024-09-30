@@ -1,40 +1,60 @@
 package settings_views
 
 import "nugu.dev/rd-vigor/repositories"
+import "fmt"
 
 templ TagsSection() {
 	<div
-		id="portifolio-section"
+		id="tags-section"
 		x-data="{ state: 'read', selected: '' }"
 		class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
 	>
-		<div class="flex flex-col w-full">
-			<div class="flex mb-5 w-full">
-				<span class="text-xl font-medium">Minhas Tags</span>
-				<button class="ml-auto">
-					<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/plus.svg"/>
-				</button>
-			</div>
+		<span class="mb-5 text-xl font-medium">Tags</span>
+		<div
+			id="tags-list"
+			hx-get="/settings/profile/tags"
+			class="flex flex-col w-full"
+			hx-trigger="revealed"
+		></div>
+		<form
+			id="new-tag-form"
+			hx-post="/settings/profile/tags"
+			hx-target="tags-list"
+			hx-swap="innerHTML"
+			class="flex flex-row w-full relative h-14"
+		>
+			<input
+				type="search"
+				name="settings-tag-search"
+				hx-post="/tags/search"
+				hx-trigger="input changed delay:500ms, search"
+				hx-target="#search-results"
+				hx-indicator=".htmx-indicator"
+				placeholder="Adicionar nova tag"
+				class="absolute w-full py-3 px-4 flex rounded-md border border-gray-200 border-solid z-10"
+			/>
 			<div
-				id="portifolio-list"
-				hx-get="/settings/profile/tags"
-				class="flex w-full"
-				hx-trigger="revealed"
+				id="search-results"
+				class="flex absolute top-10 flex-col py-1 px-2 pt-3 w-full font-normal text-gray-800 bg-gray-100 rounded-b-md"
 			></div>
-		</div>
+		</form>
 	</div>
 }
 
-templ UserTagsList(list []repositories.Tag) {
-	if len(list) == 0 {
-		<span class="text-xl font-normal">
-			Nenhuma tag encontrada
-		</span>
-	}
+templ UserTagsList(list []repositories.Tag, user repositories.User) {
 	for _, t := range list {
 		<div>
-			<div class="flex p-3 mb-3 w-full rounded-xl border border-gray-200">
+			<div class="flex p-3 w-full">
 				{ t.Name }
+				<button
+					name="settings-set-tag"
+					hx-patch={ fmt.Sprintf("/settings/profile/tags?tag=%s", t.ID) }
+					hx-target="this"
+					hx-swap="outerHTML"
+					class="ml-auto"
+				>
+					<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/arrow-right-2.svg"/>
+				</button>
 			</div>
 		</div>
 	}

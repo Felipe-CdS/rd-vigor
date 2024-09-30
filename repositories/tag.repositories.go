@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"strings"
 
 	"github.com/google/uuid"
 	"nugu.dev/rd-vigor/db"
@@ -32,7 +33,7 @@ func (tr *TagRepository) CreateTag(t Tag) *RepositoryLayerErr {
 	_, err := tr.TagStore.Db.Exec(
 		stmt,
 		uuid.New(),
-		t.Name,
+		strings.ToLower(t.Name),
 	)
 
 	if err != nil {
@@ -46,7 +47,7 @@ func (tr *TagRepository) CheckTagExists(name string) bool {
 
 	stmt := "SELECT tag_name FROM tags WHERE tag_name = $1"
 
-	queryResult := tr.TagStore.Db.QueryRow(stmt, name).Scan()
+	queryResult := tr.TagStore.Db.QueryRow(stmt, strings.ToLower(name)).Scan()
 
 	return queryResult != sql.ErrNoRows
 }
@@ -82,7 +83,7 @@ func (tr *TagRepository) SearchTagByName(name string) ([]Tag, *RepositoryLayerEr
 
 	stmt := "SELECT * FROM tags WHERE tag_name LIKE CONCAT('%%',$1::text,'%%')"
 
-	rows, err := tr.TagStore.Db.Query(stmt, name)
+	rows, err := tr.TagStore.Db.Query(stmt, strings.ToLower(name))
 
 	if err != nil {
 		return nil, &RepositoryLayerErr{err, "Insert Error"}
@@ -100,6 +101,21 @@ func (tr *TagRepository) SearchTagByName(name string) ([]Tag, *RepositoryLayerEr
 	}
 
 	return tags, nil
+}
+
+func (tr *TagRepository) GetTagById(id string) (Tag, *RepositoryLayerErr) {
+
+	var t Tag
+	stmt := "SELECT * FROM tags WHERE tag_id = $1;"
+
+	if err := tr.TagStore.Db.QueryRow(stmt, id).Scan(
+		&t.ID,
+		&t.Name,
+	); err != nil {
+		return t, &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	return t, nil
 }
 
 func (tr *TagRepository) GetUserTags(u User) ([]Tag, *RepositoryLayerErr) {

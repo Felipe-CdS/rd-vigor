@@ -11,6 +11,7 @@ type TagRepository interface {
 	CheckTagExists(name string) bool
 	GetAllTags() ([]repositories.Tag, *repositories.RepositoryLayerErr)
 	SearchTagByName(name string) ([]repositories.Tag, *repositories.RepositoryLayerErr)
+	GetTagById(id string) (repositories.Tag, *repositories.RepositoryLayerErr)
 	GetUserTags(u repositories.User) ([]repositories.Tag, *repositories.RepositoryLayerErr)
 }
 
