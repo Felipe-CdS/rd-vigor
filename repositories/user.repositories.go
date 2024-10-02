@@ -282,7 +282,6 @@ func (ur *UserRepository) GetUserByUsername(username string) (User, *RepositoryL
 		&usr.Zipcode,
 		&usr.StripeID,
 	); err != nil {
-		fmt.Println(err)
 		return User{}, &RepositoryLayerErr{sql.ErrNoRows, "Usuario inexistente."}
 	}
 	usr, _ = ur.GetUserByID(usr.ID)
@@ -354,6 +353,23 @@ func (ur *UserRepository) SetNewTagUser(u User, t Tag) *RepositoryLayerErr {
 	return nil
 }
 
+func (ur *UserRepository) DeleteUserTag(u User, tagId string) *RepositoryLayerErr {
+
+	stmt := `DELETE FROM users_tags WHERE fk_user_id = $1 AND fk_tag_id = $2;`
+
+	_, err := ur.UserStore.Db.Exec(
+		stmt,
+		u.ID,
+		tagId,
+	)
+
+	if err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	return nil
+}
+
 func (ur *UserRepository) GetUserTags(user User) ([]Tag, *RepositoryLayerErr) {
 
 	var tagsIdList []string
@@ -378,6 +394,44 @@ func (ur *UserRepository) GetUserTags(user User) ([]Tag, *RepositoryLayerErr) {
 	}
 
 	stmt = "SELECT * FROM tags WHERE tag_id = $1"
+
+	for _, id := range tagsIdList {
+		var tag Tag
+		if err := ur.UserStore.Db.QueryRow(stmt, id).Scan(
+			&tag.ID,
+			&tag.Name,
+		); err != nil {
+			return nil, &RepositoryLayerErr{err, "Insert Error"}
+		}
+		tags = append(tags, tag)
+	}
+	return tags, nil
+}
+
+func (ur *UserRepository) GetUserNotTags(user User) ([]Tag, *RepositoryLayerErr) {
+
+	var tagsIdList []string
+	var tags []Tag
+
+	stmt := "SELECT fk_tag_id FROM users_tags WHERE fk_user_id = $1"
+
+	rows, err := ur.UserStore.Db.Query(stmt, user.ID)
+
+	if err != nil {
+		return nil, &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	for rows.Next() {
+		var tagId string
+		if err := rows.Scan(
+			&tagId,
+		); err != nil {
+			return nil, &RepositoryLayerErr{err, "Insert Error"}
+		}
+		tagsIdList = append(tagsIdList, tagId)
+	}
+
+	stmt = "SELECT * FROM tags WHERE tag_id != $1"
 
 	for _, id := range tagsIdList {
 		var tag Tag

@@ -81,6 +81,10 @@ func (tr *TagRepository) SearchTagByName(name string) ([]Tag, *RepositoryLayerEr
 
 	var tags []Tag
 
+	if name == "" {
+		return tags, nil
+	}
+
 	stmt := "SELECT * FROM tags WHERE tag_name LIKE CONCAT('%%',$1::text,'%%')"
 
 	rows, err := tr.TagStore.Db.Query(stmt, strings.ToLower(name))
@@ -133,7 +137,7 @@ func (tr *TagRepository) GetUserTags(u User) ([]Tag, *RepositoryLayerErr) {
 
 	for rows.Next() {
 		var s string
-		if err := rows.Scan(
+		if err = rows.Scan(
 			&s,
 		); err != nil {
 			return nil, &RepositoryLayerErr{err, "Insert Error"}
@@ -143,7 +147,7 @@ func (tr *TagRepository) GetUserTags(u User) ([]Tag, *RepositoryLayerErr) {
 
 	stmt = "SELECT * FROM tags WHERE tag_id = $1"
 
-	for i := range relationsIDs {
+	for _, i := range relationsIDs {
 
 		rows, err = tr.TagStore.Db.Query(stmt, i)
 

@@ -30,9 +30,11 @@ type UserRepository interface {
 	GetUserByEmail(email string) (repositories.User, *repositories.RepositoryLayerErr)
 	GetUserByUsername(username string) (repositories.User, *repositories.RepositoryLayerErr)
 	GetUserPasswordByID(id string) (string, *repositories.RepositoryLayerErr)
-	SetNewTagUser(u repositories.User, t repositories.Tag) *repositories.RepositoryLayerErr
 
 	GetUserTags(user repositories.User) ([]repositories.Tag, *repositories.RepositoryLayerErr)
+	GetUserNotTags(user repositories.User) ([]repositories.Tag, *repositories.RepositoryLayerErr)
+	SetNewTagUser(u repositories.User, t repositories.Tag) *repositories.RepositoryLayerErr
+	DeleteUserTag(u repositories.User, tagId string) *repositories.RepositoryLayerErr
 }
 
 type UserService struct {
@@ -158,8 +160,6 @@ func (us *UserService) AuthUser(login string, password string) (repositories.Use
 
 	userPassword, queryErr := us.Repository.GetUserPasswordByID(user.ID)
 
-	fmt.Println(userPassword)
-
 	if queryErr != nil {
 		return repositories.User{}, &ServiceLayerErr{queryErr.Error, "Query Err", http.StatusInternalServerError}
 	}
@@ -212,7 +212,6 @@ func putFileS3(f *multipart.FileHeader) *ServiceLayerErr {
 
 func (us *UserService) SetNewTagUser(username string, tagId string) *ServiceLayerErr {
 
-	fmt.Println(username, tagId)
 	user, err := us.Repository.GetUserByUsername(username)
 
 	if err != nil {
@@ -236,13 +235,32 @@ func (us *UserService) SetNewTagUser(username string, tagId string) *ServiceLaye
 	return nil
 }
 
+func (us *UserService) DeleteUserTag(user repositories.User, tagId string) *ServiceLayerErr {
+
+	queryErr := us.Repository.DeleteUserTag(user, tagId)
+
+	if queryErr != nil {
+		return &ServiceLayerErr{queryErr.Error, "Delete Err", http.StatusInternalServerError}
+	}
+
+	return nil
+}
+
 func (us *UserService) GetUserTags(user repositories.User) ([]repositories.Tag, *ServiceLayerErr) {
 
 	tags, err := us.Repository.GetUserTags(user)
 
 	if err != nil {
+		return nil, &ServiceLayerErr{err.Error, "Query Err 3", http.StatusInternalServerError}
+	}
+	return tags, nil
+}
 
-		fmt.Printf("%+v\n", err)
+func (us *UserService) GetUserNotTags(user repositories.User) ([]repositories.Tag, *ServiceLayerErr) {
+
+	tags, err := us.Repository.GetUserNotTags(user)
+
+	if err != nil {
 		return nil, &ServiceLayerErr{err.Error, "Query Err 3", http.StatusInternalServerError}
 	}
 	return tags, nil
@@ -255,7 +273,6 @@ func (us *UserService) UpdateUser(u repositories.User, newUserData repositories.
 	}
 
 	if u.Email != newUserData.Email && us.Repository.CheckEmailExists(newUserData.Email) {
-		fmt.Println(u.Email, newUserData.Email)
 		return &ServiceLayerErr{nil, "Email já cadastrado.", http.StatusBadRequest}
 	}
 

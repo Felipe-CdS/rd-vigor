@@ -1,7 +1,9 @@
 package settings_views
 
-import "nugu.dev/rd-vigor/repositories"
-import "fmt"
+import (
+	"fmt"
+	"nugu.dev/rd-vigor/repositories"
+)
 
 templ TagsSection() {
 	<div
@@ -9,11 +11,11 @@ templ TagsSection() {
 		x-data="{ state: 'read', selected: '' }"
 		class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
 	>
-		<span class="mb-5 text-xl font-medium">Tags</span>
+		<span class="mb-2 text-xl font-medium">Tags</span>
 		<div
 			id="tags-list"
 			hx-get="/settings/profile/tags"
-			class="flex flex-col w-full"
+			class="flex mb-3 space-x-1 w-full"
 			hx-trigger="revealed"
 		></div>
 		<form
@@ -21,41 +23,77 @@ templ TagsSection() {
 			hx-post="/settings/profile/tags"
 			hx-target="tags-list"
 			hx-swap="innerHTML"
-			class="flex flex-row w-full relative h-14"
+			class="flex relative flex-row w-full h-14"
 		>
 			<input
 				type="search"
 				name="settings-tag-search"
-				hx-post="/tags/search"
+				hx-post="/settings/profile/tags-search"
 				hx-trigger="input changed delay:500ms, search"
 				hx-target="#search-results"
 				hx-indicator=".htmx-indicator"
 				placeholder="Adicionar nova tag"
-				class="absolute w-full py-3 px-4 flex rounded-md border border-gray-200 border-solid z-10"
+				autocomplete="off"
+				class="flex absolute z-40 py-3 px-4 w-full rounded-md border border-gray-200 border-solid"
 			/>
 			<div
 				id="search-results"
-				class="flex absolute top-10 flex-col py-1 px-2 pt-3 w-full font-normal text-gray-800 bg-gray-100 rounded-b-md"
+				class="flex absolute top-10 z-20 flex-col py-1 px-2 pt-3 w-full font-normal text-gray-800 bg-gray-100 rounded-b-md"
 			></div>
 		</form>
 	</div>
 }
 
-templ UserTagsList(list []repositories.Tag, user repositories.User) {
-	for _, t := range list {
-		<div>
-			<div class="flex p-3 w-full">
+templ SearchTagsList(searchTag string, list []repositories.Tag, user repositories.User) {
+	if searchTag == "" {
+	} else if len(list) == 0 {
+		<div class="flex p-3 w-full">
+			Tag não encontrada.
+		</div>
+	} else {
+		for _, t := range list {
+			<div
+				id={ fmt.Sprintf("tag-add-select-%s", t.ID) }
+				class="flex p-3 w-full"
+			>
 				{ t.Name }
 				<button
 					name="settings-set-tag"
 					hx-patch={ fmt.Sprintf("/settings/profile/tags?tag=%s", t.ID) }
-					hx-target="this"
+					hx-target={ fmt.Sprintf("#tag-add-select-%s", t.ID) }
 					hx-swap="outerHTML"
 					class="ml-auto"
 				>
 					<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/arrow-right-2.svg"/>
 				</button>
 			</div>
-		</div>
+		}
 	}
+}
+
+templ UserTagsList(list []repositories.Tag, user repositories.User) {
+	<div
+		id="tags-list"
+		hx-get="/settings/profile/tags"
+		hx-swap-oob="outerHTML"
+		class="flex mb-3 space-x-1 w-full"
+	>
+		for _, t := range list {
+			<div
+				id={ fmt.Sprintf("tag-bubble-%s", t.ID) }
+				class="flex items-center py-1 px-3 text-gray-800 bg-gray-200 rounded rounded-full"
+			>
+				<span>
+					{ t.Name }
+				</span>
+				<button
+					hx-delete={ fmt.Sprintf("/settings/profile/tags?tag=%s", t.ID) }
+					hx-target="#tags-list"
+					class="ml-1"
+				>
+					<img class="opacity-40 hover:opacity-100 size-5" src="/static/img/close.svg"/>
+				</button>
+			</div>
+		}
+	</div>
 }

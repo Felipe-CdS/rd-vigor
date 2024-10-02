@@ -28,9 +28,11 @@ type UserService interface {
 
 	GetUserByID(id string) (repositories.User, *services.ServiceLayerErr)
 	GetUserByUsername(username string) (repositories.User, *services.ServiceLayerErr)
-	GetUserTags(user repositories.User) ([]repositories.Tag, *services.ServiceLayerErr)
 
+	GetUserTags(user repositories.User) ([]repositories.Tag, *services.ServiceLayerErr)
+	GetUserNotTags(user repositories.User) ([]repositories.Tag, *services.ServiceLayerErr)
 	SetNewTagUser(username string, tagId string) *services.ServiceLayerErr
+	DeleteUserTag(user repositories.User, tagId string) *services.ServiceLayerErr
 }
 
 func NewUserHandler(us UserService) *UserHandler {
@@ -261,8 +263,49 @@ func (uh *UserHandler) SetUserTag(c echo.Context) error {
 		tagId = c.QueryParam("tag")
 	}
 
-	uh.UserServices.SetNewTagUser(username, tagId)
-	return nil
+	if err := uh.UserServices.SetNewTagUser(username, tagId); err != nil {
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		return uh.View(c, auth_views.SignupFormErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
+	}
+
+	return c.Redirect(http.StatusSeeOther, "/settings/profile/tags")
+}
+
+func (uh *UserHandler) GetUserNotTags(c echo.Context) error {
+
+	loggedUser := c.Get("user").(repositories.User)
+
+	// if triggerInput == settings-tag-search:
+	// request from settings
+	// if triggerInput == search:
+	// request from admin dashboard
+
+	triggerInput := c.Request().Header.Get("HX-Trigger-Name")
+	tagName := c.FormValue(triggerInput)
+
+	list, err := uh.UserServices.GetUserNotTags(loggedUser)
+
+	if err != nil {
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		return nil
+	}
+
+	fmt.Println(list)
+
+	return uh.View(c, settings_views.SearchTagsList(tagName, list, loggedUser))
+}
+
+func (uh *UserHandler) DeleteUserTag(c echo.Context) error {
+
+	loggedUser := c.Get("user").(repositories.User)
+	tagId := c.QueryParam("tag")
+
+	if err := uh.UserServices.DeleteUserTag(loggedUser, tagId); err != nil {
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		return uh.View(c, auth_views.SignupFormErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
+	}
+
+	return c.Redirect(http.StatusSeeOther, "/settings/profile/tags")
 }
 
 func (uh *UserHandler) SearchUserByAny(c echo.Context) error {
@@ -275,7 +318,6 @@ func (uh *UserHandler) SearchUserByAny(c echo.Context) error {
 	found, err := uh.UserServices.GetUsersByAny(query)
 
 	if err != nil {
-		fmt.Println(err)
 	}
 
 	return uh.View(c, inbox_views.SearchUserFormOptions(found))

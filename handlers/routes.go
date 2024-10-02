@@ -97,7 +97,9 @@ func SetupRoutes(e *echo.Echo,
 	e.POST("/settings/contact-info/location", authMiddleware(uh, uh.UpdateUserLocationInfo))
 
 	e.GET("/settings/profile/tags", authMiddleware(uh, th.GetUserTags))
+	e.POST("/settings/profile/tags-search", authMiddleware(uh, uh.GetUserNotTags))
 	e.PATCH("/settings/profile/tags", authMiddleware(uh, uh.SetUserTag))
+	e.DELETE("/settings/profile/tags", authMiddleware(uh, uh.DeleteUserTag))
 
 	e.GET("/settings/profile/portifolio", authMiddleware(uh, ph.GetUserPortifolios))
 	e.POST("/settings/profile/portifolio", authMiddleware(uh, ph.CreatePortifolio))

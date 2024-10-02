@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/a-h/templ"
@@ -102,7 +103,7 @@ func (th *TagHandler) SearchTagByName(c echo.Context) error {
 	}
 
 	if triggerInput == "settings-tag-search" {
-		return th.View(c, settings_views.UserTagsList(list, loggedUser))
+		return th.View(c, settings_views.SearchTagsList(tagName, list, loggedUser))
 	}
 
 	user, err := th.UserService.GetUserByUsername(c.FormValue("user"))
@@ -149,6 +150,8 @@ func (th *TagHandler) GetUserTags(c echo.Context) error {
 	loggedUser := c.Get("user").(repositories.User)
 
 	list, err := th.Service.GetUserTags(loggedUser)
+
+	fmt.Println(err)
 
 	if err != nil {
 		c.Response().WriteHeader(err.Code)
