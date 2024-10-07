@@ -413,7 +413,12 @@ func (ur *UserRepository) GetUserNotTags(user User) ([]Tag, *RepositoryLayerErr)
 	var tagsIdList []string
 	var tags []Tag
 
-	stmt := "SELECT fk_tag_id FROM users_tags WHERE fk_user_id = $1"
+	stmt := `SELECT t.tag_id, t.tag_name, ut.fk_user_id
+		FROM tags t
+		INNER JOIN users_tags ut
+		ON t.tag_id = ut.fk_tag_id
+		WHERE ut.fk_user_id != '55a399f3-a7d3-4c9b-bdf1-300ca6bbcc50'
+		AND tag_name LIKE CONCAT('%%', 'pro', '%%');`
 
 	rows, err := ur.UserStore.Db.Query(stmt, user.ID)
 

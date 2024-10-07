@@ -107,6 +107,41 @@ func (tr *TagRepository) SearchTagByName(name string) ([]Tag, *RepositoryLayerEr
 	return tags, nil
 }
 
+func (tr *TagRepository) SearchTagByNameAvaiableToUser(user User, name string) ([]Tag, *RepositoryLayerErr) {
+
+	var tags []Tag
+
+	if name == "" {
+		return tags, nil
+	}
+
+	stmt := `SELECT t.tag_id, t.tag_name
+		FROM tags t
+		LEFT JOIN users_tags ut
+		ON t.tag_id = ut.fk_tag_id
+		WHERE ut.fk_user_id != $1
+		AND t.tag_name LIKE CONCAT('%%',$2::text,'%%');`
+
+	rows, err := tr.TagStore.Db.Query(stmt, user.ID, strings.ToLower(name))
+
+	if err != nil {
+		return nil, &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	for rows.Next() {
+		var tag Tag
+		if err := rows.Scan(
+			&tag.ID,
+			&tag.Name,
+		); err != nil {
+			return nil, &RepositoryLayerErr{err, "Insert Error"}
+		}
+		tags = append(tags, tag)
+	}
+
+	return tags, nil
+}
+
 func (tr *TagRepository) GetTagById(id string) (Tag, *RepositoryLayerErr) {
 
 	var t Tag

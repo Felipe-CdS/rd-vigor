@@ -13,6 +13,8 @@ type TagRepository interface {
 	SearchTagByName(name string) ([]repositories.Tag, *repositories.RepositoryLayerErr)
 	GetTagById(id string) (repositories.Tag, *repositories.RepositoryLayerErr)
 	GetUserTags(u repositories.User) ([]repositories.Tag, *repositories.RepositoryLayerErr)
+
+	SearchTagByNameAvaiableToUser(u repositories.User, name string) ([]repositories.Tag, *repositories.RepositoryLayerErr)
 }
 
 type TagService struct {

@@ -97,7 +97,7 @@ func SetupRoutes(e *echo.Echo,
 	e.POST("/settings/contact-info/location", authMiddleware(uh, uh.UpdateUserLocationInfo))
 
 	e.GET("/settings/profile/tags", authMiddleware(uh, th.GetUserTags))
-	e.POST("/settings/profile/tags-search", authMiddleware(uh, uh.GetUserNotTags))
+	e.POST("/settings/profile/tags-search", authMiddleware(uh, uh.SearchTagByNameAvaiableToUser))
 	e.PATCH("/settings/profile/tags", authMiddleware(uh, uh.SetUserTag))
 	e.DELETE("/settings/profile/tags", authMiddleware(uh, uh.DeleteUserTag))
 
@@ -143,6 +143,11 @@ func authMiddleware(uh *UserHandler, next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		c.Set("user", loggedUser)
+
+		if loggedUser.Role != "admin" {
+			return c.Redirect(http.StatusMovedPermanently, "/signin")
+		}
+
 		return next(c)
 	}
 }

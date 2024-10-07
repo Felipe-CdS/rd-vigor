@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/a-h/templ"
@@ -150,8 +149,6 @@ func (th *TagHandler) GetUserTags(c echo.Context) error {
 	loggedUser := c.Get("user").(repositories.User)
 
 	list, err := th.Service.GetUserTags(loggedUser)
-
-	fmt.Println(err)
 
 	if err != nil {
 		c.Response().WriteHeader(err.Code)

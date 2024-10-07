@@ -266,6 +266,17 @@ func (us *UserService) GetUserNotTags(user repositories.User) ([]repositories.Ta
 	return tags, nil
 }
 
+// Search Tag by name but only if user doesnt already have it
+func (us *UserService) SearchTagByNameAvaiableToUser(user repositories.User, query string) ([]repositories.Tag, *ServiceLayerErr) {
+
+	tags, err := us.TagRepository.SearchTagByNameAvaiableToUser(user, query)
+
+	if err != nil {
+		return nil, &ServiceLayerErr{err.Error, "Query Err", http.StatusInternalServerError}
+	}
+	return tags, nil
+}
+
 func (us *UserService) UpdateUser(u repositories.User, newUserData repositories.User) *ServiceLayerErr {
 
 	if _, err := mail.ParseAddress(newUserData.Email); err != nil {

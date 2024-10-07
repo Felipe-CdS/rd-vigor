@@ -33,6 +33,8 @@ type UserService interface {
 	GetUserNotTags(user repositories.User) ([]repositories.Tag, *services.ServiceLayerErr)
 	SetNewTagUser(username string, tagId string) *services.ServiceLayerErr
 	DeleteUserTag(user repositories.User, tagId string) *services.ServiceLayerErr
+
+	SearchTagByNameAvaiableToUser(user repositories.User, query string) ([]repositories.Tag, *services.ServiceLayerErr)
 }
 
 func NewUserHandler(us UserService) *UserHandler {
@@ -271,7 +273,7 @@ func (uh *UserHandler) SetUserTag(c echo.Context) error {
 	return c.Redirect(http.StatusSeeOther, "/settings/profile/tags")
 }
 
-func (uh *UserHandler) GetUserNotTags(c echo.Context) error {
+func (uh *UserHandler) SearchTagByNameAvaiableToUser(c echo.Context) error {
 
 	loggedUser := c.Get("user").(repositories.User)
 
@@ -283,14 +285,12 @@ func (uh *UserHandler) GetUserNotTags(c echo.Context) error {
 	triggerInput := c.Request().Header.Get("HX-Trigger-Name")
 	tagName := c.FormValue(triggerInput)
 
-	list, err := uh.UserServices.GetUserNotTags(loggedUser)
+	list, err := uh.UserServices.SearchTagByNameAvaiableToUser(loggedUser, tagName)
 
 	if err != nil {
 		c.Response().WriteHeader(http.StatusInternalServerError)
 		return nil
 	}
-
-	fmt.Println(list)
 
 	return uh.View(c, settings_views.SearchTagsList(tagName, list, loggedUser))
 }

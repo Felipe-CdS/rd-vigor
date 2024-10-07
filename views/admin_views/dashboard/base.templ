@@ -276,7 +276,7 @@ templ TagsListResponse(list []repositories.Tag, user repositories.User) {
 				<span class="flex grow">{ tag.Name }</span>
 				<input
 					name="tag"
-					value={ fmt.Sprintf("%s", tag.Name) }
+					value={ fmt.Sprintf("%s", tag.ID) }
 					class="hidden"
 				/>
 				<input
