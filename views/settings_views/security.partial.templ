@@ -1,0 +1,110 @@
+package settings_views
+
+templ SecuritySettings() {
+	<div class="flex overflow-y-scroll flex-col p-5 space-y-3 w-full h-full text-center">
+		<h1 class="hidden font-semibold lg:block lg:text-2xl text-start">Informações de contato</h1>
+		<button
+			x-on:click="state = 'menu'"
+			class="font-medium lg:hidden text-start"
+		>
+			<img class="inline ml-auto w-6 rotate-180" src="/static/img/arrow-right-3.svg"/>
+			Voltar
+		</button>
+		<!-- ############################################################################################### -->
+		<div
+			x-data="{ edit: false }"
+			class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
+		>
+			@editPasswordTemplate()
+			@readPasswordTemplate()
+		</div>
+	</div>
+}
+
+templ readPasswordTemplate() {
+	<template x-if="!edit">
+		<div class="flex flex-col space-y-3 w-full">
+			<div class="flex w-full">
+				<span class="text-xl font-medium">Senha</span>
+				<button
+					x-on:click="edit = !edit"
+					class="ml-auto"
+				>
+					<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/edit.svg"/>
+				</button>
+			</div>
+			<span class="text-base font-normal text-start">
+				<p class="text-xs opacity-50">
+					Escolha uma senha forte, com pelo menos 8 caracteres.
+				</p>
+				<img class="size-6 inline" src="/static/img/success.svg"/>
+				Senha definida com sucesso.
+			</span>
+		</div>
+	</template>
+}
+
+templ editPasswordTemplate() {
+	<template x-if="edit" x-init="$watch('edit', () => htmx.process(htmx.find('#contact-info-form')))">
+		<div
+			class="flex flex-col space-y-3 w-full"
+		>
+			<div class="flex w-full">
+				<span class="text-xl font-medium">Redefinir Senha</span>
+				<button
+					x-on:click="edit = !edit"
+					class="ml-auto"
+				>
+					<img class="opacity-40 hover:opacity-100 size-8" src="/static/img/close.svg"/>
+				</button>
+			</div>
+			<form
+				id="contact-info-form"
+				hx-patch="/settings/security/password"
+				hx-target="#generic-settings-div"
+				hx-target-error="#error-alert"
+				class="flex flex-col space-y-3 w-full"
+			>
+				<label class="text-sm font-normal text-left text-gray-500">
+					Senha Atual
+					<input
+						type="password"
+						name="old"
+						class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+					/>
+				</label>
+				<label class="text-sm font-normal text-left text-gray-500">
+					Nova Senha
+					<input
+						type="password"
+						name="new"
+						class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+					/>
+				</label>
+				<label class="text-sm font-normal text-left text-gray-500">
+					Repita a nova senha
+					<input
+						type="password"
+						name="repeat"
+						class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+					/>
+				</label>
+				<!-- <span id="error-alert"></span> -->
+				<div class="flex space-x-3">
+					<button
+						type="submit"
+						class="py-1 px-3 w-fit font-normal text-base rounded-md text-white bg-[#FFBD59]"
+					>
+						Atualizar
+					</button>
+					<button
+						x-on:click="edit = !edit"
+						class="text-base font-normal w-fit"
+					>
+						Cancelar
+					</button>
+				</div>
+			</form>
+		</div>
+	</template>
+}

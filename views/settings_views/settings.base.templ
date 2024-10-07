@@ -8,7 +8,7 @@ import (
 templ Base(title string, loggedUser repositories.User, cmp templ.Component) {
 	@layout.Base(title, loggedUser, true) {
 		<div
-			x-data="{ state: 'menu', selected: 'profile' }"
+			x-data="{ state: 'menu', selected: 'security' }"
 			x-init="state = window.innerWidth > 810 ? 'all' : 'menu'"
 			class="bg-[#F0F2F5] flex overflow-y-scroll justify-center items-center py-5 px-5 2xl:px-16  lg:space-x-2 w-full grow"
 		>
@@ -54,7 +54,6 @@ templ SettingsMenu() {
 			<button
 				hx-get="/settings/profile"
 				hx-target="#generic-settings-div"
-				hx-trigger="load, click"
 				x-on:click="selected = 'profile'; if(state != 'all'){ state = 'generic'; }"
 				x-bind:style="selected == 'profile' && { 'border-left': '4px solid #ED6C09', 'opacity': '1', 'background-color': '#fff9ed'  }"
 				class="flex py-2 px-4 w-full border-b border-gray-200 border-solid opacity-60 cursor-pointer hover:opacity-100"
@@ -66,6 +65,7 @@ templ SettingsMenu() {
 			<button
 				hx-get="/settings/security"
 				hx-target="#generic-settings-div"
+				hx-trigger="load, click"
 				x-on:click="selected = 'security'; if(state != 'all'){ state = 'generic'; }"
 				x-bind:style="selected == 'security' && { 'border-left': '4px solid #ED6C09', 'opacity': '1', 'background-color': '#fff9ed'  }"
 				class="flex py-2 px-4 w-full border-b border-gray-200 border-solid opacity-60 cursor-pointer hover:opacity-100"
@@ -91,12 +91,6 @@ templ SettingsGenericWindow(cmp templ.Component) {
 				<h1 class="mt-1 text-xl font-normal text-gray-400">Nenhuma configuração selecionada</h1>
 			</div>
 		}
-	</div>
-}
-
-templ SecuritySettings() {
-	<div class="flex flex-col justify-center items-center p-4 w-full h-full text-center">
-		Security Settings
 	</div>
 }
 
