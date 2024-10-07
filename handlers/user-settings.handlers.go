@@ -62,12 +62,10 @@ func (uh *UserHandler) GetProfileSettings(c echo.Context) error {
 
 func (uh *UserHandler) GetSecuritySettings(c echo.Context) error {
 
-	loggedUser := c.Get("user").(repositories.User)
-
 	if c.Request().Header.Get("HX-Request") != "true" {
 		c.Response().Header().Set("HX-redirect", "/settings")
 		return c.NoContent(http.StatusMovedPermanently)
 	}
 
-	return uh.View(c, settings_views.SecuritySettings(loggedUser))
+	return uh.View(c, settings_views.SecuritySettings())
 }
