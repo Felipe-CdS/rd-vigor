@@ -165,11 +165,23 @@ templ baseNavbar(user repositories.User) {
 		>
 			<img class="mr-2 opacity-50 size-5" src="/static/img/events.svg"/> Eventos
 		</a>
-		<a class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
+		<a
+			href="/courses"
+			class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
+		>
+			<img class="opacity-50 size-6" src="/static/img/school.svg"/> Cursos
+		</a>
+		<a
+			href="/inbox"
+			class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
+		>
 			<img class="mr-2 opacity-50 size-5" src="/static/img/mail.svg"/> Mensagens
 		</a>
-		<a class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
-			<img class="mr-2 opacity-50 size-5" src="/static/img/group.svg"/> Núcleos
+		<a
+			href="/calendar"
+			class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
+		>
+			<img class="opacity-50 size-6" src="/static/img/calendar.svg"/> Agenda
 		</a>
 		<a
 			href={ templ.URL(fmt.Sprintf("/user/%s", user.Username)) }
@@ -183,9 +195,12 @@ templ baseNavbar(user repositories.User) {
 			<button class="lg:hidden flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
 				<img class="mr-1 w-6 opacity-50" src="/static/img/notification.svg"/> Notificações
 			</button>
-			<button class="lg:!mt-0 flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
+			<a
+				href="/settings"
+				class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
+			>
 				<img class="mr-1 w-6 opacity-50" src="/static/img/settings.svg"/> Configurações
-			</button>
+			</a>
 			<a
 				href="/admin/dashboard/users"
 				class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
