@@ -23,7 +23,7 @@ templ InboxList() {
 			hx-get="/chatroom/list"
 			hx-trigger="load"
 			id="recipients-list"
-			class="w-full"
+			class="overflow-y-scroll w-full"
 			x-data="{selectedRecipient: ''}"
 		></div>
 	</div>

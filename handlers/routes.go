@@ -76,6 +76,9 @@ func SetupRoutes(e *echo.Echo,
 	e.GET("/calendar", authMiddleware(uh, uh.GetCalendar))
 
 	/* INBOX ROUTES*/
+	e.GET("/courses", authMiddleware(uh, eh.GetCoursesSearchPage))
+
+	/* INBOX ROUTES*/
 
 	e.GET("/inbox", authMiddleware(uh, ch.GetInboxBase))
 	e.POST("/chatroom/new", authMiddleware(uh, ch.CreateChatroom))

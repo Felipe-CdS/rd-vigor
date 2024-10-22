@@ -1,17 +1,52 @@
 package user_views
 
 import (
+	"fmt"
 	"nugu.dev/rd-vigor/repositories"
 	"nugu.dev/rd-vigor/views/layout"
 )
 
 templ Calendar(title string, loggedUser repositories.User) {
 	@layout.Base(title, loggedUser, true) {
-		<div class="overflow-x-hidden flex flex-col py-5 px-5 lg:px-12 2xl:px-64 w-full grow overflow-y-scroll bg-[#F0F2F5]">
-			<div class="flex items-center">
+		<div class="overflow-x-scroll flex flex-col py-5 px-5 lg:px-12 2xl:px-64 w-full grow overflow-y-scroll bg-[#F0F2F5]">
+			<div class="flex items-center mb-2">
 				<img class="inline -mr-2 w-10" src="/static/img/slash.svg"/>
 				<span class="text-3xl font-bold">Calendário</span>
 			</div>
+			<div class="flex flex-col space-y-3 w-full h-full md:flex-row md:space-y-0 md:space-x-3">
+				@today()
+				<div
+					class="grid grid-cols-7 w-full h-full bg-white rounded-xl border border-gray-200 border-solid lg:w-8/12 2xl:w-10/12 card-shadow"
+				>
+					<div class="p-3">Seg</div>
+					<div class="p-3">Ter</div>
+					<div class="p-3">Qua</div>
+					<div class="p-3">Qui</div>
+					<div class="p-3">Sex</div>
+					<div class="p-3">Sáb</div>
+					<div class="p-3">Dom</div>
+					for i := 0; i < 5; i++ {
+						for j := 1; j < 8; j++ {
+							<div class="p-3">
+								{ fmt.Sprintf("%d", ((i * 7) + j)) }
+							</div>
+						}
+					}
+				</div>
+			</div>
 		</div>
 	}
+}
+
+templ today() {
+	<div
+		class="flex-col w-full h-full text-left bg-white rounded-xl border border-gray-200 border-solid lg:flex lg:w-3/12 2xl:w-2/12 card-shadow"
+	>
+		<div class="flex items-center py-3 px-5 w-full rounded-t-xl border-b border-gray-200 border-solid">
+			<h1 class="text-2xl font-semibold">Hoje</h1>
+		</div>
+		<div class="flex items-center py-3 px-4 w-full text-sm font-normal text-center text-gray-500">
+			<span>Sem compromissos marcados para hoje.</span>
+		</div>
+	</div>
 }

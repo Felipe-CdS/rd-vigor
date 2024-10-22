@@ -4,6 +4,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 	"nugu.dev/rd-vigor/repositories"
+	"nugu.dev/rd-vigor/views/courses_views"
 	"nugu.dev/rd-vigor/views/events_views"
 )
 
@@ -30,6 +31,11 @@ func (eh *EventHandler) GetEventDetails(c echo.Context) error {
 
 	loggedUser := c.Get("user").(repositories.User)
 	return eh.View(c, events_views.EventDetails(loggedUser))
+}
+
+func (eh *EventHandler) GetCoursesSearchPage(c echo.Context) error {
+	loggedUser := c.Get("user").(repositories.User)
+	return eh.View(c, courses_views.CoursesSearch(loggedUser))
 }
 
 func (eh *EventHandler) View(c echo.Context, cmp templ.Component) error {

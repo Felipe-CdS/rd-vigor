@@ -1,0 +1,97 @@
+package events_views
+
+import (
+	"nugu.dev/rd-vigor/repositories"
+	"nugu.dev/rd-vigor/views/layout"
+)
+
+templ EventDetails1(user repositories.User) {
+	@layout.Base("Eventos", user, true) {
+		<div class="space-y-3 flex flex-col py-5 px-5 lg:px-12 2xl:px-64 w-full h-[calc(100vh-4rem)] overflow-y-scroll bg-[#F0F2F5]">
+			<!-- UP -->
+			<div class="flex flex-col w-full">
+				<h1 class="mb-1 text-xs text-gray-500">
+					<span class="text-gray-900">Evento / </span>
+					Negócios e Inteligência Relacional
+				</h1>
+				<h1 class="mb-2 text-2xl font-bold text-gray-900">
+					<a href="/events">
+						<img class="inline rotate-180 size-8" src="/static/img/arrow-right-2.svg"/>
+					</a>
+					Detalhes do Evento
+				</h1>
+				<!-- ################################################################################# -->
+				<div
+					class="w-full bg-center bg-cover rounded-t-md border border-b-0 border-gray-200 border-solid min-h-52 card-shadow"
+					style="background-image: url(/static/img/events-2.png);"
+				></div>
+				<div class="flex flex-col p-6 w-full bg-white rounded-b-md border border-gray-200 border-solid min-h-64 card-shadow">
+					<h1 class="mb-2 text-xl font-bold text-gray-900 md:text-3xl">Negócios e Inteligência Relacional</h1>
+					<p class="text-xs font-normal text-justify md:text-sm">
+						&emsp;&emsp;Participe do evento "Negócios e Inteligência Relacional", uma oportunidade única de descobrir um projeto inovador que promete transformar a maneira como as empresas se conectam e colaboram. Durante o encontro, apresentaremos um site desenvolvido especialmente para facilitar o networking entre empreendedores, profissionais e organizações de diversos setores.
+						<br/>
+						&emsp;&emsp;Neste evento, você terá a chance de explorar as funcionalidades do nosso site, que não apenas otimiza a criação de parcerias estratégicas, mas também proporciona um espaço para o compartilhamento de conhecimentos e experiências. Além das apresentações, haverá painéis de discussão com especialistas em networking e inteligência relacional, proporcionando insights valiosos sobre como maximizar suas conexões. Venha se inspirar, interagir e expandir sua rede de contatos de forma eficaz e inovadora! Junte-se a nós e descubra como fortalecer seus negócios por meio de relacionamentos mais inteligentes e colaborativos. Não perca essa chance de estar à frente no mundo empresarial!
+					</p>
+				</div>
+			</div>
+			<!-- Right -->
+			<div class="flex flex-col space-y-3 w-full md:flex-row md:space-y-0 md:space-x-3 h-3/12">
+				<div class="flex flex-col space-y-3 w-full md:w-4/12">
+					<div class="flex flex-col py-4 px-4 w-full bg-white rounded-md border border-gray-200 border-solid h-fit card-shadow">
+						<div class="flex items-center w-full text-xs font-normal h-fit">
+							<img class="mr-2 opacity-50 size-7" src="/static/img/map.svg"/>
+							<div class="flex flex-col">
+								<span class="text-sm font-medium text-gray-400">Local</span>
+								<span>Praça Pio X, 79 - 2º andar</span>
+								<span>Centro - Rio de Janeiro</span>
+							</div>
+						</div>
+					</div>
+					<div class="flex flex-col py-4 px-4 w-full bg-white rounded-md border border-gray-200 border-solid h-fit card-shadow">
+						<div class="flex items-center w-full text-xs font-normal h-fit">
+							<img class="mr-2 opacity-50 size-7" src="/static/img/clock.svg"/>
+							<div class="flex flex-col">
+								<span class="text-sm font-medium text-gray-400">Data</span>
+								<span>13 de agosto de 2024</span>
+								<span>a partir das 09:00h</span>
+							</div>
+						</div>
+					</div>
+					<div
+						class="flex justify-center items-center w-full"
+					>
+						<button class="rounded-lg card-shadow bg-[#ffbd59] text-white px-2 py-2 flex grow justify-center">Confirmar</button>
+						<button class="grid justify-center items-center ml-3 bg-white rounded-full card-shadow size-10">
+							<img class="size-6" src="/static/img/star.svg"/>
+						</button>
+					</div>
+				</div>
+				<!-- ################################################################################# -->
+				<div
+					class="flex relative flex-col py-4 px-4 w-full text-left bg-white rounded-md border border-gray-200 border-solid md:w-5/12 h-fit card-shadow"
+				>
+					<div class="flex flex-col w-full text-sm font-medium h-fit">
+						<span class="mb-1 text-gray-400">Palestrantes do evento</span>
+						<span class="mb-1">Williams Ramalho</span>
+						<p
+							class="overflow-hidden mb-3 text-xs font-normal text-justify text-ellipsis"
+							style="display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical"
+						>Formação em administração de empresas, marketing e análise de sistemas atuando como consultor empresarial levando soluções que visam ampliar o resultado de empresas. Com mais de 25 anos de experiência é diretor de desenvolvimento e expansão do Instituto Quintal, organização do terceiro setor com ações voltadas à educação e preservação do meio ambiente que promove ações públicas e privadas oferecendo soluções relevantes para a vida das pessoas e empresas sobre meio ambiente e educação.</p>
+						<img class="bg-gray-200 rounded-xl size-12" src="/static/img/williams.webp"/>
+					</div>
+				</div>
+				<!-- ################################################################################# -->
+				<div
+					class="flex overflow-hidden w-full rounded-md border border-gray-200 border-solid md:w-4/12 grow card-shadow"
+				>
+					<iframe
+						class="w-full h-full"
+						src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1837.6611426153117!2d-43.178432455100584!3d-22.901480656755396!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x997f592c15c54f%3A0x9575718825711b92!2sPra%C3%A7a%20Pio%20X%2C%2079%20-%202%C2%BA%20andar%20-%20Centro%2C%20Rio%20de%20Janeiro%20-%20RJ%2C%2020040-020!5e0!3m2!1sen!2sbr!4v1723061267284!5m2!1sen!2sbr"
+						loading="lazy"
+						referrerpolicy="no-referrer-when-downgrade"
+					></iframe>
+				</div>
+			</div>
+		</div>
+	}
+}
