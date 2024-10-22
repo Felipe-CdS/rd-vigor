@@ -20,6 +20,7 @@ func SetupRoutes(e *echo.Echo,
 	ch *ChatroomHandler,
 ) {
 
+	e.GET("/", authMiddleware(uh, uh.GetHome))
 	e.GET("/home", authMiddleware(uh, uh.GetHome))
 
 	e.GET("/ws-chatroom/:chatroom_id", authMiddleware(
