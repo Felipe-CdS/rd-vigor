@@ -32,7 +32,7 @@ async function handleSubmit(e, elements) {
 
   const { error } = await stripe.confirmPayment({
     elements,
-    confirmParams: { return_url: "http://localhost:7331/settings/billing" },
+    confirmParams: { return_url: "http://rdvigor.com.br/settings/billing" },
   });
 
   setLoading(false);
