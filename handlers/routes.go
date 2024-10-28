@@ -59,15 +59,19 @@ func SetupRoutes(e *echo.Echo,
 
 	e.GET("/user/:username", authMiddleware(uh, uh.GetUserProfile))
 	e.POST("/user/tags", authMiddleware(uh, uh.SetUserTag))
+
 	e.GET("/admin/dashboard/users", authMiddleware(uh, uh.GetAdminUserList))
 	e.GET("/admin/dashboard/users/details", authMiddleware(uh, uh.GetUserDetails))
 	e.GET("/admin/dashboard/tags", authMiddleware(uh, th.GetTagDashboard))
 	e.POST("/admin/dashboard/tags", authMiddleware(uh, th.CreateNewTag))
+
 	/* EVENTS ROUTES*/
 
 	e.GET("/events", authMiddleware(uh, eh.GetEventSearchPage))
 	e.GET("/event/:event_id", authMiddleware(uh, eh.GetEventDetails))
 
+	/* SEARCH ROUTES*/
+	e.GET("/search", authMiddleware(uh, uh.SearchUsersByTag))
 	e.POST("/users/search", authMiddleware(uh, uh.SearchUserByAny))
 	e.POST("/tags/search", authMiddleware(uh, th.SearchTagByName))
 	e.POST("/navbar/search", authMiddleware(uh, th.SearchTagNavbar))

@@ -14,6 +14,7 @@ import (
 	"nugu.dev/rd-vigor/views/auth_views"
 	"nugu.dev/rd-vigor/views/home_views"
 	"nugu.dev/rd-vigor/views/inbox_views"
+	"nugu.dev/rd-vigor/views/search_views"
 	"nugu.dev/rd-vigor/views/settings_views"
 	"nugu.dev/rd-vigor/views/user_views"
 )
@@ -25,6 +26,7 @@ type UserService interface {
 
 	GetAllUsers() ([]repositories.User, *services.ServiceLayerErr)
 	GetUsersByAny(any string) ([]repositories.User, *services.ServiceLayerErr)
+	GetUsersByTagID(any string) ([]repositories.User, *services.ServiceLayerErr)
 
 	GetUserByID(id string) (repositories.User, *services.ServiceLayerErr)
 	GetUserByUsername(username string) (repositories.User, *services.ServiceLayerErr)
@@ -321,6 +323,19 @@ func (uh *UserHandler) SearchUserByAny(c echo.Context) error {
 	}
 
 	return uh.View(c, inbox_views.SearchUserFormOptions(found))
+}
+
+func (uh *UserHandler) SearchUsersByTag(c echo.Context) error {
+
+	loggedUser := c.Get("user").(repositories.User)
+	t := c.QueryParam("t")
+
+	found, err := uh.UserServices.GetUsersByTagID(t)
+
+	if err != nil {
+	}
+
+	return uh.View(c, search_views.Base(loggedUser, found, "programador"))
 }
 
 func (uh *UserHandler) UpdateUserAccountInfo(c echo.Context) error {

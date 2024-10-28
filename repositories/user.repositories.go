@@ -240,6 +240,43 @@ func (ur *UserRepository) GetUsersByAny(any string) ([]User, error) {
 	return users, nil
 }
 
+func (ur *UserRepository) GetUsersByTagID(tagId string) ([]User, error) {
+
+	var users []User
+
+	stmt := `SELECT id, username, first_name, last_name, email, occupation_area
+		FROM users
+		WHERE id
+		IN (
+			SELECT fk_user_id
+			FROM users_tags
+			WHERE fk_tag_id = $1
+		);`
+
+	rows, err := ur.UserStore.Db.Query(stmt, tagId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var usr User
+		if err = rows.Scan(
+			&usr.ID,
+			&usr.Username,
+			&usr.FirstName,
+			&usr.LastName,
+			&usr.Email,
+			&usr.OccupationArea,
+		); err != nil {
+			return nil, err
+		}
+		users = append(users, usr)
+	}
+
+	return users, nil
+}
+
 func (ur *UserRepository) GetUserByEmail(email string) (User, *RepositoryLayerErr) {
 
 	var usr User
