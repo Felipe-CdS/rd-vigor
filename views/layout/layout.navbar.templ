@@ -46,7 +46,7 @@ templ Navbar(user repositories.User, isLogged bool) {
 					class="flex items-center px-2 w-3/12 bg-gray-200 rounded-md group"
 				>
 					<img class="mr-2 w-6 opacity-50" src="/static/img/search-2.svg"/>
-					<span class="text-gray-500 transition group-hover:text-gray-800">Pesquisar</span>
+					<span class="font-normal text-gray-500 transition group-hover:text-gray-800">Buscar</span>
 				</button>
 				<a
 					href="/home"
@@ -295,9 +295,9 @@ templ SearchModal() {
 			</div>
 			<div
 				id="search-navbar-results"
-				class="flex overflow-y-scroll flex-col justify-center items-center w-full border-b border-gray-200 border-solid max-h-4/6 min-h-40"
+				class="flex overflow-y-scroll flex-col justify-center items-center w-full font-normal text-gray-400 border-b border-gray-200 border-solid max-h-4/6 min-h-40"
 			>
-				<h1 class="font-normal text-gray-400">Sem pesquisas recentes </h1>
+				<h1>Sem pesquisas recentes </h1>
 			</div>
 		</div>
 	</div>
@@ -305,35 +305,24 @@ templ SearchModal() {
 
 templ SearchModalResponsePartial(list []repositories.Tag, input string) {
 	if len(input) == 0 {
-		<h1 class="font-normal text-gray-400">Sem pesquisas recentes </h1>
+		<h1>Sem pesquisas recentes </h1>
 	} else if len(list) == 0 {
-		<h1 class="font-normal text-gray-400">Sem resultados para "{ input }"</h1>
+		<h1>Sem resultados para "{ input }"</h1>
 	} else {
-		<h1 class="block pl-6 mb-2 w-full text-sm font-normal text-left text-gray-400">Especialidades</h1>
+		<h1 class="block pl-6 mb-2 w-full text-sm text-left">Especialidades</h1>
 		<div class="flex flex-col px-2 space-y-1 w-full">
 			for _, t := range list {
-				<div class="flex px-4 cursor-pointer py-2 w-full text-lg font-semibold rounded-md text-white bg-[#FFBD59] hover:bg-[#fea439]">
+				<a
+					href={ templ.SafeURL(fmt.Sprintf("search?t=%s", t.ID)) }
+					class="flex items-center px-4 cursor-pointer py-2 w-full rounded-md text-white bg-[#FFBD59] hover:bg-[#fea439]"
+				>
 					<img class="w-8 brightness-200 invert" src="/static/img/hashtag.svg"/>
-					<div class="flex flex-col">
-						<p class="text-base font-medium text-white">{ t.Name }</p>
-						<span class="text-xs font-normal text-white underline">TI</span>
-					</div>
+					<span class="text-base font-medium text-white">{ t.Name }</span>
 					<img class="ml-auto w-4 brightness-200" src="/static/img/arrow-right.svg"/>
-				</div>
+				</a>
 			}
 		</div>
-		<h1 class="block pl-6 mt-6 mb-2 w-full text-sm font-normal text-left text-gray-400">Outras Categorias</h1>
-		<div class="flex flex-col px-2 mb-4 space-y-1 w-full">
-			for _, t := range list {
-				<div class="flex px-4 cursor-pointer py-2 w-full text-lg font-semibold rounded-md text-white bg-[#FFBD59] hover:bg-[#fea439]">
-					<img class="w-8 brightness-200 invert" src="/static/img/hashtag.svg"/>
-					<div class="flex flex-col">
-						<p class="text-base font-medium text-white">{ t.Name }</p>
-						<span class="text-xs font-normal text-white underline">TI</span>
-					</div>
-					<img class="ml-auto w-4 brightness-200" src="/static/img/arrow-right.svg"/>
-				</div>
-			}
-		</div>
+		<h1 class="block pl-6 mt-6 w-full text-sm text-left">Usuários</h1>
+		<h1 class="block pl-6 mt-1 mb-3 w-full text-sm">Sem usuários encontrados com esse nome.</h1>
 	}
 }
