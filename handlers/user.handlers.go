@@ -40,16 +40,20 @@ type UserService interface {
 	SearchTagByNameAvaiableToUser(user repositories.User, query string) ([]repositories.Tag, *services.ServiceLayerErr)
 }
 
-func NewUserHandler(us UserService, es EventService) *UserHandler {
+func NewUserHandler(us UserService, es EventService, ps PortifolioService, ts TagService) *UserHandler {
 	return &UserHandler{
-		UserServices:  us,
-		EventServices: es,
+		UserServices:       us,
+		EventServices:      es,
+		PortifolioServices: ps,
+		TagServices:        ts,
 	}
 }
 
 type UserHandler struct {
-	UserServices  UserService
-	EventServices EventService
+	UserServices       UserService
+	EventServices      EventService
+	PortifolioServices PortifolioService
+	TagServices        TagService
 }
 
 func (uh *UserHandler) CreateNewUser(c echo.Context) error {
@@ -219,12 +223,20 @@ func (uh *UserHandler) GetUserProfile(c echo.Context) error {
 		return c.NoContent(http.StatusMovedPermanently)
 	}
 
+	portifolios, queryErr := uh.PortifolioServices.GetUserPortifolios(usr)
+
+	if queryErr != nil {
+		c.Response().Header().Set("HX-redirect", "/admin/dashboard/users")
+		return c.NoContent(http.StatusMovedPermanently)
+	}
+
 	return uh.View(c,
 		user_views.UserProfile(
 			fmt.Sprintf("%s %s", usr.FirstName, usr.LastName),
 			loggedUser,
 			usr,
 			tags,
+			portifolios,
 		))
 }
 
@@ -331,14 +343,38 @@ func (uh *UserHandler) SearchUserByAny(c echo.Context) error {
 func (uh *UserHandler) SearchUsersByTag(c echo.Context) error {
 
 	loggedUser := c.Get("user").(repositories.User)
+
 	t := c.QueryParam("t")
 
-	found, err := uh.UserServices.GetUsersByTagID(t)
+	tag, err := uh.TagServices.GetTagByID(t)
 
 	if err != nil {
 	}
 
-	return uh.View(c, search_views.Base(loggedUser, found, "programador"))
+	foundUsers, err := uh.UserServices.GetUsersByTagID(t)
+
+	if err != nil {
+	}
+
+	userPlusTags := []search_views.UserAndTagsStruct{}
+
+	for _, f := range foundUsers {
+
+		foundTags, err := uh.UserServices.GetUserTags(f)
+
+		if err != nil {
+			foundTags = []repositories.Tag{}
+		}
+
+		x := search_views.UserAndTagsStruct{
+			User: f,
+			Tags: foundTags,
+		}
+
+		userPlusTags = append(userPlusTags, x)
+	}
+
+	return uh.View(c, search_views.Base(loggedUser, userPlusTags, tag.Name))
 }
 
 func (uh *UserHandler) UpdateUserAccountInfo(c echo.Context) error {

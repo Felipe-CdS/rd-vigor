@@ -17,6 +17,7 @@ type TagService interface {
 	CreateTag(n string) *services.ServiceLayerErr
 	SearchTagByName(n string) ([]repositories.Tag, *services.ServiceLayerErr)
 	GetAllTags() ([]repositories.Tag, *services.ServiceLayerErr)
+	GetTagByID(id string) (repositories.Tag, *services.ServiceLayerErr)
 	GetUserTags(u repositories.User) ([]repositories.Tag, *services.ServiceLayerErr)
 }
 

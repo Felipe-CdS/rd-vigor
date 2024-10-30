@@ -86,6 +86,10 @@ templ eventCard(e repositories.Event) {
 					<img class="mr-1 opacity-50 size-5" src="/static/img/clock.svg"/>
 					<span>{ fmt.Sprintf("%s", e.Date.Local().Format(time.RFC822)) } </span>
 				</span>
+				<span class="flex items-center mt-1">
+					<img class="mr-1 opacity-50 size-5" src="/static/img/money.svg"/>
+					<span>Entrada Gratuita</span>
+				</span>
 			</div>
 		</div>
 		<!-- Mobile -->
@@ -115,6 +119,10 @@ templ eventCard(e repositories.Event) {
 					<span class="col-span-2">
 						<img class="inline opacity-50 size-5" src="/static/img/map.svg"/>
 						<span class="mt-auto">{ e.Address }</span>
+					</span>
+					<span class="col-span-2">
+						<img class="mr-1 opacity-50 size-5" src="/static/img/money.svg"/>
+						<span>Entrada Gratuita</span>
 					</span>
 				</div>
 				<div class="flex justify-end mt-4 w-full">
