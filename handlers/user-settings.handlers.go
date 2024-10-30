@@ -34,9 +34,9 @@ func (uh *UserHandler) GetContactInfoSettings(c echo.Context) error {
 
 func (uh *UserHandler) GetBillingSettings(c echo.Context) error {
 
+	loggedUser := c.Get("user").(repositories.User)
 	if c.Request().Header.Get("HX-Request") != "true" {
 
-		loggedUser := c.Get("user").(repositories.User)
 		txResult := c.QueryParam("payment_intent_client_secret")
 
 		return uh.View(c,
@@ -47,7 +47,7 @@ func (uh *UserHandler) GetBillingSettings(c echo.Context) error {
 			))
 	}
 
-	return uh.View(c, settings_views.BillingSettings())
+	return uh.View(c, settings_views.BillingSettings(loggedUser.SubscriptionStatus))
 }
 
 func (uh *UserHandler) GetProfileSettings(c echo.Context) error {

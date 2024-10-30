@@ -176,6 +176,14 @@ func createMigrations(db *sql.DB) error {
 		return fmt.Errorf("failed to create statement 8... Error: %s", err)
 	}
 
+	statement = `ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status BOOLEAN DEFAULT false NOT NULL;`
+
+	_, err = db.Exec(statement)
+
+	if err != nil {
+		return fmt.Errorf("failed to create statement 9... Error: %s", err)
+	}
+
 	statement = `CREATE TABLE IF NOT EXISTS portifolios ( 
 		portifolio_id UUID PRIMARY KEY
 		, fk_user_id UUID NOT NULL
@@ -187,7 +195,7 @@ func createMigrations(db *sql.DB) error {
 	_, err = db.Exec(statement)
 
 	if err != nil {
-		return fmt.Errorf("failed to create statement 9... Error: %s", err)
+		return fmt.Errorf("failed to create statement 10... Error: %s", err)
 	}
 
 	return nil

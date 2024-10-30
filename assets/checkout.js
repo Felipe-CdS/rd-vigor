@@ -1,5 +1,5 @@
 const stripe = Stripe(
-  "pk_test_51PtsLPP4MxIMgAth8ymcxGIUDZTilzzf9nOFiwkmXTKyT149RsxH4kXW9CKvUEt6jI02Pq5h8kVtaXfNlMI4RRXF00bT3of6po",
+  "pk_test_51QFd8CEO8E0VEaQp05Z8YVdz8jLpOjZTMAyJkqMV5Ff7K6gWvKjc3GXBq9GuYOIwY4Gt6DXv4VYRyUFLiBzr7Mbf00wr244bLd",
   { locale: "pt-BR" },
 );
 
@@ -32,7 +32,7 @@ async function handleSubmit(e, elements) {
 
   const { error } = await stripe.confirmPayment({
     elements,
-    confirmParams: { return_url: "http://rdvigor.com.br/settings/billing" },
+    confirmParams: { return_url: `${window.location.origin}/settings/billing` },
   });
 
   setLoading(false);

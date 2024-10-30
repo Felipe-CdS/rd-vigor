@@ -2,7 +2,7 @@ package settings_views
 
 import "fmt"
 
-templ BillingSettings() {
+templ BillingSettings(subscriptionStatus bool) {
 	<div class="flex overflow-y-scroll flex-col p-5 space-y-3 w-full h-full text-center">
 		<h1 class="hidden font-semibold lg:block lg:text-2xl text-start">Inscrição Afiliado</h1>
 		<button
@@ -14,10 +14,21 @@ templ BillingSettings() {
 		</button>
 		<!-- ############################################################################################### -->
 		<div
-			x-data="{ checkout: false }"
+			x-data={ fmt.Sprintf("{ member: %t, checkout: false }", subscriptionStatus) }
 			class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
 		>
-			<template x-if="!checkout">
+			<template x-if="member">
+				<div class="flex flex-col space-y-3 w-full">
+					<div class="flex w-full">
+						<span class="text-xl font-medium">Situação Atual</span>
+					</div>
+					<span class="text-base font-normal text-start">
+						<p class="text-xs opacity-50">Inscrição</p>
+						Sua afiliação na RD Vigor está ativa no momento e você pode aproveitar as vantagens da RD Vigor.
+					</span>
+				</div>
+			</template>
+			<template x-if="!member && !checkout">
 				<div class="flex flex-col space-y-3 w-full">
 					<div class="flex w-full">
 						<span class="text-xl font-medium">Situação Atual</span>
@@ -35,7 +46,7 @@ templ BillingSettings() {
 				</div>
 			</template>
 			<template
-				x-if="checkout"
+				x-if="!member && checkout"
 				x-data="{ checkoutState: 'loading' }"
 				x-init="$watch('checkout', async () => { checkoutState = await window.initializeStripe(); })"
 			>

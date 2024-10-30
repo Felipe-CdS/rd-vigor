@@ -28,6 +28,7 @@ type UserRepository interface {
 	GetUsersByTagID(tagId string) ([]repositories.User, error)
 
 	GetUserByID(id string) (repositories.User, error)
+	GetUserByStripeID(id string) (repositories.User, error)
 	GetUserByEmail(email string) (repositories.User, *repositories.RepositoryLayerErr)
 	GetUserByUsername(username string) (repositories.User, *repositories.RepositoryLayerErr)
 	GetUserPasswordByID(id string) (string, *repositories.RepositoryLayerErr)
@@ -104,6 +105,16 @@ func (us *UserService) GetAllUsers() ([]repositories.User, *ServiceLayerErr) {
 func (us *UserService) GetUserByID(id string) (repositories.User, *ServiceLayerErr) {
 
 	users, err := us.Repository.GetUserByID(id)
+
+	if err != nil {
+		return repositories.User{}, &ServiceLayerErr{err, "Query Err", http.StatusInternalServerError}
+	}
+	return users, nil
+}
+
+func (us *UserService) GetUserByStripeID(id string) (repositories.User, *ServiceLayerErr) {
+
+	users, err := us.Repository.GetUserByStripeID(id)
 
 	if err != nil {
 		return repositories.User{}, &ServiceLayerErr{err, "Query Err", http.StatusInternalServerError}

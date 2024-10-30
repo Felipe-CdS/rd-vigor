@@ -115,7 +115,12 @@ func SetupRoutes(e *echo.Echo,
 	e.DELETE("/settings/profile/portifolio", authMiddleware(uh, ph.DeletePortifolio))
 
 	/* STRIPE ROUTES*/
-	e.POST("/create-subscription", authMiddleware(uh, HandleCreateSubscrition))
+	e.POST("/create-subscription", authMiddleware(uh, HandleCreateSubscription))
+
+	e.POST("/stripe-webhook", func(c echo.Context) error {
+		HandleWebhook(c, uh)
+		return nil
+	})
 }
 
 func signupFormDone(c echo.Context) error {
@@ -154,6 +159,19 @@ func authMiddleware(uh *UserHandler, next echo.HandlerFunc) echo.HandlerFunc {
 
 		if loggedUser.Role != "admin" {
 			return c.Redirect(http.StatusMovedPermanently, "/signin")
+		}
+
+		if loggedUser.StripeID == "" {
+			stripeId, err := CreateStripeCostumer(loggedUser)
+
+			if err != nil {
+				return c.Redirect(http.StatusMovedPermanently, "/signin")
+			}
+
+			u := loggedUser
+			u.StripeID = stripeId
+
+			uh.UserServices.UpdateUser(loggedUser, u)
 		}
 
 		return next(c)
