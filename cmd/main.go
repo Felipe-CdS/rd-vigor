@@ -51,7 +51,7 @@ func main() {
 	ms := services.NewMessageService(mr)
 
 	th := handlers.NewTagHandler(ts, us)
-	uh := handlers.NewUserHandler(us)
+	uh := handlers.NewUserHandler(us, es)
 	eh := handlers.NewEventHandler(es)
 	ph := handlers.NewPortifolioHandler(ps)
 	ch := handlers.NewChatroomHandler(cs, us, ms)

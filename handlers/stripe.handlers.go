@@ -56,6 +56,7 @@ func CreatePaymentIntent(c echo.Context) error {
 	return c.JSONBlob(http.StatusOK, buf.Bytes())
 }
 
+// https://docs.stripe.com/billing/subscriptions/overview
 func HandleCreateSubscription(c echo.Context) error {
 
 	loggedUser := c.Get("user").(repositories.User)
@@ -116,6 +117,9 @@ func CreateStripeCostumer(loggedUser repositories.User) (string, error) {
 
 	return result.ID, nil
 }
+
+// https://docs.stripe.com/billing/subscriptions/build-subscriptions?platform=web&ui=elements#webhooks
+// https://docs.stripe.com/webhooks
 
 func HandleWebhook(c echo.Context, uh *UserHandler) error {
 

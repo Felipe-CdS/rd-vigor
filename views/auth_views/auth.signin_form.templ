@@ -3,8 +3,7 @@ package auth_views
 templ SigninForm() {
 	<form
 		hx-post="/signin"
-		hx-target="#form-box"
-		hx-target-3xx="body"
+		hx-target="body"
 		hx-target-4xx="#error-alert"
 		hx-push-url="true"
 		class="flex flex-col space-y-3 w-full"

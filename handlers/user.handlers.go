@@ -40,14 +40,16 @@ type UserService interface {
 	SearchTagByNameAvaiableToUser(user repositories.User, query string) ([]repositories.Tag, *services.ServiceLayerErr)
 }
 
-func NewUserHandler(us UserService) *UserHandler {
+func NewUserHandler(us UserService, es EventService) *UserHandler {
 	return &UserHandler{
-		UserServices: us,
+		UserServices:  us,
+		EventServices: es,
 	}
 }
 
 type UserHandler struct {
-	UserServices UserService
+	UserServices  UserService
+	EventServices EventService
 }
 
 func (uh *UserHandler) CreateNewUser(c echo.Context) error {
@@ -137,10 +139,9 @@ func (uh *UserHandler) SigninUser(c echo.Context) error {
 			}
 
 			if claims.Role == "admin" {
-				return c.Redirect(http.StatusMovedPermanently, "/admin/dashboard/users")
 			}
 
-			return c.Redirect(http.StatusMovedPermanently, "/user/home")
+			return c.Redirect(http.StatusMovedPermanently, "/home")
 		}
 
 		cmp := auth_views.Base("Login or sign up", auth_views.SigninForm())
@@ -150,24 +151,16 @@ func (uh *UserHandler) SigninUser(c echo.Context) error {
 	if c.Request().Method == "POST" {
 		usr, err := uh.UserServices.AuthUser(c.FormValue("login"), c.FormValue("password"))
 
-		fmt.Println(err)
-
 		if err != nil {
 			c.Response().WriteHeader(err.Code)
 			return uh.View(c, auth_views.SigninFormErrorAlert(err.Message))
 		}
 
-		if usr.Role == "admin" {
-			if err := auth.GenerateTokensAndSetCookies(usr, c); err != nil {
-				c.Response().WriteHeader(http.StatusInternalServerError)
-				return uh.View(c, auth_views.SigninFormErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
-			}
-			return c.Redirect(http.StatusMovedPermanently, "/admin/dashboard/users")
-		} else {
-			cmp := auth_views.SigninFormDone()
-			return cmp.Render(c.Request().Context(), c.Response().Writer)
+		if err := auth.GenerateTokensAndSetCookies(usr, c); err != nil {
+			c.Response().WriteHeader(http.StatusInternalServerError)
+			return uh.View(c, auth_views.SigninFormErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
 		}
-
+		return c.Redirect(http.StatusMovedPermanently, "/home")
 	}
 
 	return c.Redirect(http.StatusMethodNotAllowed, "/signup")
@@ -239,10 +232,17 @@ func (uh *UserHandler) GetHome(c echo.Context) error {
 
 	loggedUser := c.Get("user").(repositories.User)
 
+	upcoming, err := uh.EventServices.GetNextEvent()
+
+	if err != nil {
+		upcoming = repositories.Event{}
+	}
+
 	return uh.View(c,
 		home_views.Base(
 			"Home",
 			loggedUser,
+			upcoming,
 		))
 }
 

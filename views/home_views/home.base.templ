@@ -1,16 +1,18 @@
 package home_views
 
 import (
+	"fmt"
 	"nugu.dev/rd-vigor/repositories"
 	"nugu.dev/rd-vigor/views/layout"
+	"time"
 )
 
-templ Base(title string, loggedUser repositories.User) {
+templ Base(title string, loggedUser repositories.User, e repositories.Event) {
 	@layout.Base(title, loggedUser, true) {
 		<div
 			class="space-y-3 flex flex-col w-full h-[calc(100vh-4rem)] overflow-y-scroll bg-[#F0F2F5]"
 		>
-			<div class="w-full pt-20 min-h-[60dvh] bg-[#ffdfa9] relative">
+			<div class="w-full pt-20 min-h-[20dvh] bg-[#ffdfa9] relative">
 				<div class="flex justify-center items-center w-full">
 					<h1></h1>
 				</div>
@@ -32,47 +34,36 @@ templ Base(title string, loggedUser repositories.User) {
 						<img class="size-6" src="/static/img/arrow-right-3.svg"/>
 					</a>
 				</div>
-				<div class="flex p-5 w-full lg:flex-row lg:space-y-0 lg:space-x-2">
-					<div class="flex flex-col space-y-2 w-8/12 lg:space-y-0">
+				<div class="flex flex-col p-5 w-full lg:flex-row lg:space-y-0 lg:space-x-2">
+					<a
+						href={ templ.SafeURL(fmt.Sprintf("/event/%s", e.ID)) }
+						class="flex flex-col space-y-2 w-8/12 lg:space-y-0"
+					>
 						<div class="mb-2 w-full cursor-pointer card-shadow">
 							<div class="hidden p-4 w-full bg-white rounded-md md:flex hover:shadow-lg card-shadow">
 								<img class="mr-5 h-32 aspect-square" src="/static/img/events-1.png"/>
 								<div class="flex flex-col text-sm font-normal text-gray-500 grow">
 									<div class="flex items-center">
-										<h1 class="text-3xl font-bold text-black">Superando os Desafios e aproveitando as oportunidades</h1>
+										<h1 class="text-3xl font-bold text-black">{ e.Title }</h1>
 									</div>
 									<span>Organizado por RD vigor </span>
 									<span class="flex items-center mt-auto">
 										<img class="mr-1 opacity-50 size-5" src="/static/img/map.svg"/>
-										<span class="mt-auto">Praça Pio X, 79 - 2º andar | Centro - Rio de Janeiro</span>
+										<span class="mt-auto">{ e.Address }</span>
 									</span>
 									<span class="flex items-center mt-1">
 										<img class="mr-1 opacity-50 size-5" src="/static/img/clock.svg"/>
-										<span>11 de setembro de 2024 a partir das 09:00h</span>
+										<span>{ fmt.Sprintf("%s", e.Date.Local().Format(time.DateOnly)) } </span>
+										<span>{ fmt.Sprintf("%s", e.Date.Local().Format(time.TimeOnly)) } </span>
+									</span>
+									<span class="flex items-center mt-1">
+										<img class="mr-1 opacity-50 size-5" src="/static/img/money.svg"/>
+										<span>Entrada gratuita</span>
 									</span>
 								</div>
 							</div>
 						</div>
-						<div class="mb-2 w-full cursor-pointer card-shadow">
-							<div class="hidden p-4 w-full bg-white rounded-md md:flex hover:shadow-lg card-shadow">
-								<img class="mr-5 h-32 aspect-square" src="/static/img/events-1.png"/>
-								<div class="flex flex-col text-sm font-normal text-gray-500 grow">
-									<div class="flex items-center">
-										<h1 class="text-3xl font-bold text-black">Negócios e Inteligência Relacional</h1>
-									</div>
-									<span>Organizado por RD vigor </span>
-									<span class="flex items-center mt-auto">
-										<img class="mr-1 opacity-50 size-5" src="/static/img/map.svg"/>
-										<span class="mt-auto">Praça Pio X, 79 - 2º andar | Centro - Rio de Janeiro</span>
-									</span>
-									<span class="flex items-center mt-1">
-										<img class="mr-1 opacity-50 size-5" src="/static/img/clock.svg"/>
-										<span>13 de agosto de 2024 a partir das 09:00h</span>
-									</span>
-								</div>
-							</div>
-						</div>
-					</div>
+					</a>
 					<div
 						class="flex overflow-hidden w-full rounded-md border border-gray-200 border-solid md:w-4/12 grow card-shadow"
 					>
