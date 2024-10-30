@@ -6,11 +6,19 @@ import (
 	"nugu.dev/rd-vigor/views/layout"
 )
 
-templ Base(loggedUser repositories.User, found []repositories.User, tagName string) {
+type UserAndTagsStruct struct {
+	User repositories.User
+	Tags []repositories.Tag
+}
+
+templ Base(loggedUser repositories.User, found []UserAndTagsStruct, tagName string) {
 	@layout.Base("Busca", loggedUser, true) {
 		<div class="overflow-x-hidden flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-5 py-5 px-5 lg:px-12 2xl:px-64 w-full grow overflow-y-scroll bg-[#F0F2F5]">
-			@AdvancedSearchTab()
-			<div class="grid grid-cols-1 gap-2 w-full md:grid-cols-3 lg:grid-cols-4">
+			@AdvancedSearchTab(tagName)
+			<div
+				class="grid grid-cols-1 gap-2 w-full md:grid-cols-3 lg:grid-cols-4"
+				style="grid-template-rows: repeat(3, 1fr);"
+			>
 				for _, u := range found {
 					@userCard(u)
 				}
@@ -19,7 +27,7 @@ templ Base(loggedUser repositories.User, found []repositories.User, tagName stri
 	}
 }
 
-templ AdvancedSearchTab() {
+templ AdvancedSearchTab(tagName string) {
 	<div
 		class="flex flex-col py-3 w-full text-left bg-white rounded-xl border border-gray-200 border-solid lg:w-3/12 h-fit card-shadow"
 	>
@@ -31,7 +39,7 @@ templ AdvancedSearchTab() {
 			<span>Tags selecionadas</span>
 			<div class="flex mb-3 space-x-1 w-full">
 				<div class="flex items-center py-1 px-3 text-gray-800 bg-gray-200 rounded rounded-full">
-					<span>programador</span>
+					<span>{ tagName }</span>
 					<button class="ml-1">
 						<img class="opacity-40 hover:opacity-100 size-5" src="/static/img/close.svg"/>
 					</button>
@@ -90,13 +98,13 @@ templ AdvancedSearchTab() {
 	</div>
 }
 
-templ userCard(u repositories.User) {
+templ userCard(a UserAndTagsStruct) {
 	<a
-		href={ templ.SafeURL(fmt.Sprintf("user/%s", u.Username)) }
-		class="flex flex-col justify-self-center items-center p-4 w-full bg-white rounded-md border border-gray-200 border-solid hover:shadow-lg h-fit card-shadow"
+		href={ templ.SafeURL(fmt.Sprintf("user/%s", a.User.Username)) }
+		class="flex flex-col justify-self-center items-center p-4 w-full bg-white rounded-md border border-gray-200 border-solid hover:shadow-lg min-h-fit card-shadow"
 	>
 		<img class="h-28 rounded-full border-8 border-gray-200 aspect-square" src="/static/img/user.svg"/>
-		<h1 class="w-11/12 text-2xl font-semibold text-center truncate text-ellipsis">{ fmt.Sprintf("%s %s", u.FirstName, u.LastName) }</h1>
+		<h1 class="w-11/12 text-2xl font-semibold text-center truncate text-ellipsis">{ fmt.Sprintf("%s %s", a.User.FirstName, a.User.LastName) }</h1>
 		<span class="font-medium text-sm text-[#ed6c09]">RD Vigor</span>
 		<h1 class="text-xs font-semibold text-gray-400">Niterói, RJ</h1>
 		<div class="flex justify-around items-center mt-2 space-x-3">
@@ -113,10 +121,12 @@ templ userCard(u repositories.User) {
 				Avaliações
 			</div>
 		</div>
-		<div class="flex justify-center items-center mt-3 w-full">
-			<button class="py-1 px-2 mr-1 text-xs font-semibold text-white bg-gray-200 rounded-full border-gray-300 border-1 w-fit">
-				<span class="text-gray-500 sm:block">{ "Programador" }</span>
-			</button>
+		<div class="flex flex-wrap gap-2 justify-center items-center mt-3 w-full">
+			for _, t := range a.Tags {
+				<button class="py-1 px-2 mr-1 text-xs font-semibold text-white bg-gray-200 rounded-full border-gray-300 border-1 w-fit">
+					<span class="text-gray-500 sm:block">{ t.Name }</span>
+				</button>
+			}
 		</div>
 	</a>
 }
