@@ -29,6 +29,7 @@ type UserService interface {
 	GetUsersByTagID(any string) ([]repositories.User, *services.ServiceLayerErr)
 
 	GetUserByID(id string) (repositories.User, *services.ServiceLayerErr)
+	GetUserByStripeID(id string) (repositories.User, *services.ServiceLayerErr)
 	GetUserByUsername(username string) (repositories.User, *services.ServiceLayerErr)
 
 	GetUserTags(user repositories.User) ([]repositories.Tag, *services.ServiceLayerErr)
@@ -148,6 +149,8 @@ func (uh *UserHandler) SigninUser(c echo.Context) error {
 
 	if c.Request().Method == "POST" {
 		usr, err := uh.UserServices.AuthUser(c.FormValue("login"), c.FormValue("password"))
+
+		fmt.Println(err)
 
 		if err != nil {
 			c.Response().WriteHeader(err.Code)

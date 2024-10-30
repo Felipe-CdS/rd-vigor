@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/stripe/stripe-go/v79/customer"
 	"github.com/stripe/stripe-go/v79/paymentintent"
 	"github.com/stripe/stripe-go/v79/subscription"
+	"github.com/stripe/stripe-go/v79/webhook"
 	"nugu.dev/rd-vigor/repositories"
 )
 
@@ -20,21 +22,10 @@ func CreatePaymentIntent(c echo.Context) error {
 
 	loggedUser := c.Get("user").(repositories.User)
 
+	// Never should enter this state because a stripeID is created
+	// when the user log in.
 	if loggedUser.StripeID == "" {
-		params := &stripe.CustomerParams{
-			Name:     stripe.String(fmt.Sprintf("%s %s", loggedUser.FirstName, loggedUser.LastName)),
-			Email:    stripe.String(loggedUser.Email),
-			Metadata: map[string]string{"rdvigor_ID": loggedUser.ID},
-		}
-
-		result, err := customer.New(params)
-
-		if err != nil {
-			c.Response().WriteHeader(http.StatusInternalServerError)
-			return err
-		}
-
-		loggedUser.StripeID = result.ID
+		return &stripe.Error{}
 	}
 
 	params := &stripe.PaymentIntentParams{
@@ -65,25 +56,9 @@ func CreatePaymentIntent(c echo.Context) error {
 	return c.JSONBlob(http.StatusOK, buf.Bytes())
 }
 
-func HandleCreateSubscrition(c echo.Context) error {
+func HandleCreateSubscription(c echo.Context) error {
 
 	loggedUser := c.Get("user").(repositories.User)
-
-	if loggedUser.StripeID == "" {
-		p := &stripe.CustomerParams{
-			Name:     stripe.String(fmt.Sprintf("%s %s", loggedUser.FirstName, loggedUser.LastName)),
-			Email:    stripe.String(loggedUser.Email),
-			Metadata: map[string]string{"rdvigor_ID": loggedUser.ID},
-		}
-
-		result, err := customer.New(p)
-
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-		}
-
-		loggedUser.StripeID = result.ID
-	}
 
 	aaa := "card"
 
@@ -123,4 +98,71 @@ func HandleCreateSubscrition(c echo.Context) error {
 	}
 
 	return c.JSONBlob(http.StatusOK, buf.Bytes())
+}
+
+func CreateStripeCostumer(loggedUser repositories.User) (string, error) {
+
+	p := &stripe.CustomerParams{
+		Name:     stripe.String(fmt.Sprintf("%s %s", loggedUser.FirstName, loggedUser.LastName)),
+		Email:    stripe.String(loggedUser.Email),
+		Metadata: map[string]string{"rdvigor_ID": loggedUser.ID},
+	}
+
+	result, err := customer.New(p)
+
+	if err != nil {
+		return "", echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return result.ID, nil
+}
+
+func HandleWebhook(c echo.Context, uh *UserHandler) error {
+
+	if c.Request().Method != "POST" {
+		return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+
+	b, err := io.ReadAll(c.Request().Body)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	event, err := webhook.ConstructEventWithOptions(b,
+		c.Request().Header.Get("Stripe-Signature"),
+		os.Getenv("STRIPE_WEBHOOK_SECRET"),
+		webhook.ConstructEventOptions{IgnoreAPIVersionMismatch: true},
+	)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	customer := fmt.Sprintf("%v", event.Data.Object["customer"])
+
+	u, queryErr := uh.UserServices.GetUserByStripeID(customer)
+	updatedUser := u
+
+	if queryErr != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+
+	if event.Type == "payment_intent.succeeded" {
+		updatedUser.SubscriptionStatus = true
+	}
+
+	if event.Type == "invoice.payment_failed" {
+		updatedUser.SubscriptionStatus = false
+	}
+
+	if event.Type == "customer.subscription.deleted" {
+		updatedUser.SubscriptionStatus = false
+	}
+
+	if err := uh.UserServices.UpdateUser(u, updatedUser); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+
+	return nil
 }

@@ -49,7 +49,8 @@ type User struct {
 	Zipcode  string `json:"zipcode"`
 
 	// Migration 8
-	StripeID string `json:"stripe_id"`
+	StripeID           string `json:"stripe_id"`
+	SubscriptionStatus bool   `json:"subscription_status"`
 }
 
 type UserRepository struct {
@@ -104,7 +105,7 @@ func (ur *UserRepository) CreateUser(u User) *RepositoryLayerErr {
 
 func (ur *UserRepository) UpdateUser(u User, newUserData User) *RepositoryLayerErr {
 
-	var aux = func(oldValue, newValue, column string) error {
+	var aux = func(oldValue, newValue, column any) error {
 		if newValue != "" && oldValue != newValue {
 			stmt := fmt.Sprintf("UPDATE users SET %s = $1 WHERE id = $2;", column)
 			if _, err := ur.UserStore.Db.Exec(stmt, newValue, u.ID); err != nil {
@@ -151,6 +152,14 @@ func (ur *UserRepository) UpdateUser(u User, newUserData User) *RepositoryLayerE
 	}
 
 	if err := aux(u.Telephone, newUserData.Telephone, "telephone"); err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	if err := aux(u.StripeID, newUserData.StripeID, "stripe_id"); err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	if err := aux(u.SubscriptionStatus, newUserData.SubscriptionStatus, "subscription_status"); err != nil {
 		return &RepositoryLayerErr{err, "Insert Error"}
 	}
 
@@ -318,6 +327,7 @@ func (ur *UserRepository) GetUserByUsername(username string) (User, *RepositoryL
 		&usr.State,
 		&usr.Zipcode,
 		&usr.StripeID,
+		&usr.SubscriptionStatus,
 	); err != nil {
 		return User{}, &RepositoryLayerErr{sql.ErrNoRows, "Usuario inexistente."}
 	}
@@ -365,6 +375,42 @@ func (ur *UserRepository) GetUserByID(id string) (User, error) {
 		&usr.State,
 		&usr.Zipcode,
 		&usr.StripeID,
+		&usr.SubscriptionStatus,
+	); err != nil {
+		return usr, err
+	}
+
+	return usr, nil
+}
+
+func (ur *UserRepository) GetUserByStripeID(id string) (User, error) {
+
+	var usr User
+	var trashPassword string
+
+	stmt := `SELECT * FROM users WHERE stripe_id = $1`
+
+	if err := ur.UserStore.Db.QueryRow(stmt, id).Scan(
+		&usr.ID,
+		&usr.Username,
+		&usr.FirstName,
+		&usr.LastName,
+		&usr.Email,
+		&usr.OccupationArea,
+		&usr.Telephone,
+		&usr.ReferFriend,
+		&trashPassword,
+		&usr.Role,
+		&usr.RegistrationStatus,
+		&usr.CreatedAt,
+		&usr.UpdatedAt,
+		&usr.Address,
+		&usr.Address2,
+		&usr.City,
+		&usr.State,
+		&usr.Zipcode,
+		&usr.StripeID,
+		&usr.SubscriptionStatus,
 	); err != nil {
 		return usr, err
 	}
