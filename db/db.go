@@ -198,5 +198,35 @@ func createMigrations(db *sql.DB) error {
 		return fmt.Errorf("failed to create statement 10... Error: %s", err)
 	}
 
+	statement = `CREATE TABLE IF NOT EXISTS events ( 
+		id UUID PRIMARY KEY
+		, title TEXT NOT NULL DEFAULT ''
+		, description TEXT NOT NULL DEFAULT ''
+		, cover_path TEXT NOT NULL DEFAULT '/assets/img/events-1.png'
+		, maps_link TEXT NOT NULL DEFAULT ''
+		, address TEXT NOT NULL DEFAULT ''
+		, date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+		, price INTEGER NOT NULL DEFAULT 0
+	)`
+
+	_, err = db.Exec(statement)
+
+	if err != nil {
+		return fmt.Errorf("failed to create statement 11... Error: %s", err)
+	}
+
+	statement = `CREATE TABLE IF NOT EXISTS user_event_confirmations ( 
+		fk_user_id UUID NOT NULL
+		, FOREIGN KEY(fk_user_id) REFERENCES users(id) ON DELETE CASCADE
+		, fk_event_id UUID NOT NULL
+		, FOREIGN KEY(fk_event_id) REFERENCES events(id) ON DELETE CASCADE
+	)`
+
+	_, err = db.Exec(statement)
+
+	if err != nil {
+		return fmt.Errorf("failed to create statement 12... Error: %s", err)
+	}
+
 	return nil
 }

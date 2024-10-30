@@ -68,8 +68,10 @@ func SetupRoutes(e *echo.Echo,
 
 	/* EVENTS ROUTES*/
 
+	e.GET("/admin/dashboard/events", authMiddleware(uh, eh.GetEventDashboard))
+	e.POST("/admin/dashboard/events", authMiddleware(uh, eh.CreateNewEvent))
 	e.GET("/events", authMiddleware(uh, eh.GetEventSearchPage))
-	e.GET("/event/:event_id", authMiddleware(uh, eh.GetEventDetails))
+	e.GET("/event/:id", authMiddleware(uh, eh.GetEventDetails))
 
 	/* SEARCH ROUTES*/
 	e.GET("/search", authMiddleware(uh, uh.SearchUsersByTag))
