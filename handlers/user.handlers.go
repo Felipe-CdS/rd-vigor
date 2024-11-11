@@ -196,7 +196,7 @@ func (uh *UserHandler) GetUserDetails(c echo.Context) error {
 		return c.NoContent(http.StatusMovedPermanently)
 	}
 
-	usr, queryErr := uh.UserServices.GetUserByID(c.QueryParam("user"))
+	usr, queryErr := uh.UserServices.GetUser(c.QueryParam("user"))
 
 	if queryErr != nil {
 		c.Response().Header().Set("HX-redirect", "/admin/dashboard/users")
