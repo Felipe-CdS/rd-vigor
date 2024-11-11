@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 	"nugu.dev/rd-vigor/repositories"
@@ -52,9 +54,10 @@ func (ch *ChatroomHandler) SelectRecipient(c echo.Context) error {
 		return ch.View(c, inbox_views.RecipientToBeSelectedDiv())
 	}
 
-	usr, queryErr := ch.UserServices.GetUserByUsername(c.QueryParam("username"))
+	usr, queryErr := ch.UserServices.GetUser(c.QueryParam("username"))
 
 	if queryErr != nil {
+		fmt.Println(queryErr)
 	}
 
 	return ch.View(c, inbox_views.RecipientSelectedDiv(usr))
@@ -77,7 +80,7 @@ func (ch *ChatroomHandler) GetUserChatroomsList(c echo.Context) error {
 		if queryErr != nil {
 		}
 
-		u, queryErr := ch.UserServices.GetUserByID(m.UserId)
+		u, queryErr := ch.UserServices.GetUser(m.UserId)
 
 		if queryErr != nil {
 		}
@@ -87,7 +90,7 @@ func (ch *ChatroomHandler) GetUserChatroomsList(c echo.Context) error {
 		if queryErr != nil {
 		}
 
-		r, queryErr := ch.UserServices.GetUserByID(rId)
+		r, queryErr := ch.UserServices.GetUser(rId)
 
 		if queryErr != nil {
 		}
@@ -102,7 +105,7 @@ func (ch *ChatroomHandler) GetUserChatroomsList(c echo.Context) error {
 		data = append(data, *d)
 	}
 
-	return ch.View(c, inbox_views.RecipientsList(data))
+	return ch.View(c, inbox_views.RecipientsList(loggedUser, data))
 }
 
 func (ch *ChatroomHandler) CreateChatroom(c echo.Context) error {
@@ -110,7 +113,7 @@ func (ch *ChatroomHandler) CreateChatroom(c echo.Context) error {
 	loggedUser := c.Get("user").(repositories.User)
 	content := c.FormValue("content")
 
-	recipient, queryErr := ch.UserServices.GetUserByUsername(c.FormValue("recipient"))
+	recipient, queryErr := ch.UserServices.GetUser(c.FormValue("recipient"))
 
 	if queryErr != nil {
 	}
@@ -141,7 +144,7 @@ func (ch *ChatroomHandler) GetChatroomDetails(c echo.Context) error {
 	if queryErr != nil {
 	}
 
-	r, queryErr := ch.UserServices.GetUserByID(rId)
+	r, queryErr := ch.UserServices.GetUser(rId)
 
 	if queryErr != nil {
 	}
@@ -159,7 +162,7 @@ func (ch *ChatroomHandler) GetChat(c echo.Context) error {
 	if queryErr != nil {
 	}
 
-	r, queryErr := ch.UserServices.GetUserByID(rId)
+	r, queryErr := ch.UserServices.GetUser(rId)
 
 	if queryErr != nil {
 	}

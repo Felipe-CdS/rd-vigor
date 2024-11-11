@@ -16,12 +16,22 @@ templ Chat(recipient repositories.User, messages []repositories.Message, chatroo
 		<div class="flex items-center py-4 pr-5 pl-2 w-full bg-white rounded-t-xl border-b border-gray-200 border-solid lg:px-5">
 			<button
 				x-on:click="if(state != 'all'){ state = 'inbox'; }"
-				title="filtrar"
 				class="lg:hidden"
 			>
-				<img class="rotate-90 size-6" src="/static/img/arrow-down.svg"/>
+				<img class="mr-3 rotate-90 size-6" src="/static/img/arrow-down.svg"/>
 			</button>
-			<h1 class="text-2xl font-semibold">{ fmt.Sprintf("%s %s", recipient.FirstName, recipient.LastName) }</h1>
+			<div class="flex flex-col w-9/12 text-[#27272A]">
+				<h1 class="text-xl truncate">
+					{ fmt.Sprintf("%s %s", recipient.FirstName, recipient.LastName) }
+				</h1>
+				<div class="flex items-center align-center">
+					<img class="inline mr-0.5 opacity-50 size-5" src="/static/img/buildings.svg"/>
+					<span class="text-xs truncate">
+						{ fmt.Sprintf("(%s)", recipient.CompanyName) }
+					</span>
+				</div>
+			</div>
+			<!--
 			<button
 				x-on:click="if(state != 'all'){ state = 'details'; }"
 				title="filtrar"
@@ -29,8 +39,16 @@ templ Chat(recipient repositories.User, messages []repositories.Message, chatroo
 			>
 				<img class="size-6" src="/static/img/address-book.svg"/>
 			</button>
+			-->
+			<a
+				href={ templ.URL(fmt.Sprintf("/user/%s", recipient.Username)) }
+				class="ml-auto w-7"
+			>
+				<img class="opacity-50 size-8" src="/static/img/address-book.svg"/>
+			</a>
 		</div>
 		@MessageSection(messages)
+		@chatInputBar(recipient)
 	</div>
 	@Details(chatroomId)
 }
@@ -44,7 +62,6 @@ templ MessageSection(messages []repositories.Message) {
 			@messageBubble(m)
 		}
 	</div>
-	@chatInputBar()
 }
 
 templ messageBubble(m repositories.Message) {
@@ -53,30 +70,37 @@ templ messageBubble(m repositories.Message) {
 	</p>
 }
 
-templ chatInputBar() {
-	<form
-		ws-send
-		hx-reset-on-success
-		id="message-input-form"
-		class="flex items-center py-3 px-2 mt-auto space-x-2 w-full bg-white rounded-b-xl border-t border-gray-200 border-solid h-fit"
-	>
-		<button class="size-6">
-			<img class="w-full" src="/static/img/paperclip.svg"/>
-		</button>
-		<input
-			required
-			type="text"
-			name="content"
-			autocomplete="off"
-			class="flex py-2 px-5 w-10/12 font-normal bg-gray-200 rounded-full grow"
-		/>
+templ chatInputBar(recipient repositories.User) {
+	<div class="flex relative items-center py-3 px-2 mt-auto space-x-2 w-full bg-white rounded-b-xl border-t border-gray-200 border-solid h-fit">
 		<button
-			type="submit"
+			x-on:click="attachmentsOpen = !attachmentsOpen;"
 			class="size-6"
 		>
-			<img class="w-full" src="/static/img/send.svg"/>
+			<img class="w-full" src="/static/img/paperclip.svg"/>
 		</button>
-	</form>
+		@AttachmentsModal(recipient)
+		<form
+			ws-send
+			hx-reset-on-success
+			id="message-input-form"
+			class="flex items-center w-full h-fit"
+		>
+			<input
+				required
+				type="text"
+				name="content"
+				autocomplete="off"
+				x-on:click="attachmentsOpen = false;"
+				class="flex py-2 px-5 w-10/12 font-normal bg-gray-200 rounded-full grow"
+			/>
+			<button
+				type="submit"
+				class="ml-2 size-6"
+			>
+				<img class="w-full" src="/static/img/send.svg"/>
+			</button>
+		</form>
+	</div>
 }
 
 templ EmptyChat() {

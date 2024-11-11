@@ -27,30 +27,38 @@ const (
 )
 
 type User struct {
-	ID                 string    `json:"id"`
-	Username           string    `json:"username"`
-	FirstName          string    `json:"first_name"`
-	LastName           string    `json:"last_name"`
-	Email              string    `json:"email"`
-	OccupationArea     string    `json:"occupation_area"`
-	Telephone          string    `json:"telephone"`
-	ReferFriend        string    `json:"refer_friend"`
-	Password           string    `json:"password"`
-	Role               string    `json:"role"`
-	RegistrationStatus string    `json:"registration_status"`
-	CreatedAt          time.Time `json:"created_at"`
-	UpdatedAt          time.Time `json:"updated_at"`
+	ID                 string `json:"id"`
+	Username           string `json:"username"`
+	Password           string `json:"password"`
+	FirstName          string `json:"first_name"`
+	LastName           string `json:"last_name"`
+	Email              string `json:"email"`
+	OccupationArea     string `json:"occupation_area"`
+	Telephone          string `json:"telephone"`
+	ReferFriend        string `json:"refer_friend"`
+	Role               string `json:"role"`
+	RegistrationStatus string `json:"registration_status"`
 
-	// Migration 7
+	ProfilePic         string `json:"profile_picture"`
+	ProfileDescription string `json:"profile_description"`
+	CompanyLogo        string `json:"company_logo"`
+	CompanyName        string `json:"company_name"`
+	MainProduct        string `json:"main_product"`
+	PresentationVideo  string `json:"presentation_video"`
+	Resume             string `json:"resume"`
+
 	Address  string `json:"address"`
 	Address2 string `json:"address2"`
 	City     string `json:"city"`
 	State    string `json:"state"`
 	Zipcode  string `json:"zipcode"`
 
-	// Migration 8
-	StripeID           string `json:"stripe_id"`
-	SubscriptionStatus bool   `json:"subscription_status"`
+	StripeID              string    `json:"stripe_id"`
+	SubscriptionStatus    bool      `json:"subscription_status"`
+	SubscriptionExpiresAt time.Time `json:"subsctription_expires_at"`
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type UserRepository struct {
@@ -296,7 +304,6 @@ func (ur *UserRepository) GetUserByEmail(email string) (User, *RepositoryLayerEr
 		return User{}, &RepositoryLayerErr{sql.ErrNoRows, "Usuario inexistente."}
 	}
 	usr, _ = ur.GetUserByID(usr.ID)
-
 	return usr, nil
 }
 
@@ -346,6 +353,47 @@ func (ur *UserRepository) GetUserPasswordByID(id string) (string, *RepositoryLay
 		return "", &RepositoryLayerErr{sql.ErrNoRows, "Usuario inexistente."}
 	}
 	return password, nil
+}
+
+func (ur *UserRepository) GetUser(id string) (User, *RepositoryLayerErr) {
+
+	var usr User
+	stmt := "SELECT * FROM users WHERE id::text = $1 OR email = $1 OR username = $1;"
+
+	if err := ur.UserStore.Db.QueryRow(stmt, id).Scan(
+		&usr.ID,
+		&usr.Username,
+		&usr.Password,
+		&usr.FirstName,
+		&usr.LastName,
+		&usr.Email,
+		&usr.OccupationArea,
+		&usr.Telephone,
+		&usr.ReferFriend,
+		&usr.Role,
+		&usr.RegistrationStatus,
+		&usr.ProfilePic,
+		&usr.ProfileDescription,
+		&usr.CompanyLogo,
+		&usr.CompanyName,
+		&usr.MainProduct,
+		&usr.PresentationVideo,
+		&usr.Resume,
+		&usr.Address,
+		&usr.Address2,
+		&usr.City,
+		&usr.State,
+		&usr.Zipcode,
+		&usr.StripeID,
+		&usr.SubscriptionStatus,
+		&usr.SubscriptionExpiresAt,
+		&usr.CreatedAt,
+		&usr.UpdatedAt,
+	); err != nil {
+		return User{}, &RepositoryLayerErr{sql.ErrNoRows, "Usuario inexistente."}
+	}
+
+	return usr, nil
 }
 
 func (ur *UserRepository) GetUserByID(id string) (User, error) {

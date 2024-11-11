@@ -43,6 +43,8 @@ func main() {
 	cr := repositories.NewChatroomRepository(repositories.Chatroom{}, store)
 	mr := repositories.NewMessageRepository(repositories.Message{}, store)
 
+	meetingr := repositories.NewMeetingRepository(repositories.Meeting{}, store)
+
 	ts := services.NewTagService(tr)
 	us := services.NewUserService(ur, tr)
 	es := services.NewEventService(er)
@@ -50,15 +52,36 @@ func main() {
 	cs := services.NewChatroomService(cr)
 	ms := services.NewMessageService(mr)
 
+	meetings := services.NewMeetingService(meetingr)
+
 	th := handlers.NewTagHandler(ts, us)
 	uh := handlers.NewUserHandler(us, es, ps, ts)
 	eh := handlers.NewEventHandler(es)
 	ph := handlers.NewPortifolioHandler(ps)
 	ch := handlers.NewChatroomHandler(cs, us, ms)
+	mh := handlers.NewMeetingHandler(meetings, us)
 
 	wsServer := chat.NewWsSever(mr)
 
-	handlers.SetupRoutes(e, wsServer, uh, eh, th, ph, ch)
+	handlers.SetupRoutes(e, wsServer, uh, eh, th, ph, ch, mh)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", port)))
+}
+
+type month struct {
+	idx       int
+	name      string
+	year      int
+	startSpan int
+	end31     bool
+}
+
+var CalendarHolder = []month{
+
+	{idx: 10, name: "outubro", year: 2024, startSpan: 0, end31: true},
+	{idx: 11, name: "novembro", year: 2024, startSpan: 6, end31: false},
+	{idx: 12, name: "dezembro", year: 2024, startSpan: 0, end31: true},
+	{idx: 13, name: "janeiro", year: 2025, startSpan: 4, end31: true},
+	{idx: 14, name: "fevereiro", year: 2025, startSpan: 7, end31: false},
+	{idx: 15, name: "março", year: 2025, startSpan: 7, end31: false},
 }

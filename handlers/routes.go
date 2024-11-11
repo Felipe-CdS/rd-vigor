@@ -18,6 +18,7 @@ func SetupRoutes(e *echo.Echo,
 	th *TagHandler,
 	ph *PortifolioHandler,
 	ch *ChatroomHandler,
+	mh *MeetingHandler,
 ) {
 
 	e.GET("/", authMiddleware(uh, uh.GetHome))
@@ -67,11 +68,13 @@ func SetupRoutes(e *echo.Echo,
 	e.POST("/admin/dashboard/tags", authMiddleware(uh, th.CreateNewTag))
 
 	/* EVENTS ROUTES*/
-
 	e.GET("/admin/dashboard/events", authMiddleware(uh, eh.GetEventDashboard))
 	e.POST("/admin/dashboard/events", authMiddleware(uh, eh.CreateNewEvent))
 	e.GET("/events", authMiddleware(uh, eh.GetEventSearchPage))
 	e.GET("/event/:id", authMiddleware(uh, eh.GetEventDetails))
+
+	/* MEETING ROUTES*/
+	e.GET("/meetings/creation-modal", authMiddleware(uh, mh.GetMeetingCreationModal))
 
 	/* SEARCH ROUTES*/
 	e.GET("/search", authMiddleware(uh, uh.SearchUsersByTag))
@@ -151,17 +154,14 @@ func authMiddleware(uh *UserHandler, next echo.HandlerFunc) echo.HandlerFunc {
 			return c.Redirect(http.StatusMovedPermanently, "/signin")
 		}
 
-		loggedUser, queryErr := uh.UserServices.GetUserByUsername(claims.Username)
+		loggedUser, queryErr := uh.UserServices.GetUser(claims.Username)
 
 		if queryErr != nil {
 			fmt.Printf("Middleware: %+v\n", queryErr)
+			return c.Redirect(http.StatusMovedPermanently, "/signin")
 		}
 
 		c.Set("user", loggedUser)
-
-		if loggedUser.Role != "admin" {
-			return c.Redirect(http.StatusMovedPermanently, "/signin")
-		}
 
 		if loggedUser.StripeID == "" {
 			stripeId, err := CreateStripeCostumer(loggedUser)

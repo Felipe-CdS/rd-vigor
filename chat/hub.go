@@ -2,7 +2,6 @@ package chat
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"sync"
 
@@ -46,15 +45,12 @@ func (h *Hub) Run(c echo.Context) {
 			h.Lock()
 			h.clients[client] = true
 			h.Unlock()
-			fmt.Printf("Client Registered: %s\n", client.id)
-
 			client.send <- getMessageTemplate(c, h.messages)
 
 		case client := <-h.unregister:
 			h.Lock()
 			if _, ok := h.clients[client]; ok {
 				close(client.send)
-				fmt.Printf("Client Unregistered: %s\n", client.id)
 				delete(h.clients, client)
 			}
 			h.Unlock()

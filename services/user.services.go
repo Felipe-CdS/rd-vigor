@@ -27,6 +27,7 @@ type UserRepository interface {
 	GetUsersByAny(any string) ([]repositories.User, error)
 	GetUsersByTagID(tagId string) ([]repositories.User, error)
 
+	GetUser(id string) (repositories.User, *repositories.RepositoryLayerErr)
 	GetUserByID(id string) (repositories.User, error)
 	GetUserByStripeID(id string) (repositories.User, error)
 	GetUserByEmail(email string) (repositories.User, *repositories.RepositoryLayerErr)
@@ -154,25 +155,22 @@ func (us *UserService) GetUsersByTagID(tagId string) ([]repositories.User, *Serv
 	return []repositories.User{}, &ServiceLayerErr{err, "Query Err", http.StatusInternalServerError}
 }
 
+func (us *UserService) GetUser(any string) (repositories.User, *ServiceLayerErr) {
+
+	usr, err := us.Repository.GetUser(any)
+
+	if err != nil {
+		return repositories.User{}, &ServiceLayerErr{err.Error, "Query Err", http.StatusInternalServerError}
+	}
+	return usr, nil
+}
+
 func (us *UserService) AuthUser(login string, password string) (repositories.User, *ServiceLayerErr) {
 
 	var user repositories.User
 	var queryErr *repositories.RepositoryLayerErr
-	var isEmail = true
 
-	if login == "" || password == "" {
-		return repositories.User{}, &ServiceLayerErr{nil, "Por favor, preencha ambos os campos.", http.StatusBadRequest}
-	}
-
-	if _, err := mail.ParseAddress(login); err != nil {
-		isEmail = false
-	}
-
-	if isEmail {
-		user, queryErr = us.Repository.GetUserByEmail(login)
-	} else {
-		user, queryErr = us.Repository.GetUserByUsername(login)
-	}
+	user, queryErr = us.Repository.GetUser(login)
 
 	if queryErr != nil {
 		if queryErr.Error == sql.ErrNoRows {
@@ -181,13 +179,7 @@ func (us *UserService) AuthUser(login string, password string) (repositories.Use
 		return repositories.User{}, &ServiceLayerErr{queryErr.Error, "Query Err", http.StatusInternalServerError}
 	}
 
-	userPassword, queryErr := us.Repository.GetUserPasswordByID(user.ID)
-
-	if queryErr != nil {
-		return repositories.User{}, &ServiceLayerErr{queryErr.Error, "Query Err", http.StatusInternalServerError}
-	}
-
-	if err := bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		return repositories.User{}, &ServiceLayerErr{err, "Login ou senha incorretos.", http.StatusBadRequest}
 	}
 

@@ -42,6 +42,7 @@ func GenerateTokensAndSetCookies(user repositories.User, c echo.Context) error {
 	tokenCookie.Expires = expirationTime
 	tokenCookie.Path = "/"
 	tokenCookie.HttpOnly = true
+	tokenCookie.SameSite = http.SameSiteStrictMode
 
 	c.SetCookie(tokenCookie)
 
@@ -51,6 +52,7 @@ func GenerateTokensAndSetCookies(user repositories.User, c echo.Context) error {
 	userCookie.Expires = expirationTime
 	userCookie.Path = "/"
 	userCookie.HttpOnly = true
+	userCookie.SameSite = http.SameSiteStrictMode
 
 	c.SetCookie(userCookie)
 

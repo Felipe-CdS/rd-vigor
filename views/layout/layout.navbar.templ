@@ -87,6 +87,12 @@ templ Navbar(user repositories.User, isLogged bool) {
 					<img class="opacity-50 size-6" src="/static/img/calendar.svg"/> Agenda
 				</a>
 				<a
+					href={ templ.URL(fmt.Sprintf("/user/%s", user.Username)) }
+					class="flex flex-col items-center w-1/12 text-[#71717A] cursor-pointer text-xs hover:text-[#fea439] svg-hover-filter"
+				>
+					<img class="opacity-50 size-6" src="/static/img/user-profile.svg"/> Meu Perfil
+				</a>
+				<a
 					href="/settings"
 					class="flex flex-col items-center w-1/12 text-[#71717A] cursor-pointer text-xs hover:text-[#fea439] svg-hover-filter"
 				>
@@ -114,20 +120,15 @@ templ Navbar(user repositories.User, isLogged bool) {
 						style="display: none;"
 						class="absolute right-0 top-16 z-10 bg-white rounded border shadow-sm w-fit"
 					>
-						<a
-							href={ templ.URL(fmt.Sprintf("/user/%s", user.Username)) }
-							class="flex items-center py-3 px-4 w-full rounded-t-md cursor-pointer"
-						>
-							<img class="mr-2 size-4" src="/static/img/user-profile.svg"/>
-							<span class="font-normal">Meu Perfil</span>
-						</a>
-						<a
-							href="/admin/dashboard"
-							class="flex items-center py-3 px-4 w-full border-t border-b border-gray-200 border-solid cursor-pointer"
-						>
-							<img class="mr-2 size-4" src="/static/img/shield.svg"/>
-							<span class="font-normal">Admin</span>
-						</a>
+						if user.Role == "admin" {
+							<a
+								href="/admin/dashboard"
+								class="flex items-center py-3 px-4 w-full border-t border-b border-gray-200 border-solid cursor-pointer"
+							>
+								<img class="mr-2 size-4" src="/static/img/shield.svg"/>
+								<span class="font-normal">Admin</span>
+							</a>
+						}
 						<a
 							href="/logout"
 							class="flex items-center py-3 px-4 w-full rounded-b-md cursor-pointer"
@@ -165,32 +166,38 @@ templ baseNavbar(user repositories.User) {
 		>
 			<img class="mr-2 opacity-50 size-5" src="/static/img/events.svg"/> Eventos
 		</a>
-		<a class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
+		<a
+			href="/courses"
+			class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
+		>
+			<img class="mr-2 opacity-50 size-5" src="/static/img/school.svg"/> Cursos
+		</a>
+		<a
+			href="/inbox"
+			class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
+		>
 			<img class="mr-2 opacity-50 size-5" src="/static/img/mail.svg"/> Mensagens
 		</a>
-		<a class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
-			<img class="mr-2 opacity-50 size-5" src="/static/img/group.svg"/> Núcleos
+		<a
+			href="/calendar"
+			class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
+		>
+			<img class="mr-2 opacity-50 size-5" src="/static/img/calendar.svg"/> Agenda
 		</a>
 		<a
 			href={ templ.URL(fmt.Sprintf("/user/%s", user.Username)) }
 			class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
 		>
-			<img class="mr-2 opacity-50 size-5" src="/static/img/profile.svg"/> Seu Pefil
+			<img class="mr-2 opacity-50 size-5" src="/static/img/user-profile.svg"/> Seu Pefil
 		</a>
 	</div>
 	<div class="flex flex-col mt-auto w-full text-sm font-normal">
 		<div class="flex flex-col py-5 px-5 space-y-2 w-full border-t border-gray-200 border-solid">
-			<button class="lg:hidden flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
-				<img class="mr-1 w-6 opacity-50" src="/static/img/notification.svg"/> Notificações
-			</button>
-			<button class="lg:!mt-0 flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter">
-				<img class="mr-1 w-6 opacity-50" src="/static/img/settings.svg"/> Configurações
-			</button>
 			<a
-				href="/admin/dashboard/users"
+				href="/settings"
 				class="flex items-center text-[#71717A] cursor-pointer hover:text-[#fea439] svg-hover-filter"
 			>
-				<img class="mr-1 w-6 opacity-50" src="/static/img/shield.svg"/> Admin
+				<img class="mr-1 w-6 opacity-50" src="/static/img/settings.svg"/> Configurações
 			</a>
 			<button
 				hx-get="/logout"

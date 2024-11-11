@@ -16,21 +16,55 @@ templ Calendar(title string, loggedUser repositories.User) {
 			<div class="flex flex-col space-y-3 w-full h-full md:flex-row md:space-y-0 md:space-x-3">
 				@today()
 				<div
-					class="grid grid-cols-7 w-full h-full bg-white rounded-xl border border-gray-200 border-solid lg:w-8/12 2xl:w-10/12 card-shadow"
+					x-data="{month: 1}"
+					class="flex-col w-full h-full text-left bg-white rounded-xl border border-gray-200 border-solid lg:flex lg:w-8/12 2xl:w-10/12 card-shadow"
 				>
-					<div class="p-3">Seg</div>
-					<div class="p-3">Ter</div>
-					<div class="p-3">Qua</div>
-					<div class="p-3">Qui</div>
-					<div class="p-3">Sex</div>
-					<div class="p-3">Sáb</div>
-					<div class="p-3">Dom</div>
-					for i := 0; i < 5; i++ {
-						for j := 1; j < 8; j++ {
-							<div class="p-3">
-								{ fmt.Sprintf("%d", ((i * 7) + j)) }
-							</div>
-						}
+					for i, m := range CalendarHolder {
+						<div
+							x-show={ fmt.Sprintf("month == %d", i) }
+							class="flex justify-between py-3 px-5 w-full rounded-t-xl border-b border-gray-200 border-solid"
+						>
+							<button
+								x-on:click="if(month > 0){month = month - 1}"
+								class="text-2xl font-semibold"
+							>
+								<img class="inline rotate-180 size-8" src="/static/img/arrow-right-3.svg"/>
+							</button>
+							<h1 class="mx-4 text-2xl font-semibold">{ fmt.Sprintf("%s/%d", m.name, m.year) }</h1>
+							<button
+								x-on:click="if(month < 14){month = month + 1}"
+								class="text-2xl font-semibold"
+							>
+								<img class="inline size-8" src="/static/img/arrow-right-3.svg"/>
+							</button>
+						</div>
+						<div
+							x-show={ fmt.Sprintf("month == %d", i) }
+							class="grid grid-cols-7 p-6 mb-3 w-full h-full text-sm font-normal"
+						>
+							<div class="justify-self-center self-center p-1 text-gray-500">Dom</div>
+							<div class="justify-self-center self-center p-1 text-gray-500">Seg</div>
+							<div class="justify-self-center self-center p-1 text-gray-500">Ter</div>
+							<div class="justify-self-center self-center p-1 text-gray-500">Qua</div>
+							<div class="justify-self-center self-center p-1 text-gray-500">Qui</div>
+							<div class="justify-self-center self-center p-1 text-gray-500">Sex</div>
+							<div class="justify-self-center self-center p-1 text-gray-500">Sáb</div>
+							for i := 0; i < 5; i++ {
+								for j := 1; j < 8; j++ {
+									if ((i * 7) + j) <= m.end {
+										if i == 0 && j == 1 {
+											<div class={ fmt.Sprintf("justify-self-center self-center p-1 col-start-%d", m.startSpan) }>
+												{ fmt.Sprintf("%d", ((i * 7) + j)) }
+											</div>
+										} else {
+											<div class="justify-self-center self-center p-1">
+												{ fmt.Sprintf("%d", ((i * 7) + j)) }
+											</div>
+										}
+									}
+								}
+							}
+						</div>
 					}
 				</div>
 			</div>
@@ -49,4 +83,29 @@ templ today() {
 			<span>Sem compromissos marcados para hoje.</span>
 		</div>
 	</div>
+}
+
+type month struct {
+	name      string
+	year      int
+	startSpan int
+	end       int
+}
+
+var CalendarHolder = []month{
+	{name: "Outubro", year: 2024, startSpan: 3, end: 31},
+	{name: "Novembro", year: 2024, startSpan: 6, end: 30},
+	{name: "Dezembro", year: 2024, startSpan: 0, end: 31},
+	{name: "Janeiro", year: 2025, startSpan: 4, end: 31},
+	{name: "Fevereiro", year: 2025, startSpan: 7, end: 28},
+	{name: "Março", year: 2025, startSpan: 7, end: 31},
+	{name: "Abril", year: 2025, startSpan: 3, end: 30},
+	{name: "Maio", year: 2025, startSpan: 5, end: 31},
+	{name: "Junho", year: 2025, startSpan: 0, end: 30},
+	{name: "Julho", year: 2025, startSpan: 3, end: 31},
+	{name: "Agosto", year: 2025, startSpan: 6, end: 31},
+	{name: "Setembro", year: 2025, startSpan: 1, end: 30},
+	{name: "Outubro", year: 2025, startSpan: 4, end: 31},
+	{name: "Novembro", year: 2025, startSpan: 7, end: 30},
+	{name: "Dezembro", year: 2025, startSpan: 1, end: 31},
 }

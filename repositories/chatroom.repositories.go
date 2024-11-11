@@ -1,12 +1,22 @@
 package repositories
 
 import (
+	"database/sql"
+	"time"
+
 	"github.com/google/uuid"
 	"nugu.dev/rd-vigor/db"
 )
 
 type Chatroom struct {
-	ChatroomId string `JSON:"chatroom_id"`
+	ChatroomId    string `JSON:"chatroom_id"`
+	LastMessageId string `JSON:"fk_last_message_id"`
+
+	LastMessageSenderID       string
+	LastMessageSenderUsername string
+	LastMessageSenderName     string
+	LastMessageContent        string
+	LastMessageTimestamp      time.Time
 }
 
 type ChatroomRepository struct {
@@ -76,7 +86,11 @@ func (cr *ChatroomRepository) GetChatroomsByUserID(id string) ([]Chatroom, *Repo
 
 	var chatrooms []Chatroom
 
-	stmt := "SELECT fk_chatroom_id FROM chatrooms_users WHERE fk_user_id = $1"
+	stmt := `SELECT chatrooms.chatroom_id, chatrooms.fk_last_message_id 
+			FROM chatrooms
+			INNER JOIN chatrooms_users
+			ON chatrooms.chatroom_id = chatrooms_users.fk_chatroom_id
+			WHERE chatrooms_users.fk_user_id = $1;`
 
 	rows, err := cr.ChatroomStore.Db.Query(stmt, id)
 
@@ -86,11 +100,31 @@ func (cr *ChatroomRepository) GetChatroomsByUserID(id string) ([]Chatroom, *Repo
 
 	for rows.Next() {
 		var c Chatroom
-		if err := rows.Scan(
+		var lastMessageID sql.NullString
+
+		if scanErr := rows.Scan(
 			&c.ChatroomId,
-		); err != nil {
+			&lastMessageID,
+		); scanErr != nil {
 			return nil, &RepositoryLayerErr{err, "Insert Error"}
 		}
+
+		if lastMessageID.Valid {
+			stmt := `SELECT users.id, users.username, users.first_name, messages.content, messages.created_at
+					FROM messages 
+					INNER JOIN users 
+					ON messages.fk_sender_id = users.id
+					WHERE message_id = $1;`
+
+			err = cr.ChatroomStore.Db.QueryRow(stmt, lastMessageID.String).Scan(
+				&c.LastMessageSenderID,
+				&c.LastMessageSenderUsername,
+				&c.LastMessageSenderName,
+				&c.LastMessageContent,
+				&c.LastMessageTimestamp,
+			)
+		}
+
 		chatrooms = append(chatrooms, c)
 	}
 

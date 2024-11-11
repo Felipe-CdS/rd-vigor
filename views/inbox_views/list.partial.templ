@@ -2,6 +2,7 @@ package inbox_views
 
 import (
 	"fmt"
+	"nugu.dev/rd-vigor/repositories"
 	"nugu.dev/rd-vigor/services"
 )
 
@@ -29,7 +30,7 @@ templ InboxList() {
 	</div>
 }
 
-templ RecipientsList(recipientsList []services.ChatroomLastData) {
+templ RecipientsList(u repositories.User, recipientsList []services.ChatroomLastData) {
 	if len(recipientsList) == 0 {
 		<div class="flex flex-col justify-center items-center py-10 w-full text-center">
 			<h1 class="text-sm font-normal text-gray-400">Nenhuma conversa por equanto...</h1>
@@ -49,14 +50,13 @@ templ RecipientsList(recipientsList []services.ChatroomLastData) {
 						<span class="flex text-[#27272A] items-center font-medium w-full text-base truncate">
 							{ fmt.Sprintf("%s %s", r.Recipient.FirstName, r.Recipient.LastName) }
 						</span>
-						<span class="text-[#71717A] text-xs ml-1 truncate w-full">
-							{ fmt.Sprintf("(@%s)", r.Recipient.Username) }
-						</span>
-						<!--
 						<span class="flex text-[#27272A] items-center font-normal text-gray-700 w-full text-xs">
-							{ fmt.Sprintf("%s", r.LastMessage.Content) }
+							if r.Chatroom.LastMessageSenderID == u.ID {
+								{ fmt.Sprintf("Você: %s", r.Chatroom.LastMessageContent) }
+							} else {
+								{ fmt.Sprintf("%s: %s", r.Chatroom.LastMessageSenderName, r.Chatroom.LastMessageContent) }
+							}
 						</span>
-						-->
 					</div>
 				</div>
 			</button>

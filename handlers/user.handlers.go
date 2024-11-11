@@ -28,6 +28,7 @@ type UserService interface {
 	GetUsersByAny(any string) ([]repositories.User, *services.ServiceLayerErr)
 	GetUsersByTagID(any string) ([]repositories.User, *services.ServiceLayerErr)
 
+	GetUser(id string) (repositories.User, *services.ServiceLayerErr)
 	GetUserByID(id string) (repositories.User, *services.ServiceLayerErr)
 	GetUserByStripeID(id string) (repositories.User, *services.ServiceLayerErr)
 	GetUserByUsername(username string) (repositories.User, *services.ServiceLayerErr)
@@ -209,24 +210,24 @@ func (uh *UserHandler) GetUserProfile(c echo.Context) error {
 
 	loggedUser := c.Get("user").(repositories.User)
 
-	usr, queryErr := uh.UserServices.GetUserByUsername(c.Param("username"))
+	usr, queryErr := uh.UserServices.GetUser(c.Param("username"))
 
 	if queryErr != nil {
-		c.Response().Header().Set("HX-redirect", "/admin/dashboard/users")
+		c.Response().Header().Set("HX-redirect", "/home")
 		return c.NoContent(http.StatusMovedPermanently)
 	}
 
 	tags, queryErr := uh.UserServices.GetUserTags(usr)
 
 	if queryErr != nil {
-		c.Response().Header().Set("HX-redirect", "/admin/dashboard/users")
+		c.Response().Header().Set("HX-redirect", "/home")
 		return c.NoContent(http.StatusMovedPermanently)
 	}
 
 	portifolios, queryErr := uh.PortifolioServices.GetUserPortifolios(usr)
 
 	if queryErr != nil {
-		c.Response().Header().Set("HX-redirect", "/admin/dashboard/users")
+		c.Response().Header().Set("HX-redirect", "/home")
 		return c.NoContent(http.StatusMovedPermanently)
 	}
 

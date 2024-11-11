@@ -12,14 +12,17 @@ import (
 templ Base(title string, loggedUser repositories.User, chatroomId string) {
 	@layout.Base(title, loggedUser, true) {
 		<div
-			x-data="{state: 'inbox', newChatModalOpen: false}"
+			x-data="{state: 'inbox', newChatModalOpen: false, attachmentsOpen: false, meetingsModalOpen: false}"
 			x-init="state = window.innerWidth > 810 ? 'all' : 'inbox'"
-			class="bg-[#F0F2F5] flex overflow-y-scroll justify-center items-center py-5 px-5 2xl:px-16  lg:space-x-2 w-full grow"
+			class="bg-[#F0F2F5] flex overflow-y-scroll justify-center items-center py-5 px-5 2xl:px-16 lg:space-x-2 w-full grow"
 		>
 			@NewChatModal()
 			@InboxList()
 			@EmptyChat()
+			@MeetingsModal()
+			<!--
 			@Details(chatroomId)
+			-->
 		</div>
 	}
 }

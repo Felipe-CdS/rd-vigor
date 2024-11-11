@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -79,14 +78,16 @@ func (mr *MessageRepository) GetLastChatroomMessage(chatroom_id string) (Message
 
 func (mr *MessageRepository) CreateMessage(sender_id string, content string, chatroom_id string) *RepositoryLayerErr {
 
-	fmt.Println(sender_id, content, chatroom_id)
+	tx, err := mr.MessageStore.Db.Begin()
+	messageId := uuid.New()
+
 	stmt := `INSERT INTO messages 
 		(message_id, fk_sender_id, fk_chatroom_id, content, created_at) 
-		VALUES ($1, $2, $3, $4, $5)`
+		VALUES ($1, $2, $3, $4, $5);`
 
-	_, err := mr.MessageStore.Db.Exec(
+	_, err = tx.Exec(
 		stmt,
-		uuid.New(),
+		messageId,
 		sender_id,
 		chatroom_id,
 		content,
@@ -94,7 +95,27 @@ func (mr *MessageRepository) CreateMessage(sender_id string, content string, cha
 	)
 
 	if err != nil {
-		return &RepositoryLayerErr{err, "Insert Error"}
+		tx.Rollback()
+		return &RepositoryLayerErr{err, "Error Creating transaction."}
+	}
+
+	stmt = `UPDATE chatrooms SET fk_last_message_id = $1 WHERE chatroom_id = $2;`
+
+	_, err = tx.Exec(
+		stmt,
+		messageId,
+		chatroom_id,
+	)
+
+	if err != nil {
+		tx.Rollback()
+		return &RepositoryLayerErr{err, "Error Creating transaction."}
+	}
+
+	err = tx.Commit()
+
+	if err != nil {
+		return &RepositoryLayerErr{err, "Error Creating transaction."}
 	}
 
 	return nil

@@ -1,0 +1,44 @@
+package inbox_views
+
+import (
+	"fmt"
+	"nugu.dev/rd-vigor/repositories"
+)
+
+templ AttachmentsModal(recipient repositories.User) {
+	<div
+		x-show="attachmentsOpen"
+		x-on:click="attachmentsOpen = false;"
+		class="flex overflow-hidden absolute bottom-20 left-1/2 z-50 flex-col justify-center items-center w-11/12 md:w-6/12 bg-white rounded translate-x-[calc(-50%-0.5rem)] h-fit drop-shadow-xl md:left-0 md:translate-x-0"
+	>
+		<div class="flex relative p-5 space-x-5 w-fit space-around">
+			<span class="flex flex-col text-[#27272A] items-center font-normal text-gray-700 w-full text-xs">
+				<button
+					hx-get={ fmt.Sprintf("/meetings/creation-modal?recipient=%s", recipient.ID) }
+					hx-target="#meeting-recipient-form"
+					x-on:click="attachmentsOpen = false; meetingsModalOpen = true;"
+					class="rounded-full w-fit bg-[#ffbd59] p-3"
+				>
+					<img class="size-6" src="/static/img/events.svg"/>
+				</button>
+				Reunião
+			</span>
+			<span class="flex flex-col text-[#27272A] items-center font-normal text-gray-700 w-full text-xs">
+				<button
+					class="rounded-full w-fit bg-[#ffbd59] p-3"
+				>
+					<img class="size-6" src="/static/img/photo.svg"/>
+				</button>
+				Imagem
+			</span>
+			<span class="flex flex-col text-[#27272A] items-center font-normal text-gray-700 w-full text-xs">
+				<button
+					class="rounded-full w-fit bg-[#ffbd59] p-3"
+				>
+					<img class="size-6" src="/static/img/address-book.svg"/>
+				</button>
+				Contatos
+			</span>
+		</div>
+	</div>
+}
