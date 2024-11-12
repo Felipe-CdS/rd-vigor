@@ -47,7 +47,7 @@ func (uh *UserHandler) GetBillingSettings(c echo.Context) error {
 			))
 	}
 
-	return uh.View(c, settings_views.BillingSettings(loggedUser.SubscriptionStatus))
+	return uh.View(c, settings_views.BillingSettings(loggedUser))
 }
 
 func (uh *UserHandler) GetProfileSettings(c echo.Context) error {

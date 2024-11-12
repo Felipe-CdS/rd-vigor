@@ -5,7 +5,7 @@ import (
 	"nugu.dev/rd-vigor/views/layout"
 )
 
-templ TagsDashboard(title string, user repositories.User, tags []repositories.Tag) {
+templ TagsDashboard(title string, user repositories.User, tags []repositories.Tag, categories []repositories.TagCategory) {
 	@layout.Base(title, user, true) {
 		<div class="flex flex-col py-5 px-5 w-full grow bg-[#F0F2F5] items-center">
 			<form
@@ -14,6 +14,18 @@ templ TagsDashboard(title string, user repositories.User, tags []repositories.Ta
 				hx-target-error="#error-alert"
 				class="flex mb-5"
 			>
+				<select
+					name="category-id"
+					placeholder="Selectionar Categoria"
+					class="flex py-3 px-4 bg-white rounded-md border border-gray-200 border-solid grow"
+				>
+					for _, c := range categories {
+						<option
+							value={ c.ID }
+							class="text-sm font-normal text-left text-gray-400 md:text-sm"
+						>{ c.Name }</option>
+					}
+				</select>
 				<input name="tag-name" type="text" placeholder="Nome da nova tag"/>
 				<button type="submit">Criar</button>
 			</form>

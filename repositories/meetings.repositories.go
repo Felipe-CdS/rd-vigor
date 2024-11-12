@@ -11,6 +11,7 @@ type Meeting struct {
 	User1     string    `json:"fk_user1_id"`
 	User2     string    `json:"fk_user2_id"`
 	Timestamp time.Time `json:"meeting_timestamp"`
+	Status    string    `json:"status"`
 }
 
 type MeetingRepository struct {

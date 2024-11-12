@@ -152,6 +152,7 @@ templ sendMessageForm() {
 		<input id="recipient-input" name="recipient" class="hidden" value=""/>
 		<button
 			type="submit"
+			x-on:click="newChatModalOpen = false; if(state != 'all'){ state = 'chat'; }"
 			class="ml-auto py-1 px-3 w-fit text-sm font-medium rounded-md text-white bg-[#FFBD59]"
 		>
 			Enviar

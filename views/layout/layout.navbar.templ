@@ -110,7 +110,11 @@ templ Navbar(user repositories.User, isLogged bool) {
 							{ fmt.Sprintf("@%s", user.Username) }
 						</span>
 					</span>
-					<img class="bg-gray-200 rounded-full size-10" src="/static/img/user.svg"/>
+					if user.ProfilePic != "/static/img/user.svg" {
+						<img class="bg-gray-200 rounded-full size-10" src={ fmt.Sprintf("/static/users/profile_pics/%s", user.ProfilePic) }/>
+					} else {
+						<img class="bg-gray-200 rounded-full size-10" src="/static/img/user.svg"/>
+					}
 					<div
 						x-ref="panel"
 						x-show="open"

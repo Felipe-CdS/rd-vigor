@@ -21,16 +21,38 @@ templ UserProfile(title string,
 			<div
 				class="flex relative flex-col p-4 w-full text-left bg-white rounded-b-md border border-gray-200 border-solid card-shadow"
 			>
-				<div class="flex absolute left-0 -top-20 flex-col p-4 mr-auto w-fit">
-					<img class="bg-white rounded-3xl size-20" src="/static/img/user.svg"/>
-					<h1 class="mt-1 text-2xl font-semibold">{ fmt.Sprintf("%s %s", user.FirstName, user.LastName) }</h1>
-					<a class="font-medium text-sm text-[#ed6c09] hover:underline" href="">RD Vigor</a>
-					<h1 class="text-xs font-semibold text-gray-400">Niterói, RJ</h1>
+				<div class="flex absolute left-0 -top-20 flex-col p-4 mr-auto space-y-1 w-fit">
+					if user.ProfilePic != "/static/img/user.svg" {
+						<img class="bg-white rounded-3xl size-20" src={ fmt.Sprintf("/static/users/profile_pics/%s", user.ProfilePic) }/>
+					} else {
+						<img class="bg-white rounded-3xl size-20" src="/static/img/user.svg"/>
+					}
+					<h1 class="mt-1 text-2xl font-semibold">
+						{ fmt.Sprintf("%s %s", user.FirstName, user.LastName) }
+					</h1>
+					if user.CompanyName != "" {
+						<a class="font-medium text-sm text-[#ed6c09]" href="">
+							{ fmt.Sprintf("%s", user.CompanyName) }
+						</a>
+					} else {
+						<a class="text-xs font-medium text-gray-400" href="">
+							{ fmt.Sprintf("Sem empresa informada") }
+						</a>
+					}
+					<h1 class="text-xs font-medium text-gray-400">
+						if user.City != "" {
+							{ fmt.Sprintf("%s %s", user.City, user.State) }
+						} else {
+							{ fmt.Sprintf("Sem localização informada") }
+						}
+					</h1>
 				</div>
+				<!--
 				<button class="px-4 py-2 rounded-full w-fit ml-auto bg-[#FFBD59] text-white font-semibold text-sm">
 					<span class="sm:block">Mensagem</span>
 				</button>
-				<div class="flex items-center mt-12 space-x-3 w-full">
+				-->
+				<div class="flex items-center mt-20 space-x-3 w-full">
 					<div class="text-sm font-medium text-gray-400 w-fit">
 						<span class="mt-1 text-base font-semibold text-black">0</span>
 						Contratos
@@ -44,7 +66,7 @@ templ UserProfile(title string,
 						Avaliações
 					</div>
 				</div>
-				<div class="flex mt-2 w-full">
+				<div class="flex flex-row mt-2 w-full">
 					for _, tag := range tags {
 						<a
 							href={ templ.SafeURL(fmt.Sprintf("/search?t=%s", tag.ID)) }
@@ -63,36 +85,44 @@ templ UserProfile(title string,
 						<div class="flex flex-col w-full">
 							<span class="font-medium">Infomações Básicas</span>
 							<p class="mt-1 text-xs font-medium text-gray-400">
-								&emsp;&emsp;Endereço
-							</p>
-							<p class="text-xs font-normal text-justify text-gray-900 md:text-sm">
-								&emsp;&emsp;{ fmt.Sprintf("%s %s, %s - %s", user.Address, user.Address2, user.City, user.State) }
-							</p>
-							<p class="mt-2 text-xs font-medium text-gray-400">
-								&emsp;&emsp;Contato
+								&emsp;&emsp;Telefone
 							</p>
 							<p class="text-xs font-normal text-justify text-gray-900 md:text-sm">
 								&emsp;&emsp;{ fmt.Sprintf("%s", user.Telephone) }
+							</p>
+							<p class="mt-2 text-xs font-medium text-gray-400">
+								&emsp;&emsp;E-mail comercial
+							</p>
+							<p class="text-xs font-normal text-justify text-gray-900 md:text-sm">
+								&emsp;&emsp;{ fmt.Sprintf("%s", user.Email) }
 							</p>
 						</div>
 						<hr class="w-full h-px bg-gray-200 border-0"/>
 						<div class="flex flex-col w-full">
 							<span class="font-medium">Sobre { user.FirstName }</span>
 							<p class="text-xs font-normal text-justify text-gray-900 md:text-sm">
-								&emsp;&emsp;Nenhuma Descrição.
+								if user.ProfileDescription != "" {
+									&emsp;&emsp;{ fmt.Sprintf("%s", user.ProfileDescription) }
+								} else {
+									&emsp;&emsp;Nenhuma Descrição.
+								}
 							</p>
 						</div>
 						<hr class="w-full h-px bg-gray-200 border-0"/>
 						<div class="flex flex-col w-full">
 							<span class="font-medium">Produto Principal</span>
 							<p class="text-xs font-normal text-justify text-gray-900 md:text-sm">
-								&emsp;&emsp;Nenhum Produto.
+								if user.MainProduct != "" {
+									&emsp;&emsp;{ fmt.Sprintf("%s", user.MainProduct) }
+								} else {
+									&emsp;&emsp;Nenhum Produto.
+								}
 							</p>
 						</div>
 						<hr class="w-full h-px bg-gray-200 border-0"/>
 						<div class="flex flex-col w-full">
 							<span class="font-medium">Indicações fora da RD Vigor</span>
-							<p class="text-xs font-normal text-justify text-gray-900 md:text-sm">
+							<p class="text-xs font-normal text-justify text-gray-400 md:text-sm">
 								&emsp;&emsp;Nenhuma indicação.
 							</p>
 						</div>
@@ -101,9 +131,14 @@ templ UserProfile(title string,
 				<div
 					class="flex relative flex-col p-4 mt-2 w-full text-left bg-white rounded-md border border-gray-200 border-solid lg:mt-0 lg:w-4/12 card-shadow"
 				>
-					<div class="flex flex-col w-full text-sm font-medium text-gray-400">
+					<div class="flex flex-col w-full h-1/2 text-sm font-medium text-gray-400">
 						<span class="font-medium">Vídeo de Apresentação</span>
-						<p class="mt-3 w-full text-sm font-medium text-center text-gray-400">Nenhum vídeo por enquanto...</p>
+						<p class="mt-3 w-full text-sm font-normal text-center text-gray-400">Nenhum vídeo disponível</p>
+					</div>
+					<hr class="my-3 w-full h-px bg-gray-200 border-0"/>
+					<div class="flex flex-col w-full h-1/2 text-sm font-medium text-gray-400">
+						<span class="font-medium">Documento de Apresentação</span>
+						<p class="mt-3 w-full text-sm font-normal text-center text-gray-400">Nenhum documento disponível</p>
 					</div>
 				</div>
 			</div>
@@ -112,12 +147,14 @@ templ UserProfile(title string,
 			>
 				<div class="flex w-full text-sm font-medium text-gray-400">
 					<span class="font-medium">Avaliações</span>
+					<!--
 					<button class="flex items-center ml-auto font-medium">
 						Ver todas
 						<img class="ml-1 size-3" src="/static/img/arrow-right.svg"/>
 					</button>
+					-->
 				</div>
-				<p class="mt-3 text-sm font-medium text-center text-gray-400">Nenhuma avaliação por enquanto...</p>
+				<p class="mt-3 text-sm font-normal text-center text-gray-400">Nenhuma avaliação por enquanto...</p>
 			</div>
 			<div
 				class="flex relative flex-col p-4 mt-2 w-full text-left bg-white rounded-md border border-gray-200 border-solid card-shadow"
@@ -126,11 +163,11 @@ templ UserProfile(title string,
 					<span class="mb-3 font-medium">Portifólios</span>
 				</div>
 				if len(portifolios) == 0 {
-					<p class="text-sm font-medium text-center text-gray-400">Nenhum portifólio por enquanto...</p>
+					<p class="text-sm font-normal text-center text-gray-400">Nenhum portifólio por enquanto...</p>
 				} else {
 					for i, p := range portifolios {
 						<details class="flex p-3 mb-3 w-full text-xs font-normal text-justify text-gray-900 rounded-xl border border-gray-200 cursor-pointer md:text-sm">
-							<summary class="text-xl font-medium">
+							<summary class="text-xl font-normal">
 								{ fmt.Sprintf("Portifólio #%d: %s", i+1, p.Title) }
 							</summary>
 							{ fmt.Sprintf("%s", p.Description) }

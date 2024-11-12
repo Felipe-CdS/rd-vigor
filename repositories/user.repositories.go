@@ -171,6 +171,12 @@ func (ur *UserRepository) UpdateUser(u User, newUserData User) *RepositoryLayerE
 		return &RepositoryLayerErr{err, "Insert Error"}
 	}
 
+	if err := aux(u.SubscriptionExpiresAt, newUserData.SubscriptionExpiresAt, "subsctription_expires_at"); err != nil {
+		return &RepositoryLayerErr{err, "Insert Error"}
+	}
+
+	fmt.Println("akdjlksdjsdk")
+
 	return nil
 }
 
@@ -531,6 +537,7 @@ func (ur *UserRepository) GetUserTags(user User) ([]Tag, *RepositoryLayerErr) {
 		if err := ur.UserStore.Db.QueryRow(stmt, id).Scan(
 			&tag.ID,
 			&tag.Name,
+			&tag.CategoryID,
 		); err != nil {
 			return nil, &RepositoryLayerErr{err, "Insert Error"}
 		}

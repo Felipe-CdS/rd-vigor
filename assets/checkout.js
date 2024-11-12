@@ -4,7 +4,7 @@ const stripe = Stripe(
 );
 
 window.initializeStripe = async function () {
-  const response = await fetch("/create-subscription", { method: "POST" });
+  const response = await fetch("/create-anual-subscription", { method: "POST" });
   const { SubscriptionID, clientSecret } = await response.json();
 
   var options = {

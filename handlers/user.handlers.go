@@ -220,6 +220,7 @@ func (uh *UserHandler) GetUserProfile(c echo.Context) error {
 	tags, queryErr := uh.UserServices.GetUserTags(usr)
 
 	if queryErr != nil {
+		fmt.Println(queryErr)
 		c.Response().Header().Set("HX-redirect", "/home")
 		return c.NoContent(http.StatusMovedPermanently)
 	}

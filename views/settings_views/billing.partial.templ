@@ -1,8 +1,11 @@
 package settings_views
 
-import "fmt"
+import (
+	"fmt"
+	"nugu.dev/rd-vigor/repositories"
+)
 
-templ BillingSettings(subscriptionStatus bool) {
+templ BillingSettings(loggedUser repositories.User) {
 	<div class="flex overflow-y-scroll flex-col p-5 space-y-3 w-full h-full text-center">
 		<h1 class="hidden font-semibold lg:block lg:text-2xl text-start">Inscrição Afiliado</h1>
 		<button
@@ -14,7 +17,7 @@ templ BillingSettings(subscriptionStatus bool) {
 		</button>
 		<!-- ############################################################################################### -->
 		<div
-			x-data={ fmt.Sprintf("{ member: %t, checkout: false }", subscriptionStatus) }
+			x-data={ fmt.Sprintf("{ member: %t, checkout: false }", loggedUser.SubscriptionStatus) }
 			class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
 		>
 			<template x-if="member">
@@ -35,71 +38,19 @@ templ BillingSettings(subscriptionStatus bool) {
 					</div>
 					<span class="text-base font-normal text-start">
 						<p class="text-xs opacity-50">Inscrição</p>
-						Sua afiliação na RD Vigor está inativa no momento.
+						<p class="text-base font-normal text-start">
+							Sua afiliação na RD Vigor está inativa no momento. Assine agora para aproveitar todas as vantagens da RD Vigor.
+						</p>
+						<p class="mb-5 text-base font-normal text-start">
+							Ao clicar em assinar você será redirecionado para um site seguro para inserir suas informações.
+						</p>
 					</span>
-					<button
-						x-on:click="checkout = !checkout"
-						class="py-1 px-3 w-fit font-normal text-base rounded-md text-white bg-[#FFBD59]"
-					>
-						Renovar Inscrição
-					</button>
+					<stripe-pricing-table
+						pricing-table-id="prctbl_1QKDpBP4MxIMgAthUbAJrOZW"
+						publishable-key="pk_test_51PtsLPP4MxIMgAth8ymcxGIUDZTilzzf9nOFiwkmXTKyT149RsxH4kXW9CKvUEt6jI02Pq5h8kVtaXfNlMI4RRXF00bT3of6po"
+						customer-email={ loggedUser.Email }
+					></stripe-pricing-table>
 				</div>
-			</template>
-			<template
-				x-if="!member && checkout"
-				x-data="{ checkoutState: 'loading' }"
-				x-init="$watch('checkout', async () => { checkoutState = await window.initializeStripe(); })"
-			>
-				<form class="w-full" id="payment-form">
-					<!-- ############################################ -->
-					<template x-if="checkoutState == 'loading'">
-						<div class="flex justify-center items-center w-full">
-							<img class="size-20" src="/static/img/loading.svg"/>
-						</div>
-					</template>
-					<!-- ############################################ -->
-					<template x-if="checkoutState == 'ready'">
-						<div class="flex flex-col mb-3 space-y-3 w-full">
-							<div class="flex w-full">
-								<span class="text-xl font-medium">Detalhes do produto</span>
-							</div>
-							<span class="text-base font-normal text-start">
-								<p class="text-xs opacity-50">Produto</p>
-								Inscrição de afiliado RD Vigor (1 ano)
-							</span>
-							<span class="text-base font-normal text-start">
-								<p class="text-xs opacity-50">Preço</p>
-								R$ 1.800,00
-							</span>
-							<hr class="my-3 w-full h-px bg-gray-200 border-0"/>
-							<div class="flex w-full">
-								<span class="text-xl font-medium">Pagamento</span>
-							</div>
-						</div>
-					</template>
-					<!-- ############################################ -->
-					<div id="payment-element"></div>
-					<div id="payment-message" class="hidden"></div>
-					<!-- ############################################ -->
-					<template x-if="checkoutState == 'ready'">
-						<div class="flex items-center mt-3 space-x-3">
-							<button
-								id="submit"
-								type="submit"
-								class="py-1 px-3 w-fit font-normal text-base rounded-md text-white bg-[#FFBD59]"
-							>
-								Concluir Compra
-							</button>
-							<button
-								x-on:click="checkout = !checkout"
-								class="text-base font-normal w-fit"
-							>
-								Cancelar
-							</button>
-						</div>
-					</template>
-					<!-- ############################################ -->
-				</form>
 			</template>
 		</div>
 	</div>

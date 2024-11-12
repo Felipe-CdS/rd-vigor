@@ -14,7 +14,7 @@ import (
 )
 
 type TagService interface {
-	CreateTag(n string) *services.ServiceLayerErr
+	CreateTag(n string, tc_id string) *services.ServiceLayerErr
 	SearchTagByName(n string) ([]repositories.Tag, *services.ServiceLayerErr)
 	GetAllTags() ([]repositories.Tag, *services.ServiceLayerErr)
 	GetTagByID(id string) (repositories.Tag, *services.ServiceLayerErr)
@@ -22,14 +22,16 @@ type TagService interface {
 }
 
 type TagHandler struct {
-	Service     TagService
-	UserService UserService
+	Service           TagService
+	UserService       UserService
+	TagCategorySerive TagCategoryService
 }
 
-func NewTagHandler(ts TagService, us UserService) *TagHandler {
+func NewTagHandler(ts TagService, us UserService, tcs TagCategoryService) *TagHandler {
 	return &TagHandler{
-		Service:     ts,
-		UserService: us,
+		Service:           ts,
+		UserService:       us,
+		TagCategorySerive: tcs,
 	}
 }
 
@@ -44,12 +46,16 @@ func (th *TagHandler) GetTagDashboard(c echo.Context) error {
 	tags, err := th.Service.GetAllTags()
 
 	if err != nil {
+	}
 
+	categories, err := th.TagCategorySerive.GetAllTagCategories()
+
+	if err != nil {
 	}
 
 	c.Response().Header().Set("HX-Retarget", "body")
 	c.Response().Header().Set("HX-Push-Url", "/admin/dashboard/users")
-	return th.View(c, tags_views.TagsDashboard("Dashboard", loggedUser, tags))
+	return th.View(c, tags_views.TagsDashboard("Dashboard", loggedUser, tags, categories))
 }
 
 func (th *TagHandler) CreateNewTag(c echo.Context) error {
@@ -65,7 +71,12 @@ func (th *TagHandler) CreateNewTag(c echo.Context) error {
 		return th.View(c, tags_views.ErrorAlert("Nome Inválido."))
 	}
 
-	if err := th.Service.CreateTag(c.FormValue("tag-name")); err != nil {
+	if c.FormValue("category-id") == "" {
+		c.Response().WriteHeader(http.StatusBadRequest)
+		return th.View(c, tags_views.ErrorAlert("Nome Inválido."))
+	}
+
+	if err := th.Service.CreateTag(c.FormValue("tag-name"), c.FormValue("category-id")); err != nil {
 		if err.Code == http.StatusInternalServerError {
 			c.Response().WriteHeader(http.StatusInternalServerError)
 			return th.View(c, tags_views.ErrorAlert("Um erro inesperado ocorreu no servidor. Por favor, tente novamente mais tarde."))
@@ -143,6 +154,27 @@ func (th *TagHandler) SearchTagNavbar(c echo.Context) error {
 	}
 
 	return th.View(c, layout.SearchModalResponsePartial(list, searchInput))
+}
+
+func (th *TagHandler) GetTagsSettingsPage(c echo.Context) error {
+
+	loggedUser := c.Get("user").(repositories.User)
+
+	list, err := th.Service.GetUserTags(loggedUser)
+
+	if err != nil {
+		c.Response().WriteHeader(err.Code)
+		return nil
+	}
+
+	categories, err := th.TagCategorySerive.GetAllTagCategories()
+
+	if err != nil {
+		c.Response().WriteHeader(err.Code)
+		return nil
+	}
+
+	return th.View(c, settings_views.TagsSettings(list, categories, loggedUser))
 }
 
 func (th *TagHandler) GetUserTags(c echo.Context) error {

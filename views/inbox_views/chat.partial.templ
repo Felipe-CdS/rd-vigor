@@ -24,12 +24,14 @@ templ Chat(recipient repositories.User, messages []repositories.Message, chatroo
 				<h1 class="text-xl truncate">
 					{ fmt.Sprintf("%s %s", recipient.FirstName, recipient.LastName) }
 				</h1>
-				<div class="flex items-center align-center">
-					<img class="inline mr-0.5 opacity-50 size-5" src="/static/img/buildings.svg"/>
-					<span class="text-xs truncate">
-						{ fmt.Sprintf("(%s)", recipient.CompanyName) }
-					</span>
-				</div>
+				if recipient.CompanyName != "" {
+					<div class="flex items-center align-center">
+						<img class="inline mr-0.5 opacity-50 size-5" src="/static/img/buildings.svg"/>
+						<span class="text-xs truncate">
+							{ fmt.Sprintf("(%s)", recipient.CompanyName) }
+						</span>
+					</div>
+				}
 			</div>
 			<!--
 			<button

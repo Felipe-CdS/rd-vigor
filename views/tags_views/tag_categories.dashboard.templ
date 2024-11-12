@@ -1,0 +1,28 @@
+package tags_views
+
+import (
+	"nugu.dev/rd-vigor/repositories"
+	"nugu.dev/rd-vigor/views/layout"
+)
+
+templ TagCategoriesDashboard(title string, user repositories.User, tc []repositories.TagCategory) {
+	@layout.Base(title, user, true) {
+		<div class="flex flex-col py-5 px-5 w-full grow bg-[#F0F2F5] items-center">
+			<form
+				hx-post="/admin/dashboard/tag-categories"
+				hx-target="body"
+				hx-target-error="#error-alert"
+				class="flex mb-5"
+			>
+				<input name="category-name" type="text" placeholder="Nome da nova categoria"/>
+				<button type="submit">Criar</button>
+			</form>
+			<span class="mb-5" id="error-alert"></span>
+			<ul id="tags-list">
+				for _, t := range tc {
+					<li>{ t.Name } </li>
+				}
+			</ul>
+		</div>
+	}
+}

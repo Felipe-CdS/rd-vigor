@@ -26,7 +26,6 @@ templ ProfileSettings() {
 			</template>
 		</div>
 		<!-- ############################################################################################### -->
-		@TagsSection()
 		@PortifolioSection()
 	</div>
 }
@@ -43,11 +42,27 @@ templ readDescription() {
 			</button>
 		</div>
 		<span class="text-base font-normal text-start">
+			<p class="text-xs opacity-50">Foto de Perfil</p>
+			<p class="text-xs">Não preenchido</p>
+		</span>
+		<span class="text-base font-normal text-start">
 			<p class="text-xs opacity-50">Descrição</p>
 			<p class="text-xs">Não preenchido</p>
 		</span>
 		<span class="text-base font-normal text-start">
 			<p class="text-xs opacity-50">Produto Principal</p>
+			<p class="text-xs">Não preenchido</p>
+		</span>
+		<span class="text-base font-normal text-start">
+			<p class="text-xs opacity-50">Nome da Empresa</p>
+			<p class="text-xs">Não preenchido</p>
+		</span>
+		<span class="text-base font-normal text-start">
+			<p class="text-xs opacity-50">Vídeo de Apresentação</p>
+			<p class="text-xs">Não preenchido</p>
+		</span>
+		<span class="text-base font-normal text-start">
+			<p class="text-xs opacity-50">Documento de Apresentação</p>
 			<p class="text-xs">Não preenchido</p>
 		</span>
 	</div>
@@ -73,41 +88,66 @@ templ editDescription() {
 			hx-target-error="#error-alert"
 			class="flex flex-col space-y-3 w-full"
 		>
-			<div class="flex flex-col justify-between items-center space-y-3 w-full md:flex-row md:space-y-0 md:space-x-3">
-				<label class="text-sm font-normal text-left text-gray-500 lg:w-1/2">
-					Primeiro Nome
-					<input
-						type="text"
-						name="first_name"
-						placeholder="Primeiro Nome"
-						class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
-					/>
-				</label>
-				<label class="text-sm font-normal text-left text-gray-500 lg:w-1/2">
-					Sobrenome
-					<input
-						type="text"
-						name="last_name"
-						placeholder="Sobrenome"
-						class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
-					/>
-				</label>
-			</div>
 			<label class="text-sm font-normal text-left text-gray-500">
-				Nome de Usuário
+				Foto de Perfil
 				<input
-					type="text"
-					name="username"
-					class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+					type="file"
+					accept=".jpg, .jpeg, .png, .pdf"
+					name="resume"
+					placeholder=""
+					class="py-3 px-4 mt-1 w-full text-sm text-black rounded-md border border-gray-200 border-solid"
 				/>
 			</label>
 			<label class="text-sm font-normal text-left text-gray-500">
-				Email
+				Descrição
+				<textarea
+					rows="5"
+					name="description"
+					placeholder="Descrição do seu perfil"
+					class="py-3 px-4 mt-1 w-full text-sm text-black rounded-md border border-gray-200 border-solid"
+				></textarea>
+			</label>
+			<label class="text-sm font-normal text-left text-gray-500">
+				Produto Principal
+				<textarea
+					rows="5"
+					name="description"
+					placeholder="Uma breve descrição do que você produz ou com o que trabalha"
+					class="py-3 px-4 mt-1 w-full text-sm text-black rounded-md border border-gray-200 border-solid"
+				></textarea>
+			</label>
+			<label class="text-sm font-normal text-left text-gray-500">
+				Nome da Empresa
 				<input
 					type="text"
-					name="email"
-					placeholder="E-mail"
-					class="py-3 px-4 mt-1 w-full text-base text-black rounded-md border border-gray-200 border-solid"
+					name="company_name"
+					placeholder="Nome da Empresa"
+					class="py-3 px-4 mt-1 w-full text-sm text-black rounded-md border border-gray-200 border-solid"
+				/>
+			</label>
+			<label class="text-sm font-normal text-left text-gray-500">
+				Video de apresentação
+				<p class="my-1 text-xs text-justify">
+					(Não obrigatório) Link de um vídeo curto no youtube mostrando o seu trabalho ou se apresentando.
+				</p>
+				<input
+					type="text"
+					name="presentation_video"
+					placeholder="Link do YouTube"
+					class="py-3 px-4 mt-1 w-full text-sm text-black rounded-md border border-gray-200 border-solid"
+				/>
+			</label>
+			<label class="text-sm font-normal text-left text-gray-500">
+				documento de apresentação 
+				<p class="my-1 text-xs text-justify">
+					(não obrigatório) uma foto ou pdf de um curriculo ou outro documento explicando melhor sobre as suas habilidades e experiências na área (png, jpg, jpeg, pdf).
+				</p>
+				<input
+					type="file"
+					accept=".jpg, .jpeg, .png, .pdf"
+					name="resume"
+					placeholder=""
+					class="py-3 px-4 mt-1 w-full text-sm text-black rounded-md border border-gray-200 border-solid"
 				/>
 			</label>
 			<span id="error-alert"></span>

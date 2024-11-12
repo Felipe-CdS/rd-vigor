@@ -129,6 +129,7 @@ CREATE TABLE meetings (
 	fk_user1_id UUID NOT NULL
 	, fk_user2_id UUID NOT NULL
 	, meeting_timestamp TIMESTAMP WITH TIME ZONE NOT NULL
+	, status TEXT NOT NULL DEFAULT 'invited'
 
 	, PRIMARY KEY(fk_user1_id, fk_user2_id, meeting_timestamp)
 	, FOREIGN KEY(fk_user1_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE

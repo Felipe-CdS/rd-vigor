@@ -19,6 +19,7 @@ func SetupRoutes(e *echo.Echo,
 	ph *PortifolioHandler,
 	ch *ChatroomHandler,
 	mh *MeetingHandler,
+	tch *TagCategoryHandler,
 ) {
 
 	e.GET("/", authMiddleware(uh, uh.GetHome))
@@ -66,6 +67,8 @@ func SetupRoutes(e *echo.Echo,
 	e.GET("/admin/dashboard/users/details", authMiddleware(uh, uh.GetUserDetails))
 	e.GET("/admin/dashboard/tags", authMiddleware(uh, th.GetTagDashboard))
 	e.POST("/admin/dashboard/tags", authMiddleware(uh, th.CreateNewTag))
+	e.GET("/admin/dashboard/tag-categories", authMiddleware(uh, tch.GetTagCategoryDashboard))
+	e.POST("/admin/dashboard/tag-categories", authMiddleware(uh, tch.CreateNewTagCategory))
 
 	/* EVENTS ROUTES*/
 	e.GET("/admin/dashboard/events", authMiddleware(uh, eh.GetEventDashboard))
@@ -109,8 +112,10 @@ func SetupRoutes(e *echo.Echo,
 	e.POST("/settings/contact-info/account", authMiddleware(uh, uh.UpdateUserAccountInfo))
 	e.POST("/settings/contact-info/location", authMiddleware(uh, uh.UpdateUserLocationInfo))
 
+	e.GET("/settings/tags", authMiddleware(uh, th.GetTagsSettingsPage))
 	e.GET("/settings/profile/tags", authMiddleware(uh, th.GetUserTags))
 	e.POST("/settings/profile/tags-search", authMiddleware(uh, uh.SearchTagByNameAvaiableToUser))
+	e.POST("/settings/profile/tags-search-by-category", authMiddleware(uh, tch.GetAllTagsByCategory))
 	e.PATCH("/settings/profile/tags", authMiddleware(uh, uh.SetUserTag))
 	e.DELETE("/settings/profile/tags", authMiddleware(uh, uh.DeleteUserTag))
 
@@ -120,7 +125,7 @@ func SetupRoutes(e *echo.Echo,
 	e.DELETE("/settings/profile/portifolio", authMiddleware(uh, ph.DeletePortifolio))
 
 	/* STRIPE ROUTES*/
-	e.POST("/create-subscription", authMiddleware(uh, HandleCreateSubscription))
+	e.POST("/create-anual-subscription", authMiddleware(uh, HandleCreateAnualSubscription))
 
 	e.POST("/stripe-webhook", func(c echo.Context) error {
 		HandleWebhook(c, uh)

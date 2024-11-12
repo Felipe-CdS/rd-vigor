@@ -43,27 +43,30 @@ func main() {
 	cr := repositories.NewChatroomRepository(repositories.Chatroom{}, store)
 	mr := repositories.NewMessageRepository(repositories.Message{}, store)
 
+	tcr := repositories.NewTagCategoryRepository(repositories.TagCategory{}, store)
 	meetingr := repositories.NewMeetingRepository(repositories.Meeting{}, store)
 
-	ts := services.NewTagService(tr)
+	ts := services.NewTagService(tr, tcr)
 	us := services.NewUserService(ur, tr)
 	es := services.NewEventService(er)
 	ps := services.NewPortifolioService(pr)
 	cs := services.NewChatroomService(cr)
 	ms := services.NewMessageService(mr)
 
+	tcs := services.NewTagCategoryService(tcr)
 	meetings := services.NewMeetingService(meetingr)
 
-	th := handlers.NewTagHandler(ts, us)
+	th := handlers.NewTagHandler(ts, us, tcs)
 	uh := handlers.NewUserHandler(us, es, ps, ts)
 	eh := handlers.NewEventHandler(es)
 	ph := handlers.NewPortifolioHandler(ps)
 	ch := handlers.NewChatroomHandler(cs, us, ms)
 	mh := handlers.NewMeetingHandler(meetings, us)
+	tch := handlers.NewTagCategoryHandler(tcs)
 
 	wsServer := chat.NewWsSever(mr)
 
-	handlers.SetupRoutes(e, wsServer, uh, eh, th, ph, ch, mh)
+	handlers.SetupRoutes(e, wsServer, uh, eh, th, ph, ch, mh, tch)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", port)))
 }

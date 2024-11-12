@@ -1,0 +1,241 @@
+package settings_views
+
+import (
+	"fmt"
+	"nugu.dev/rd-vigor/repositories"
+)
+
+templ TagsSettings(list []repositories.Tag, categories []repositories.TagCategory, user repositories.User) {
+	<div class="flex overflow-y-scroll flex-col p-5 space-y-3 w-full h-full text-center">
+		<h1 class="hidden font-semibold lg:block lg:text-2xl text-start">Tags</h1>
+		<button
+			x-on:click="state = 'menu'"
+			class="font-medium lg:hidden text-start"
+		>
+			<img class="inline ml-auto w-6 rotate-180" src="/static/img/arrow-right-3.svg"/>
+			Voltar
+		</button>
+		<!-- ############################################################################################### -->
+		@UserTagsList(list, user)
+		@searchTagsSection(categories)
+		@createTagsSection()
+	</div>
+}
+
+templ searchTagsSection(categories []repositories.TagCategory) {
+	<div
+		id="tags-section"
+		x-data="{ state: 'read', selected: '', search: 'category' }"
+		class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
+	>
+		<span class="text-xl font-medium">Buscar Tags</span>
+		<span class="mb-2 text-sm font-normal text-left text-gray-400 md:text-sm">
+			As suas tags são parte importante da sua conta porque é com elas que as pessoas vão te encontrar.
+			Escolha algumas que combinam com a sua área.
+		</span>
+		<div class="flex mb-2 w-full text-sm font-normal text-gray-400 md:text-sm">
+			<button
+				href="/events"
+				class="px-1"
+				x-on:click="search = 'category'"
+				x-bind:style="search == 'category' && { 
+						'border-bottom-width': '2px',
+						'border-color': '#ed6c09',
+						'color': '#ed6c09',
+						'padding-bottom': '0.5rem',
+						}"
+			>
+				Por Categoria
+			</button>
+			<button
+				href="/events?p=true"
+				class="ml-3"
+				x-on:click="search = 'name'"
+				x-bind:style="search == 'name' && { 
+						'border-bottom-width': '2px',
+						'border-color': '#ed6c09',
+						'color': '#ed6c09',
+						'padding-bottom': '0.5rem',
+						}"
+			>
+				Por Nome
+			</button>
+		</div>
+		<template x-if="search == 'category'">
+			<form
+				id="new-tag-form"
+				hx-post="/settings/profile/tags-search-by-category"
+				hx-target="#tags-by-category-list"
+				hx-swap="innerHTML"
+				class="flex relative flex-row items-center w-full h-14"
+			>
+				<select
+					name="category-name"
+					placeholder="Selectionar Categoria"
+					class="flex py-3 px-4 bg-white rounded-md border border-gray-200 border-solid grow"
+				>
+					for _, c := range categories {
+						<option
+							value={ c.ID }
+							class="text-sm font-normal text-left text-gray-400 md:text-sm"
+						>{ c.Name }</option>
+					}
+				</select>
+				<button
+					type="submit"
+					class="px-2 py-1 ml-2 h-fit rounded-md text-white bg-[#FFBD59]"
+				>
+					Buscar
+				</button>
+			</form>
+		</template>
+		<template x-if="search == 'name'">
+			<form
+				id="new-tag-form"
+				hx-post="/settings/profile/tags"
+				hx-target="tags-list"
+				hx-swap="innerHTML"
+				class="flex relative flex-row w-full h-14"
+			>
+				<input
+					type="search"
+					name="settings-tag-search"
+					hx-post="/settings/profile/tags-search"
+					hx-trigger="input changed delay:500ms, search"
+					hx-target="#search-results"
+					hx-indicator=".htmx-indicator"
+					placeholder="Buscar tag"
+					autocomplete="off"
+					class="flex absolute z-40 py-3 px-4 w-full rounded-md border border-gray-200 border-solid"
+				/>
+			</form>
+		</template>
+		<div
+			id="tags-by-category-list"
+			class="flex flex-col py-1 px-2 pt-3 w-full"
+		></div>
+	</div>
+}
+
+templ createTagsSection() {
+	<div
+		id="tags-section"
+		x-data="{ state: 'read', selected: '', search: 'category' }"
+		class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
+	>
+		<span class="text-xl font-medium">Criar Nova Tag</span>
+		<span class="mb-2 text-sm font-normal text-left text-gray-400 md:text-sm">
+			Não encontrou a tag que gostaria? Escolha uma categoria e crie exatamente como desejar.
+		</span>
+		<form
+			id="new-tag-form"
+			hx-post="/settings/profile/tags"
+			hx-target="tags-list"
+			hx-swap="innerHTML"
+			class="flex relative flex-row w-full h-14"
+		>
+			<input
+				type="search"
+				name="settings-tag-search"
+				hx-post="/settings/profile/tags-search"
+				placeholder="Adicionar nova tag"
+				autocomplete="off"
+				class="flex absolute z-40 py-3 px-4 w-full rounded-md border border-gray-200 border-solid"
+			/>
+			<div
+				id="search-results"
+				class="flex absolute top-10 z-20 flex-col py-1 px-2 pt-3 w-full font-normal text-gray-800 bg-gray-100 rounded-b-md"
+			></div>
+		</form>
+	</div>
+}
+
+templ SearchTagsList(searchTag string, list []repositories.Tag, user repositories.User) {
+	if searchTag == "" {
+	} else if len(list) == 0 {
+		<div class="flex p-3 w-full">
+			Tag não encontrada.
+		</div>
+	} else {
+		for _, t := range list {
+			<div
+				id={ fmt.Sprintf("tag-add-select-%s", t.ID) }
+				class="flex p-3 w-full"
+			>
+				{ t.Name }
+				<button
+					name="settings-set-tag"
+					hx-patch={ fmt.Sprintf("/settings/profile/tags?tag=%s", t.ID) }
+					hx-target={ fmt.Sprintf("#tag-add-select-%s", t.ID) }
+					hx-swap="outerHTML"
+					class="ml-auto"
+				>
+					<img class="opacity-40 hover:opacity-100 size-6" src="/static/img/arrow-right-2.svg"/>
+				</button>
+			</div>
+		}
+	}
+}
+
+templ UserTagsList(list []repositories.Tag, user repositories.User) {
+	<div
+		id="tags-section"
+		x-data="{ state: 'read', selected: '', search: 'category' }"
+		class="flex flex-col items-start p-5 w-full rounded-xl border border-gray-200"
+	>
+		<span class="mb-3 text-xl font-medium">Suas Tags</span>
+		<div
+			id="tags-list"
+			class="flex mb-3 space-x-1 w-full"
+		>
+			for _, t := range list {
+				<div
+					id={ fmt.Sprintf("tag-bubble-%s", t.ID) }
+					class="flex items-center py-1 px-3 text-gray-800 bg-gray-200 rounded rounded-full"
+				>
+					<span>
+						{ t.Name }
+					</span>
+					<button
+						class="ml-1"
+					>
+						<img class="opacity-40 hover:opacity-100 size-5" src="/static/img/close.svg"/>
+					</button>
+				</div>
+			}
+		</div>
+	</div>
+}
+
+templ TagsByCategoryList(loggedUser repositories.User, list []repositories.Tag) {
+	if len(list) == 0 {
+		<span class="mb-2 text-sm font-normal text-left text-gray-400 md:text-sm">
+			Nenhuma tag encontrada.
+		</span>
+	}
+	<div
+		id="tags-by-category-list"
+		class="flex mb-3 space-x-1 w-full"
+	>
+		for _, t := range list {
+			<div
+				id={ fmt.Sprintf("tag-bubble-%s", t.ID) }
+				class="flex items-center py-1 px-3 text-gray-800 bg-gray-200 rounded rounded-full"
+			>
+				<span>
+					{ t.Name }
+				</span>
+				<form
+					class="flex items-center"
+					hx-patch="/settings/profile/tags"
+				>
+					<input class="hidden" name="user" value={ loggedUser.ID }/>
+					<input class="hidden" name="tag" value={ t.ID }/>
+					<button type="submit">
+						<img class="opacity-40 hover:opacity-100 size-5" src="/static/img/plus.svg"/>
+					</button>
+				</form>
+			</div>
+		}
+	</div>
+}

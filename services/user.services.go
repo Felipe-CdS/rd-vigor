@@ -227,7 +227,7 @@ func putFileS3(f *multipart.FileHeader) *ServiceLayerErr {
 
 func (us *UserService) SetNewTagUser(username string, tagId string) *ServiceLayerErr {
 
-	user, err := us.Repository.GetUserByUsername(username)
+	user, err := us.Repository.GetUser(username)
 
 	if err != nil {
 		return &ServiceLayerErr{err.Error, "Query Err 1", http.StatusInternalServerError}
@@ -236,6 +236,7 @@ func (us *UserService) SetNewTagUser(username string, tagId string) *ServiceLaye
 	tag, err := us.TagRepository.GetTagById(tagId)
 
 	if err != nil {
+		fmt.Println(err)
 		return &ServiceLayerErr{err.Error, "Query Err 2", http.StatusInternalServerError}
 	}
 

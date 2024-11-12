@@ -7,7 +7,7 @@ import (
 )
 
 type TagRepository interface {
-	CreateTag(t repositories.Tag) *repositories.RepositoryLayerErr
+	CreateTag(t repositories.Tag, tc repositories.TagCategory) *repositories.RepositoryLayerErr
 	CheckTagExists(name string) bool
 	GetAllTags() ([]repositories.Tag, *repositories.RepositoryLayerErr)
 	SearchTagByName(name string) ([]repositories.Tag, *repositories.RepositoryLayerErr)
@@ -19,26 +19,32 @@ type TagRepository interface {
 }
 
 type TagService struct {
-	Repository TagRepository
+	Repository            TagRepository
+	TagCategoryRepository TagCategoryRepository
 }
 
-func NewTagService(tr TagRepository) *TagService {
+func NewTagService(tr TagRepository, tcr TagCategoryRepository) *TagService {
 	return &TagService{
-		Repository: tr,
+		Repository:            tr,
+		TagCategoryRepository: tcr,
 	}
 }
 
-func (ts *TagService) CreateTag(n string) *ServiceLayerErr {
+func (ts *TagService) CreateTag(n string, tc_id string) *ServiceLayerErr {
 
 	newTag := repositories.Tag{
 		Name: n,
+	}
+
+	category := repositories.TagCategory{
+		ID: tc_id,
 	}
 
 	if ts.Repository.CheckTagExists(n) {
 		return &ServiceLayerErr{nil, "Tag já cadastrada.", http.StatusBadRequest}
 	}
 
-	err := ts.Repository.CreateTag(newTag)
+	err := ts.Repository.CreateTag(newTag, category)
 
 	if err != nil {
 		return &ServiceLayerErr{err.Error, "Query Err", http.StatusInternalServerError}

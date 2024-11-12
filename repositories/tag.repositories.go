@@ -9,8 +9,9 @@ import (
 )
 
 type Tag struct {
-	ID   string `JSON:"tag_id"`
-	Name string `JSON:"name"`
+	ID         string `JSON:"tag_id"`
+	Name       string `JSON:"name"`
+	CategoryID string `JSON:"fk_category_id"`
 }
 
 type TagRepository struct {
@@ -26,14 +27,15 @@ func NewTagRepository(t Tag, tStore db.Store) *TagRepository {
 	}
 }
 
-func (tr *TagRepository) CreateTag(t Tag) *RepositoryLayerErr {
+func (tr *TagRepository) CreateTag(t Tag, tc TagCategory) *RepositoryLayerErr {
 
-	stmt := `INSERT INTO tags (tag_id, tag_name) VALUES ($1, $2)`
+	stmt := `INSERT INTO tags (tag_id, tag_name, fk_category_id) VALUES ($1, $2, $3)`
 
 	_, err := tr.TagStore.Db.Exec(
 		stmt,
 		uuid.New(),
 		strings.ToLower(t.Name),
+		tc.ID,
 	)
 
 	if err != nil {
@@ -98,6 +100,7 @@ func (tr *TagRepository) SearchTagByName(name string) ([]Tag, *RepositoryLayerEr
 		if err := rows.Scan(
 			&tag.ID,
 			&tag.Name,
+			&tag.CategoryID,
 		); err != nil {
 			return nil, &RepositoryLayerErr{err, "Insert Error"}
 		}
@@ -150,6 +153,7 @@ func (tr *TagRepository) GetTagById(id string) (Tag, *RepositoryLayerErr) {
 	if err := tr.TagStore.Db.QueryRow(stmt, id).Scan(
 		&t.ID,
 		&t.Name,
+		&t.CategoryID,
 	); err != nil {
 		return t, &RepositoryLayerErr{err, "Insert Error"}
 	}
@@ -195,6 +199,7 @@ func (tr *TagRepository) GetUserTags(u User) ([]Tag, *RepositoryLayerErr) {
 			if err := rows.Scan(
 				&t.ID,
 				&t.Name,
+				&t.CategoryID,
 			); err != nil {
 				return nil, &RepositoryLayerErr{err, "Search Error"}
 			}

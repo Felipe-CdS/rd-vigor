@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/stripe/stripe-go/v79"
@@ -57,7 +58,7 @@ func CreatePaymentIntent(c echo.Context) error {
 }
 
 // https://docs.stripe.com/billing/subscriptions/overview
-func HandleCreateSubscription(c echo.Context) error {
+func HandleCreateAnualSubscription(c echo.Context) error {
 
 	loggedUser := c.Get("user").(repositories.User)
 
@@ -143,13 +144,25 @@ func HandleWebhook(c echo.Context, uh *UserHandler) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	customer := fmt.Sprintf("%v", event.Data.Object["customer"])
+	var email string
+	var customerId string
+	if event.GetObjectValue("customer_details") != "" {
+		customerId = fmt.Sprint(event.GetObjectValue("customer"))
+		email = fmt.Sprint(event.GetObjectValue("customer_details", "email"))
+	}
 
-	u, queryErr := uh.UserServices.GetUserByStripeID(customer)
+	u, queryErr := uh.UserServices.GetUser(email)
 	updatedUser := u
 
 	if queryErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+
+	if event.Type == "checkout.session.complete" {
+		fmt.Println(u.ID)
+		updatedUser.StripeID = customerId
+		updatedUser.SubscriptionStatus = true
+		updatedUser.SubscriptionExpiresAt = time.Now().Add(time.Hour * 24 * 31)
 	}
 
 	if event.Type == "payment_intent.succeeded" {
