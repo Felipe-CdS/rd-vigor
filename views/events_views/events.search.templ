@@ -77,10 +77,10 @@ templ eventCard(e repositories.Event) {
 						{ e.Title }
 					</h1>
 				</div>
-				<span>Organizado por RD vigor </span>
+				<span>Organizado por RD Vigor </span>
 				<span class="flex items-center mt-auto">
 					<img class="mr-1 opacity-50 size-5" src="/static/img/map.svg"/>
-					<span class="mt-auto">{ e.Address }</span>
+					<span class="mt-auto">{  fmt.Sprintf("%s, %s", e.Address, e.Address2) }</span>
 				</span>
 				<span class="flex items-center mt-1">
 					<img class="mr-1 opacity-50 size-5" src="/static/img/clock.svg"/>

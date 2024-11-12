@@ -11,10 +11,13 @@ type Event struct {
 	ID          string    `json:"id"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
+	Price       int       `json:"price"`
 	CoverPath   string    `json:"cover_path"`
 	MapsLink    string    `json:"maps_link"`
 	Address     string    `json:"address"`
-	Price       int       `json:"price"`
+	Address2    string    `json:"address2"`
+	City        string    `json:"city"`
+	State       string    `json:"state"`
 	Date        time.Time `json:"date"`
 }
 
@@ -33,18 +36,21 @@ func NewEventRepository(e Event, eStore db.Store) *EventRepository {
 func (er *EventRepository) CreateEvent(e Event) *RepositoryLayerErr {
 
 	stmt := `INSERT INTO events 
-		(id, title, description, cover_path, maps_link, address, price, date) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+		(id, title, description, price, cover_path, maps_link, address, address2, city, state, date) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 
 	_, err := er.EventStore.Db.Exec(
 		stmt,
 		uuid.New(),
 		e.Title,
 		e.Description,
+		e.Price,
 		e.CoverPath,
 		e.MapsLink,
 		e.Address,
-		e.Price,
+		e.Address2,
+		e.City,
+		e.State,
 		e.Date,
 	)
 
@@ -71,7 +77,6 @@ func (er *EventRepository) GetEvents(past bool) ([]Event, *RepositoryLayerErr) {
 
 	if err != nil {
 		return nil, &RepositoryLayerErr{err, "Query Error"}
-
 	}
 
 	for rows.Next() {
@@ -80,11 +85,14 @@ func (er *EventRepository) GetEvents(past bool) ([]Event, *RepositoryLayerErr) {
 			&e.ID,
 			&e.Title,
 			&e.Description,
+			&e.Price,
 			&e.CoverPath,
 			&e.MapsLink,
 			&e.Address,
+			&e.Address2,
+			&e.City,
+			&e.State,
 			&e.Date,
-			&e.Price,
 		); err != nil {
 			return nil, &RepositoryLayerErr{err, "Query Error"}
 		}
@@ -104,11 +112,14 @@ func (er *EventRepository) GetEventByID(id string) (Event, *RepositoryLayerErr) 
 		&e.ID,
 		&e.Title,
 		&e.Description,
+		&e.Price,
 		&e.CoverPath,
 		&e.MapsLink,
 		&e.Address,
+		&e.Address2,
+		&e.City,
+		&e.State,
 		&e.Date,
-		&e.Price,
 	); err != nil {
 		return e, &RepositoryLayerErr{err, "Query Error"}
 	}
@@ -127,11 +138,14 @@ func (er *EventRepository) GetNextEvent() (Event, *RepositoryLayerErr) {
 		&e.ID,
 		&e.Title,
 		&e.Description,
+		&e.Price,
 		&e.CoverPath,
 		&e.MapsLink,
 		&e.Address,
+		&e.Address2,
+		&e.City,
+		&e.State,
 		&e.Date,
-		&e.Price,
 	); err != nil {
 		return e, &RepositoryLayerErr{err, "Query Error"}
 	}
